@@ -27,6 +27,88 @@ describe("GET /api/user/:id", () => {
   });
 });
 
+describe("GET /api/user/:username/preferences", () => {
+  it("should 404 for nonexistent users", async () => {
+    response = await supertest(app).get(`/api/user/${randomUUID().toString()}/preferences`);
+    expect(response.status).toBe(404);
+    expect(response.body).toStrictEqual({ error: "User not found" });
+  });
+
+  it("should return default preferences for existing users", async () => {
+    response = await supertest(app).get("/api/user/user1/preferences");
+    expect(response.status).toBe(200);
+    expect(response.body).toStrictEqual({
+      theme: "light",
+      fontSize: "medium",
+      updatedAt: expect.anything(),
+    });
+  });
+});
+
+describe("POST /api/user/:username/preferences", () => {
+  it("should return 400 on ill-formed payload", async () => {
+    response = await supertest(app)
+      .post("/api/user/user1/preferences")
+      .send({ auth: auth1, payload: { theme: "neon" } });
+    expect(response.status).toBe(400);
+    expect(response.body).toStrictEqual({ error: "Poorly-formed request" });
+  });
+
+  it("should reject invalid authorization", async () => {
+    response = await supertest(app)
+      .post("/api/user/user1/preferences")
+      .send({ auth: { ...auth1, password: "wrong" }, payload: { theme: "dark" } });
+    expect(response.status).toBe(403);
+    expect(response.body).toStrictEqual({ error: "Invalid credentials" });
+  });
+
+  it("requires the authorization to match the route", async () => {
+    response = await supertest(app)
+      .post("/api/user/user1/preferences")
+      .send({ auth: auth2, payload: { theme: "dark" } });
+    expect(response.status).toBe(403);
+    expect(response.body).toStrictEqual({ error: "Invalid credentials" });
+  });
+
+  it("should update preferences with partial patches", async () => {
+    response = await supertest(app)
+      .post("/api/user/user1/preferences")
+      .send({ auth: auth1, payload: { theme: "dark" } });
+    expect(response.status).toBe(200);
+    expect(response.body).toStrictEqual({
+      theme: "dark",
+      fontSize: "medium",
+      updatedAt: expect.anything(),
+    });
+
+    response = await supertest(app).get("/api/user/user1/preferences");
+    expect(response.status).toBe(200);
+    expect(response.body).toStrictEqual({
+      theme: "dark",
+      fontSize: "medium",
+      updatedAt: expect.anything(),
+    });
+
+    response = await supertest(app)
+      .post("/api/user/user1/preferences")
+      .send({
+        auth: auth1,
+        payload: {
+          profilePictureChoice: "avatar-3",
+          banner: { imageUrl: "https://example.com/banner.png", position: "center" },
+        },
+      });
+    expect(response.status).toBe(200);
+    expect(response.body).toStrictEqual({
+      theme: "dark",
+      fontSize: "medium",
+      profilePictureChoice: "avatar-3",
+      banner: { imageUrl: "https://example.com/banner.png", position: "center" },
+      updatedAt: expect.anything(),
+    });
+  });
+});
+
 describe("POST /api/user/login", () => {
   it("should return 400 on ill-formed payload", async () => {
     response = await supertest(app)

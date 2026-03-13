@@ -23,3 +23,42 @@ export const zUserUpdateRequest = z.object({
   password: z.string().optional(),
   display: z.string().optional(),
 });
+
+/**
+ * Banner display preferences.
+ */
+export interface BannerPreferences {
+  imageUrl?: string;
+  position?: "top" | "center" | "bottom";
+  overlayOpacity?: number;
+}
+
+/**
+ * User display preferences persisted to the user account.
+ */
+export interface UserPreferences {
+  theme: "light" | "dark";
+  fontSize: "small" | "medium" | "large";
+  profilePictureChoice?: string;
+  profilePictureUrl?: string;
+  banner?: BannerPreferences;
+  updatedAt: Date;
+}
+
+/**
+ * Represents allowed updates to user display preferences.
+ */
+export type UserPreferencesUpdateRequest = z.infer<typeof zUserPreferencesUpdateRequest>;
+export const zUserPreferencesUpdateRequest = z.object({
+  theme: z.enum(["light", "dark"]).optional(),
+  fontSize: z.enum(["small", "medium", "large"]).optional(),
+  profilePictureChoice: z.string().optional(),
+  profilePictureUrl: z.string().optional(),
+  banner: z
+    .object({
+      imageUrl: z.string().optional(),
+      position: z.enum(["top", "center", "bottom"]).optional(),
+      overlayOpacity: z.number().min(0).max(1).optional(),
+    })
+    .optional(),
+});

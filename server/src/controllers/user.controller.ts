@@ -1,4 +1,11 @@
-import { type SafeUserInfo, withAuth, zUserAuth, zUserUpdateRequest } from "@gamenite/shared";
+import {
+  type SafeUserInfo,
+  type UserPreferences,
+  withAuth,
+  zUserAuth,
+  zUserPreferencesUpdateRequest,
+  zUserUpdateRequest,
+} from "@gamenite/shared";
 import {
   createUser,
   getUsersByUsername,
@@ -8,6 +15,22 @@ import {
 import { type RestAPI } from "../types.ts";
 import { z } from "zod";
 import { checkAuth, getUserByUsername } from "../services/auth.service.ts";
+import type { UserPreferencesRecord } from "../models.ts";
+import {
+  getOrCreateUserPreferences,
+  updateUserPreferences,
+} from "../services/userPreferences.service.ts";
+
+function populateUserPreferences(record: UserPreferencesRecord): UserPreferences {
+  return {
+    theme: record.theme,
+    fontSize: record.fontSize,
+    profilePictureChoice: record.profilePictureChoice,
+    profilePictureUrl: record.profilePictureUrl,
+    banner: record.banner,
+    updatedAt: new Date(record.updatedAt),
+  };
+}
 
 /**
  * Handles user login by validating credentials.
@@ -79,6 +102,46 @@ export const getByUsername: RestAPI<SafeUserInfo, { username: string }> = async 
     return;
   }
   res.send(await populateSafeUserInfo(user.userId));
+};
+
+/**
+ * Retrieves preferences for a user by username.
+ */
+export const getByUsernamePreferences: RestAPI<UserPreferences, { username: string }> = async (
+  req,
+  res,
+) => {
+  const user = await getUserByUsername(req.params.username);
+  if (!user) {
+    res.status(404).send({ error: "User not found" });
+    return;
+  }
+
+  const preferences = await getOrCreateUserPreferences(user.userId);
+  res.send(populateUserPreferences(preferences));
+};
+
+/**
+ * Updates preferences for a user by username.
+ */
+export const postByUsernamePreferences: RestAPI<UserPreferences, { username: string }> = async (
+  req,
+  res,
+) => {
+  const body = withAuth(zUserPreferencesUpdateRequest).safeParse(req.body);
+  if (!body.success) {
+    res.status(400).send({ error: "Poorly-formed request" });
+    return;
+  }
+
+  const user = await checkAuth(body.data.auth);
+  if (!user || user.username !== req.params.username) {
+    res.status(403).send({ error: "Invalid credentials" });
+    return;
+  }
+
+  const preferences = await updateUserPreferences(user.userId, body.data.payload, new Date());
+  res.send(populateUserPreferences(preferences));
 };
 
 /**

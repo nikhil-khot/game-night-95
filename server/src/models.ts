@@ -160,3 +160,75 @@ export interface UserPreferencesRecord {
   banner?: BannerPreferences;
   updatedAt: DateISO;
 }
+
+/**
+ * Represents the possible states of a friendship between two users.
+ *
+ * - `"pending"`  — A friend request has been sent but not yet responded to.
+ * - `"accepted"` — The request was accepted; the two users are now friends.
+ * - `"declined"` — The request was declined, or a prior friendship was removed.
+ */
+export type FriendStatus = "pending" | "accepted" | "declined";
+
+/**
+ * Represents a friendship or friend request between two users.
+ *
+ * `fromUserId`: the user ID of the person who sent the friend request
+ * `toUserId`: the user ID of the person who received the friend request
+ * `status`: the current status of this relationship (pending, accepted, or declined)
+ * `createdAt`: when the friend request was sent
+ * `updatedAt`: when the friend request was last updated (e.g., accepted or declined)
+ */
+
+export interface FriendRecord {
+  fromUserId: string; // who sent the request
+  toUserId: string; // who received it
+  status: FriendStatus; // current state of the relationship
+  createdAt: string; // ISO timestamp of when request was sent
+  updatedAt: string; // ISO timestamp of last status change
+}
+
+/**
+ * The role a user can hold within a club.
+ *
+ * - `"owner"` — Created the club. Can promote/demote admins and remove any member.
+ *               There is exactly one owner per club at all times.
+ * - `"admin"` — Elevated member. Can remove regular members but not other admins or the owner.
+ * - `"member"` — Standard club member with no moderation privileges.
+ */
+export type ClubRole = "owner" | "admin" | "member";
+
+/**
+ * Represents a single member's entry within a club,
+ * including their role and contribution to the club leaderboard.
+ * - `userId`: the user ID of this member
+ * - `role`: the member's role within the club (owner, admin, or member)
+ * - `points`: leaderboard points this member has earned within the club
+ * - `joinedAt`: when this user joined the club
+ */
+export interface ClubMember {
+  userId: string;
+  role: ClubRole;
+  points: number;
+  joinedAt: string;
+}
+
+/**
+ * Represents a club — a persistent group that users can join, compete in, and communicate within.
+ * - `name`: the club's display name; must be unique across all clubs
+ * - `description`: a short bio or description for the club
+ * - `members`: the list of current club members, each with their role and leaderboard points; the owner is always present in this list with role `"owner"`
+ * - `createdAt`: when the club was created
+ *
+ *
+ * @todo Decide what happens when the owner leaves — options are:
+ *   1. Club is deleted
+ *   2. Ownership transfers to the longest-standing admin (or member)
+ *
+ */
+export interface ClubRecord {
+  name: string;
+  description: string;
+  members: ClubMember[];
+  createdAt: string;
+}

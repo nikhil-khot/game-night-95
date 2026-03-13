@@ -10,7 +10,7 @@ export const battleshipLogic: GameLogic<BattleshipState, BattleshipView> = {
   },
   update: function (
     state: BattleshipState,
-    movePayload: unknown,
+    payload: unknown,
     playerIndex: number,
   ): BattleshipState | null {
     throw new Error("Function not implemented.");
@@ -25,9 +25,9 @@ export const battleshipLogic: GameLogic<BattleshipState, BattleshipView> = {
     throw new Error("Function not implemented.");
   },
   describeMove: function (
-    prevState: BattleshipState,
+    _prevState: BattleshipState,
     newState: BattleshipState,
-    movePayload: unknown,
+    payload: unknown,
     playerIndex: number,
   ): string {
     throw new Error("Function not implemented.");

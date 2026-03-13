@@ -44,6 +44,10 @@ describe("sendFriendRequest/respondToFriendRequest", () => {
       error: "User nope not found",
     });
 
+    await expect(sendFriendRequest("user2", "nonexistent")).resolves.toStrictEqual({
+      error: "User nonexistent not found",
+    });
+
     await expect(respondToFriendRequest("user2", "ghost", "accepted")).resolves.toStrictEqual({
       error: "User ghost not found",
     });
@@ -81,6 +85,15 @@ describe("getFriends/getPendingRequests/removeFriend", () => {
     await expect(removeFriend("user1", "user2")).resolves.toBeUndefined();
     await expect(removeFriend("user1", "user2")).resolves.toStrictEqual({
       error: "These users are not friends",
+    });
+  });
+
+  it("returns not-found errors for invalid users", async () => {
+    await expect(removeFriend("user1", "nope")).resolves.toStrictEqual({
+      error: "User nope not found",
+    });
+    await expect(removeFriend("ghost", "user2")).resolves.toStrictEqual({
+      error: "User ghost not found",
     });
   });
 });

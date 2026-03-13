@@ -1,5 +1,6 @@
 import { type SafeUserInfo, type UserUpdateRequest } from "@gamenite/shared";
 import { getUserByUsername, updateAuth } from "./auth.service.ts";
+import { createDefaultUserPreferences } from "./userPreferences.service.ts";
 import { UserRepo } from "../repository.ts";
 
 const disallowedUsernames = new Set(["login", "signup", "list"]);
@@ -42,6 +43,7 @@ export async function createUser(
     display: username,
   });
   await updateAuth(username, password, id);
+  await createDefaultUserPreferences(id, createdAt);
   return Promise.resolve({
     username,
     createdAt,

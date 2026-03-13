@@ -1,6 +1,7 @@
 import useLoginContext from "../hooks/useLoginContext.ts";
 import "./Header.css";
 import { useNavigate } from "react-router-dom";
+import { resetDisplayPreferences } from "../util/displayPreferences.ts";
 
 /**
  * Header component that renders the main title.
@@ -16,6 +17,7 @@ export default function Header() {
       <button
         className="narrowcenter secondary"
         onClick={() => {
+          resetDisplayPreferences();
           reset();
           navigate("/login");
         }}

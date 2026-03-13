@@ -1,7 +1,7 @@
 /* eslint no-console: "off" */
 
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Login from "./pages/Login.tsx";
 import type { AuthContext } from "./contexts/LoginContext.ts";
 import Layout from "./components/Layout.tsx";
@@ -19,6 +19,9 @@ import { ErrorBoundary } from "react-error-boundary";
 import fallback from "./fallback.tsx";
 import NewThread from "./pages/NewThread.tsx";
 import TimeContextKeeper from "./components/UpdatingTimeContext.tsx";
+import Preferences from "./pages/Preferences.tsx";
+import ApplyUserPreferences from "./components/ApplyUserPreferences.tsx";
+import { resetDisplayPreferences } from "./util/displayPreferences.ts";
 
 /** If `true`, all incoming socket messages will be logged */
 const DEBUG_SOCKETS = false;
@@ -45,6 +48,13 @@ function NoSuchRoute() {
 
 export default function App() {
   const [auth, setAuth] = useState<AuthContext | null>(null);
+
+  useEffect(() => {
+    if (auth === null) {
+      resetDisplayPreferences();
+    }
+  }, [auth]);
+
   return (
     socket && (
       <BrowserRouter>
@@ -54,9 +64,12 @@ export default function App() {
             element={
               <LoggedInRoute auth={auth} socket={socket}>
                 <TimeContextKeeper updateFrequency={20 * 1000}>
-                  <ErrorBoundary fallbackRender={fallback}>
-                    <Layout />
-                  </ErrorBoundary>
+                  <>
+                    <ApplyUserPreferences />
+                    <ErrorBoundary fallbackRender={fallback}>
+                      <Layout />
+                    </ErrorBoundary>
+                  </>
                 </TimeContextKeeper>
               </LoggedInRoute>
             }
@@ -69,6 +82,7 @@ export default function App() {
             <Route path="/game/new" element={<NewGame />} />
             <Route path="/game/:gameId" element={<Game />} />
             <Route path="/profile/:username" element={<Profile />} />
+            <Route path="/preferences" element={<Preferences />} />
             <Route path="/*" element={<NoSuchRoute />} />
           </Route>
         </Routes>

@@ -216,7 +216,7 @@ export interface ClubMember {
 /**
  * Represents a club — a persistent group that users can join, compete in, and communicate within.
  * - `name`: the club's display name; must be unique across all clubs
- * - `description`: a short bio or description for the club 
+ * - `description`: a short bio or description for the club
  * - `members`: the list of current club members, each with their role and leaderboard points; the owner is always present in this list with role `"owner"`
  * - `createdAt`: when the club was created
  *

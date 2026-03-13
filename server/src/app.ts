@@ -62,6 +62,7 @@ io.on("connection", (socket) => {
   socket.on("chatSendMessage", chat.socketSendMessage(socket, io));
 
   socket.on("gameJoinAsPlayer", game.socketJoinAsPlayer(socket, io));
+  socket.on("gameJoinAsAI", game.socketJoinAsAI(socket, io));
   socket.on("gameMakeMove", game.socketMakeMove(socket, io));
   socket.on("gameStart", game.socketStart(socket, io));
   socket.on("gameWatch", game.socketWatch(socket, io));

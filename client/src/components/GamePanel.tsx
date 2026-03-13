@@ -20,10 +20,8 @@ export default function GamePanel({
   const { user } = useLoginContext();
   const timeSince = useTimeSince();
 
-  const { view, players, userPlayerIndex, hasWatched, joinGame, startGame } = useSocketsForGame(
-    gameId,
-    initialPlayers,
-  );
+  const { view, players, userPlayerIndex, hasWatched, joinGame, startGame, aiJoinGame } =
+    useSocketsForGame(gameId, initialPlayers);
 
   return hasWatched ? (
     <div className="gamePanel">
@@ -48,6 +46,14 @@ export default function GamePanel({
           userPlayerIndex < 0 && !view && (
             <button className="primary narrow" onClick={joinGame}>
               Join Game
+            </button>
+          )
+        }
+        {
+          // If the game hasn't started and user has joined, they can add an AI opponent if there are not enough players
+          userPlayerIndex >= 0 && !view && players.length < minPlayers && (
+            <button className="primary narrow" onClick={aiJoinGame}>
+              Add AI Opponent
             </button>
           )
         }

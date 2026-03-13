@@ -128,6 +128,9 @@ export const socketJoinAsPlayer: SocketAPI = (socket, io) => async (body) => {
   }
 };
 
+/**
+ * Handle the socket request sent by a user when they try to add an AI opponent to a game.
+ */
 export const socketJoinAsAI: SocketAPI = (socket, io) => async (body) => {
   try {
     const { payload: gameId } = withAuth(z.string()).parse(body);

@@ -45,9 +45,9 @@ describe("chat.service", () => {
 
   it("throws when adding a message to an invalid chat", async () => {
     const user1 = await enforceAuth({ username: "user1", password: "pwd1111" });
-    await expect(addMessageToChat(randomUUID().toString(), user1, randomUUID().toString())).rejects.toThrow(
-      "invalid chat id",
-    );
+    await expect(
+      addMessageToChat(randomUUID().toString(), user1, randomUUID().toString()),
+    ).rejects.toThrow("invalid chat id");
   });
 
   it("adds and retrieves move logs; returns [] for invalid chat", async () => {

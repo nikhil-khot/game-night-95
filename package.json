@@ -12,10 +12,29 @@
     "lint": "eslint .",
     "prettier": "prettier --check .",
     "prettier:fix": "prettier --write .",
-    "test": "npm run test --workspaces",
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "test:workspaces": "npm run test --workspaces",
     "dev": "concurrently -n client,server -c blue,green \"npm run dev -w=client\" \"npm run dev -w=server\"",
     "build": "npm run build -w=client",
     "start": "npm start -w=server",
     "playwright": "npm run playwright -w=client"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
+  "jest": {
+    "passWithNoTests": true,
+    "testMatch": [
+      "**/*.jest.[jt]s?(x)"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 80,
+        "functions": 80,
+        "lines": 80,
+        "statements": 80
+      }
+    }
   }
 }

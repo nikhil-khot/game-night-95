@@ -1,0 +1,28 @@
+name: Jest Coverage
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  jest-coverage:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Jest tests
+        run: npm run test
+
+      - name: Run Jest coverage
+        run: npm run test:coverage

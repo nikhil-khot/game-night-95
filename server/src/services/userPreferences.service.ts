@@ -5,7 +5,7 @@ import { UserPreferencesRepo, UserRepo } from "../repository.ts";
 /**
  * Default preferences assigned to users who have not explicitly set any.
  */
-const DEFAULT_PREFERENCES = {
+const defaultPreferences = {
   theme: "light",
   fontSize: "medium",
 } as const satisfies Pick<UserPreferencesRecord, "theme" | "fontSize">;
@@ -23,7 +23,7 @@ export async function createDefaultUserPreferences(
 ): Promise<UserPreferencesRecord> {
   const record: UserPreferencesRecord = {
     userId,
-    ...DEFAULT_PREFERENCES,
+    ...defaultPreferences,
     updatedAt: updatedAt.toISOString(),
   };
   await UserPreferencesRepo.set(userId, record);

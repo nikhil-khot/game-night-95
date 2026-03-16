@@ -6,7 +6,7 @@ import { Keyv } from "keyv";
 import "dotenv/config";
 import { app, httpServer } from "./app.ts";
 import * as path from "node:path";
-import express from "express";
+// import express from "express";
 import { createRepo, setDbInitializer } from "./keyv.ts";
 import { resetEverythingToDefaults } from "./initRepository.ts";
 

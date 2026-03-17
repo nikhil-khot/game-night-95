@@ -53,25 +53,25 @@ export default function GamePanel({
           )
         }
         {
-          // If the game hasn't started, the user has joined, and it is a player vs ai game, they can add ai opponents
-          userPlayerIndex >= 0 && !view && mode === "player vs ai" && (
+          // If the game hasn't started and the user has joined, they can add ai opponents (if in the right game mode)
+          // and/or start the game once enough players exist
+          userPlayerIndex >= 0 && !view && (
             <div className="buttonContainer">
-              <button className="primary narrow" onClick={() => addAI("easy")}>
-                Add Easy AI
-              </button>
-              <button className="primary narrow" onClick={() => addAI("medium")}>
-                Add Medium AI
-              </button>
-            </div>
-          )
-        }
-        {
-          // If the game hasn't started and the user has joined, they can start the game if a minimum number of players are present
-          userPlayerIndex >= 0 && !view && players.length >= minPlayers && (
-            <div className="buttonContainer">
-              <button className="primary narrow" onClick={startGame}>
-                Start Game
-              </button>
+              {mode === "player vs ai" && (
+                <>
+                  <button className="primary narrow" onClick={() => addAI("easy")}>
+                    Add Easy AI
+                  </button>
+                  <button className="primary narrow" onClick={() => addAI("medium")}>
+                    Add Medium AI
+                  </button>
+                </>
+              )}
+              {players.length >= minPlayers && (
+                <button className="primary narrow" onClick={startGame}>
+                  Start Game
+                </button>
+              )}
             </div>
           )
         }

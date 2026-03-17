@@ -14,7 +14,7 @@ import { type SafeUserInfo } from "./user.types.ts";
  */
 export interface GameInfo {
   gameId: string;
-  type: GameKey;
+  type: GameType;
   status: "waiting" | "active" | "done";
   chat: string;
   players: SafeUserInfo[];
@@ -60,8 +60,15 @@ export * from "./games/battleship.types.ts";
  * key for each game. See README.md for the operations that are required to
  * add a new game.
  */
-export type GameKey = z.infer<typeof zGameKey>;
-export const zGameKey = z.union([z.literal("nim"), z.literal("guess"), z.literal("battleship")]);
+export type GameType = z.infer<typeof zGameType>;
+export const zGameType = z.union([z.literal("nim"), z.literal("guess"), z.literal("battleship")]);
+
+export type GameMode = z.infer<typeof zGameMode>;
+export const zGameMode = z.union([
+  z.literal("player vs player"),
+  z.literal("player vs ai"),
+  z.literal("club vs club"),
+]);
 
 /**
  * The TaggedGameView type allows the views for different game to be

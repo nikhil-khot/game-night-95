@@ -13,6 +13,7 @@ import UserLink from "./UserLink.tsx";
 export default function GamePanel({
   gameId,
   type,
+  mode,
   players: initialPlayers,
   createdAt,
   minPlayers,
@@ -45,7 +46,7 @@ export default function GamePanel({
         </div>
         {
           // If the game hasn't started and user hasn't joined, they can join
-          userPlayerIndex < 0 && !view && (
+          userPlayerIndex < 0 && !view && mode === "player vs player" && (
             <button className="primary narrow" onClick={joinGame}>
               Join Game
             </button>

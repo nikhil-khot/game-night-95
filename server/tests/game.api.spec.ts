@@ -25,20 +25,23 @@ describe("POST /api/game/create", () => {
   it("should return 403 with bad auth", async () => {
     response = await supertest(app)
       .post(`/api/game/create`)
-      .send({ auth: authBad, payload: "nim" });
+      .send({ auth: authBad, payload: { gameType: "nim", gameMode: "player vs player" } });
     expect(response.status).toBe(403);
   });
 
   it("should succeed when asked to create a game of nim", async () => {
-    response = await supertest(app).post(`/api/game/create`).send({
-      auth: auth3,
-      payload: "nim",
-    });
+    response = await supertest(app)
+      .post(`/api/game/create`)
+      .send({
+        auth: auth3,
+        payload: { gameType: "nim", gameMode: "player vs player" },
+      });
     expect(response.status).toBe(200);
     expect(response.body).toStrictEqual({
       gameId: expect.anything(),
       chat: expect.anything(),
       type: "nim",
+      mode: "player vs player",
       status: "waiting",
       createdBy: {
         username: "user3",
@@ -65,10 +68,12 @@ describe("GET /api/game/:id", () => {
   });
 
   it("should succeed if a created game is requested", async () => {
-    response = await supertest(app).post(`/api/game/create`).send({
-      auth: auth3,
-      payload: "nim",
-    });
+    response = await supertest(app)
+      .post(`/api/game/create`)
+      .send({
+        auth: auth3,
+        payload: { gameType: "nim", gameMode: "player vs player" },
+      });
     expect(response.status).toBe(200);
     const gameInfo = response.body;
 

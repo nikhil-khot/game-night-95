@@ -21,10 +21,8 @@ export default function GamePanel({
   const { user } = useLoginContext();
   const timeSince = useTimeSince();
 
-  const { view, players, userPlayerIndex, hasWatched, joinGame, startGame } = useSocketsForGame(
-    gameId,
-    initialPlayers,
-  );
+  const { view, players, userPlayerIndex, hasWatched, joinGame, startGame, addAI } =
+    useSocketsForGame(gameId, initialPlayers);
 
   return hasWatched ? (
     <div className="gamePanel">
@@ -45,19 +43,36 @@ export default function GamePanel({
           ))}
         </div>
         {
-          // If the game hasn't started and user hasn't joined, they can join
+          // If the game hasn't started and user hasn't joined, they can join if it is a player vs player game
           userPlayerIndex < 0 && !view && mode === "player vs player" && (
-            <button className="primary narrow" onClick={joinGame}>
-              Join Game
-            </button>
+            <div className="buttonContainer">
+              <button className="primary narrow" onClick={joinGame}>
+                Join Game
+              </button>
+            </div>
+          )
+        }
+        {
+          // If the game hasn't started, the user has joined, and it is a player vs ai game, they can add ai opponents
+          userPlayerIndex >= 0 && !view && mode === "player vs ai" && (
+            <div className="buttonContainer">
+              <button className="primary narrow" onClick={() => addAI("easy")}>
+                Add Easy AI
+              </button>
+              <button className="primary narrow" onClick={() => addAI("medium")}>
+                Add Medium AI
+              </button>
+            </div>
           )
         }
         {
           // If the game hasn't started and the user has joined, they can start the game if a minimum number of players are present
           userPlayerIndex >= 0 && !view && players.length >= minPlayers && (
-            <button className="primary narrow" onClick={startGame}>
-              Start Game
-            </button>
+            <div className="buttonContainer">
+              <button className="primary narrow" onClick={startGame}>
+                Start Game
+              </button>
+            </div>
           )
         }
       </div>

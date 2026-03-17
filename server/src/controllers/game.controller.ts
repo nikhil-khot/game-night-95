@@ -139,6 +139,48 @@ export const socketJoinAsPlayer: SocketAPI = (socket, io) => async (body) => {
 };
 
 /**
+ * Handle the socket request sent by a user when they try to add an ai to a game.
+ */
+export const socketAddAI: SocketAPI = (socket, io) => async (body) => {
+  try {
+    const {
+      auth,
+      payload: { gameId, aiType },
+    } = withAuth(z.object({ gameId: z.string(), aiType: z.string() })).parse(body);
+    await enforceAuth(auth);
+    let user;
+    switch (aiType) {
+      case "easy":
+        user = await enforceAuth({ username: "AI-Easy", password: "pwd_AI_Easy" });
+        break;
+      case "medium":
+        user = await enforceAuth({ username: "AI-Medium", password: "pwd_AI_Medium" });
+        break;
+      default:
+        throw new Error("Invalid AI type");
+    }
+    const game = await joinGame(gameId, user);
+
+    // Let everyone know the user joined (`io` instead of `socket` includes
+    // the joiner)
+    io.to(gameId).emit("gamePlayersUpdated", game.players);
+
+    // This socket should receive user-specific updates for this game, if it
+    // isn't already
+    if (!socket.rooms.has(userRoom(gameId, user.userId))) {
+      await socket.join(userRoom(gameId, user.userId));
+    }
+
+    // If the game is full, it starts automatically
+    if (game.players.length === gameServices[game.type].maxPlayers) {
+      sendViewUpdates(io, gameId, await startGame(gameId, user));
+    }
+  } catch (err) {
+    logSocketError(socket, err);
+  }
+};
+
+/**
  * Handle a request to start the game.
  */
 export const socketStart: SocketAPI = (socket, io) => async (body) => {

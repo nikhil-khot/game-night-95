@@ -48,7 +48,7 @@ export default function useNewGameForm() {
     }
 
     setErr(null);
-    const game = await createGame(auth, gameType);
+    const game = await createGame(auth, gameType, gameMode);
     if ("error" in game) {
       setErr(game.error);
       return;

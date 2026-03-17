@@ -24,6 +24,7 @@ async function resetStoredGames() {
   const storedGames: { [key: string]: GameRecord } = {
     [randomUUID().toString()]: {
       type: "nim",
+      mode: "player vs player",
       state: { remaining: 0, nextPlayer: 1 },
       done: true,
       chat: (await createChat(new Date("2025-04-21"))).chatId,
@@ -33,6 +34,7 @@ async function resetStoredGames() {
     },
     [randomUUID().toString()]: {
       type: "guess",
+      mode: "player vs player",
       state: { secret: 43, guesses: [null, 2, 99, null] },
       done: false,
       chat: (await createChat(recently)).chatId,
@@ -42,6 +44,7 @@ async function resetStoredGames() {
     },
     [randomUUID().toString()]: {
       type: "nim",
+      mode: "player vs player",
       done: false,
       chat: (await createChat(new Date())).chatId,
       players: [user1id],

@@ -11,7 +11,7 @@ export default function NewGame() {
       <div>
         <select
           value={gameType}
-          aria-label="Game selection"
+          aria-label="Game Type selection"
           onChange={(e) => handleGameTypeChange(e)}
         >
           <option value="">— Select a game —</option>
@@ -24,7 +24,7 @@ export default function NewGame() {
         &nbsp;&nbsp;&nbsp;
         <select
           value={gameMode}
-          aria-label="Game selection"
+          aria-label="Game Mode selection"
           onChange={(e) => handleGameModeChange(e)}
         >
           <option value="">— Select a game mode —</option>

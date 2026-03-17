@@ -23,6 +23,7 @@ export async function logInUser(page: Page, username: string, password: string) 
  * @param page1 - A Page where we will attempt to create a *new* user. That user will initiate the game.
  * @param page2 - A Page where the preexisting user2 will log in
  * @param gameId - The game id shared by the frontend and backend
+ * @param gameMode - The game mode shared by the frontend and backend
  * @param gameStartsAutomatically - true if the game has a maximum of two players
  * @param doAssess - `true` adds extra expectations
  * @returns
@@ -31,6 +32,7 @@ export async function createAndLoadGame(
   page1: Page,
   page2: Page,
   gameId: string,
+  gameMode: string,
   gameStartsAutomatically: boolean,
   doAssess: boolean,
 ) {
@@ -52,7 +54,8 @@ export async function createAndLoadGame(
   // User 1 creates a new game
   await page1.getByRole("button", { name: "Create New Game" }).click();
   await page1.waitForURL("/game/new");
-  await page1.getByLabel("Game selection").selectOption(gameId);
+  await page1.getByLabel("Game Type selection").selectOption(gameId);
+  await page1.getByLabel("Game Mode selection").selectOption(gameMode);
   await page1.getByRole("button", { name: "Create New Game" }).click();
 
   // Causes Playwright to auto-wait for for game to be enabled

@@ -32,7 +32,8 @@ export const battleshipLogic: GameLogic<BattleshipState, BattleshipView> = {
   ): string {
     throw new Error("Function not implemented.");
   },
-};
+}
+
 
 export const battleshipGameService = new GameService<BattleshipState, BattleshipView>(
   battleshipLogic,

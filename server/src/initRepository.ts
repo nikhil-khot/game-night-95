@@ -24,6 +24,7 @@ async function resetStoredGames() {
   const storedGames: { [key: string]: GameRecord } = {
     [randomUUID().toString()]: {
       type: "nim",
+      mode: "player vs player",
       state: { remaining: 0, nextPlayer: 1 },
       done: true,
       chat: (await createChat(new Date("2025-04-21"))).chatId,
@@ -33,6 +34,7 @@ async function resetStoredGames() {
     },
     [randomUUID().toString()]: {
       type: "guess",
+      mode: "player vs player",
       state: { secret: 43, guesses: [null, 2, 99, null] },
       done: false,
       chat: (await createChat(recently)).chatId,
@@ -42,6 +44,7 @@ async function resetStoredGames() {
     },
     [randomUUID().toString()]: {
       type: "nim",
+      mode: "player vs player",
       done: false,
       chat: (await createChat(new Date())).chatId,
       players: [user1id],
@@ -110,13 +113,15 @@ async function resetStoredUsers() {
   await createUser("user1", "pwd1111", new Date());
   await createUser("user2", "pwd2222", new Date());
   await createUser("user3", "pwd3333", new Date());
-  await createUser("AI", "pwd_AI", new Date());
+  await createUser("AI-Easy", "pwd_AI_Easy", new Date());
+  await createUser("AI-Medium", "pwd_AI_Medium", new Date());
 
   await updateUser("user0", { display: "The Knight Of Games" });
   await updateUser("user1", { display: "Yāo" });
   await updateUser("user2", { display: "Sénior Dos" });
   await updateUser("user3", { display: "Frau Drei" });
-  await updateUser("AI", { display: "AI Opponent" });
+  await updateUser("AI-Easy", { display: "Easy AI" });
+  await updateUser("AI-Medium", { display: "Medium AI" });
 }
 
 export async function resetEverythingToDefaults() {

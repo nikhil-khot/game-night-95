@@ -1,4 +1,4 @@
-import type { GameKey } from "@gamenite/shared";
+import type { GameType, GameMode } from "@gamenite/shared";
 import { type ChangeEvent, useState, type SubmitEvent } from "react";
 import useAuth from "./useAuth.ts";
 import { useNavigate } from "react-router-dom";
@@ -13,28 +13,42 @@ import { createGame } from "../services/gameService.ts";
  *  - Form handlers `handleInputChange` and `handleSubmit`
  */
 export default function useNewGameForm() {
-  const [gameKey, setGameKey] = useState<GameKey | "">("");
+  const [gameType, setGameType] = useState<GameType | "">("");
+  const [gameMode, setGameMode] = useState<GameMode | "">("");
   const [err, setErr] = useState<string | null>(null);
   const auth = useAuth();
   const navigate = useNavigate();
 
-  const handleInputChange = (e: ChangeEvent<HTMLSelectElement>) => {
+  const handleGameTypeChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setErr(null);
 
     // type assertion is safe because NewGame.tsx only allows selection of
     // valid game keys
-    setGameKey(e.target.value as GameKey | "");
+    setGameType(e.target.value as GameType | "");
+  };
+
+  const handleGameModeChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    setErr(null);
+
+    // type assertion is safe because NewGame.tsx only allows selection of
+    // valid game modes
+    setGameMode(e.target.value as GameMode | "");
   };
 
   const handleSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (gameKey === "") {
+    if (gameType === "") {
       setErr("Please select a game");
       return;
     }
+    if (gameMode === "") {
+      setErr("Please select a game mode");
+      return;
+    }
+
     setErr(null);
-    const game = await createGame(auth, gameKey);
+    const game = await createGame(auth, gameType, gameMode);
     if ("error" in game) {
       setErr(game.error);
       return;
@@ -43,9 +57,11 @@ export default function useNewGameForm() {
   };
 
   return {
-    gameKey,
+    gameType,
+    gameMode,
     err,
-    handleInputChange,
+    handleGameTypeChange,
+    handleGameModeChange,
     handleSubmit,
   };
 }

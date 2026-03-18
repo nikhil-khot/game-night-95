@@ -14,7 +14,8 @@ import { type SafeUserInfo } from "./user.types.ts";
  */
 export interface GameInfo {
   gameId: string;
-  type: GameKey;
+  type: GameType;
+  mode: GameMode;
   status: "waiting" | "active" | "done";
   chat: string;
   players: SafeUserInfo[];
@@ -37,14 +38,6 @@ export interface GamePlayInfo {
   players: SafeUserInfo[];
 }
 
-/*** TYPES USED IN THE GAMES API ***/
-
-export type GameMakeMovePayload = z.infer<typeof zGameMakeMovePayload>;
-export const zGameMakeMovePayload = z.object({
-  gameId: z.string(),
-  move: z.unknown(),
-});
-
 /*** INDIVIDUAL GAME TYPES ***/
 import type { NimView } from "./games/nim.types.ts";
 export * from "./games/nim.types.ts";
@@ -56,12 +49,36 @@ import type { BattleshipView } from "./games/battleship.types.ts";
 export * from "./games/battleship.types.ts";
 
 /**
- * A GameKey selects which game is being played. There needs to be exactly one
- * key for each game. See README.md for the operations that are required to
+ * A GameType selects which game is being played. There needs to be exactly one
+ * type for each game. See README.md for the operations that are required to
  * add a new game.
  */
-export type GameKey = z.infer<typeof zGameKey>;
-export const zGameKey = z.union([z.literal("nim"), z.literal("guess"), z.literal("battleship")]);
+export type GameType = z.infer<typeof zGameType>;
+export const zGameType = z.union([z.literal("nim"), z.literal("guess"), z.literal("battleship")]);
+
+/**
+ * A GameMode selects which mode the game is being played in.
+ * Each game mode should be supported by each game.
+ */
+export type GameMode = z.infer<typeof zGameMode>;
+export const zGameMode = z.union([
+  z.literal("player vs player"),
+  z.literal("player vs ai"),
+  z.literal("club vs club"),
+]);
+
+/*** TYPES USED IN THE GAMES API ***/
+
+export type GameMakeMovePayload = z.infer<typeof zGameMakeMovePayload>;
+export const zGameMakeMovePayload = z.object({
+  gameId: z.string(),
+  move: z.unknown(),
+});
+export type GameCreationPayload = z.infer<typeof zGameCreationPayload>;
+export const zGameCreationPayload = z.object({
+  gameType: zGameType,
+  gameMode: zGameMode,
+});
 
 /**
  * The TaggedGameView type allows the views for different game to be

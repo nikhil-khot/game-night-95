@@ -1,4 +1,4 @@
-import { type GameInfo, type GameKey, type TaggedGameView } from "@gamenite/shared";
+import { type GameInfo, type GameMode, type GameType, type TaggedGameView } from "@gamenite/shared";
 import { createChat } from "./chat.service.ts";
 import { populateSafeUserInfo } from "./user.service.ts";
 import { type GameServicer } from "../games/gameServiceManager.ts";
@@ -11,7 +11,7 @@ import { GameRepo } from "../repository.ts";
 /**
  * The service interface for individual games
  */
-export const gameServices: { [key in GameKey]: GameServicer } = {
+export const gameServices: { [key in GameType]: GameServicer } = {
   nim: nimGameService,
   guess: guessGameService,
   battleship: battleshipGameService,
@@ -32,6 +32,7 @@ async function populateGameInfo(gameId: string): Promise<GameInfo> {
     createdAt: new Date(game.createdAt),
     players: await Promise.all(game.players.map(populateSafeUserInfo)),
     type: game.type,
+    mode: game.mode,
     status: !game.state ? "waiting" : game.done ? "done" : "active",
     minPlayers: gameServices[game.type].minPlayers,
   };
@@ -41,18 +42,21 @@ async function populateGameInfo(gameId: string): Promise<GameInfo> {
  * Create and store a new game
  *
  * @param user - Initial player in the game's waiting room
- * @param type - Game key
+ * @param type - Game type
+ * @param mode - Game mode
  * @param createdAt - Creation time for this game
  * @returns the new game's info object
  */
 export async function createGame(
   user: UserWithId,
-  type: GameKey,
+  type: GameType,
+  mode: GameMode,
   createdAt: Date,
 ): Promise<GameInfo> {
   const chat = await createChat(createdAt);
   const gameId = await GameRepo.add({
     type,
+    mode,
     done: false,
     chat: chat.chatId,
     createdAt: createdAt.toISOString(),
@@ -119,7 +123,7 @@ export async function startGame(gameId: string, user: UserWithId): Promise<GameV
     throw new Error(`user ${user.username} starting game that started`);
   }
 
-  const key: GameKey = game.type;
+  const key: GameType = game.type;
 
   if (game.players.length < gameServices[key].minPlayers) {
     throw new Error(`user ${user.username} starting underpopulated game`);

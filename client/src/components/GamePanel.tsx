@@ -13,6 +13,7 @@ import UserLink from "./UserLink.tsx";
 export default function GamePanel({
   gameId,
   type,
+  mode,
   players: initialPlayers,
   createdAt,
   minPlayers,
@@ -20,7 +21,7 @@ export default function GamePanel({
   const { user } = useLoginContext();
   const timeSince = useTimeSince();
 
-  const { view, players, userPlayerIndex, hasWatched, joinGame, startGame, aiJoinGame } =
+  const { view, players, userPlayerIndex, hasWatched, joinGame, startGame, addAI } =
     useSocketsForGame(gameId, initialPlayers);
 
   return hasWatched ? (
@@ -42,27 +43,36 @@ export default function GamePanel({
           ))}
         </div>
         {
-          // If the game hasn't started and user hasn't joined, they can join
-          userPlayerIndex < 0 && !view && (
-            <button className="primary narrow" onClick={joinGame}>
-              Join Game
-            </button>
+          // If the game hasn't started and user hasn't joined, they can join if it is a player vs player game
+          userPlayerIndex < 0 && !view && mode === "player vs player" && (
+            <div className="buttonContainer">
+              <button className="primary narrow" onClick={joinGame}>
+                Join Game
+              </button>
+            </div>
           )
         }
         {
-          // If the game hasn't started and user has joined, they can add an AI opponent if there are not enough players
-          userPlayerIndex >= 0 && !view && players.length < minPlayers && (
-            <button className="primary narrow" onClick={aiJoinGame}>
-              Add AI Opponent
-            </button>
-          )
-        }
-        {
-          // If the game hasn't started and the user has joined, they can start the game if a minimum number of players are present
-          userPlayerIndex >= 0 && !view && players.length >= minPlayers && (
-            <button className="primary narrow" onClick={startGame}>
-              Start Game
-            </button>
+          // If the game hasn't started and the user has joined, they can add ai opponents (if in the right game mode)
+          // and/or start the game once enough players exist
+          userPlayerIndex >= 0 && !view && (
+            <div className="buttonContainer">
+              {mode === "player vs ai" && (
+                <>
+                  <button className="primary narrow" onClick={() => addAI("easy")}>
+                    Add Easy AI
+                  </button>
+                  <button className="primary narrow" onClick={() => addAI("medium")}>
+                    Add Medium AI
+                  </button>
+                </>
+              )}
+              {players.length >= minPlayers && (
+                <button className="primary narrow" onClick={startGame}>
+                  Start Game
+                </button>
+              )}
+            </div>
           )
         }
       </div>

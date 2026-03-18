@@ -9,9 +9,14 @@
   white-space: nowrap;
 }
 
-.gameSummary .mid {
-  flex-grow: 1;
+.gameSummary .gameLink {
   color: cornflowerblue;
+  width: 15rem;
+}
+
+.gameSummary .gameMode {
+  flex-grow: 1;
+  text-align: left;
 }
 
 .gameSummary .stats {

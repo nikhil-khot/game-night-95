@@ -77,3 +77,14 @@ describe(`Nim's tagView() logic`, () => {
     });
   });
 });
+
+describe(`Nim's describeMove() logic`, () => {
+  it("Should appropriately describe moves of different values", () => {
+    expect(
+      nimLogic.describeMove({ remaining: 4, nextPlayer: 0 }, { remaining: 1, nextPlayer: 1 }, 3, 0),
+    ).toBe(" took three tokens, leaving 1");
+    expect(
+      nimLogic.describeMove({ remaining: 2, nextPlayer: 1 }, { remaining: 0, nextPlayer: 0 }, 2, 1),
+    ).toBe(" took two tokens and lost the game");
+  });
+});

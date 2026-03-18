@@ -1,16 +1,34 @@
 import useNewGameForm from "../hooks/useNewGameForm.ts";
-import { gameNames } from "../util/consts.ts";
+import { gameModes, gameNames } from "../util/consts.ts";
 
 export default function NewGame() {
-  const { gameKey, handleInputChange, err, handleSubmit } = useNewGameForm();
+  const { gameType, handleGameTypeChange, gameMode, handleGameModeChange, err, handleSubmit } =
+    useNewGameForm();
 
   return (
     <form className="content spacedSection" onSubmit={handleSubmit}>
       <h2>Create new game</h2>
       <div>
-        <select value={gameKey} aria-label="Game selection" onChange={(e) => handleInputChange(e)}>
+        <select
+          value={gameType}
+          aria-label="Game Type selection"
+          onChange={(e) => handleGameTypeChange(e)}
+        >
           <option value="">— Select a game —</option>
           {Object.entries(gameNames).map(([key, name]) => (
+            <option key={key} value={key}>
+              {name}
+            </option>
+          ))}
+        </select>
+        &nbsp;&nbsp;&nbsp;
+        <select
+          value={gameMode}
+          aria-label="Game Mode selection"
+          onChange={(e) => handleGameModeChange(e)}
+        >
+          <option value="">— Select a game mode —</option>
+          {Object.entries(gameModes).map(([key, name]) => (
             <option key={key} value={key}>
               {name}
             </option>

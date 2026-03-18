@@ -59,8 +59,8 @@ export default function useSocketsForGame(gameId: string, initialPlayers: SafeUs
     socket.emit("gameJoinAsPlayer", { auth, payload: gameId });
   }
 
-  function aiJoinGame() {
-    socket.emit("gameJoinAsAI", { auth, payload: gameId });
+  function addAI(aiType: string) {
+    socket.emit("gameAddAI", { auth, payload: { gameId, aiType } });
   }
 
   function startGame() {
@@ -74,6 +74,6 @@ export default function useSocketsForGame(gameId: string, initialPlayers: SafeUs
     view,
     joinGame,
     startGame,
-    aiJoinGame,
+    addAI,
   };
 }

@@ -1,4 +1,9 @@
-import { type GameInfo, withAuth, zGameKey, zGameMakeMovePayload } from "@gamenite/shared";
+import {
+  type GameInfo,
+  withAuth,
+  zGameMakeMovePayload,
+  zGameCreationPayload,
+} from "@gamenite/shared";
 import { type RestAPI, type GameViewUpdates, type SocketAPI, type GameServer } from "../types.ts";
 import {
   createGame,
@@ -20,7 +25,7 @@ import { checkAuth, enforceAuth } from "../services/auth.service.ts";
  * starts with one player, the user who made the POST request.
  */
 export const postCreate: RestAPI<GameInfo> = async (req, res) => {
-  const body = withAuth(zGameKey).safeParse(req.body);
+  const body = withAuth(zGameCreationPayload).safeParse(req.body);
   if (body.error) {
     res.status(400).send({ error: "Poorly-formed request" });
     return;
@@ -32,7 +37,12 @@ export const postCreate: RestAPI<GameInfo> = async (req, res) => {
     return;
   }
 
-  const game = await createGame(user, body.data.payload, new Date());
+  const game = await createGame(
+    user,
+    body.data.payload.gameType,
+    body.data.payload.gameMode,
+    new Date(),
+  );
   res.send(game);
 };
 
@@ -129,12 +139,26 @@ export const socketJoinAsPlayer: SocketAPI = (socket, io) => async (body) => {
 };
 
 /**
- * Handle the socket request sent by a user when they try to add an AI opponent to a game.
+ * Handle the socket request sent by a user when they try to add an ai to a game.
  */
-export const socketJoinAsAI: SocketAPI = (socket, io) => async (body) => {
+export const socketAddAI: SocketAPI = (socket, io) => async (body) => {
   try {
-    const { payload: gameId } = withAuth(z.string()).parse(body);
-    const user = await enforceAuth({ username: "AI", password: "pwd_AI" });
+    const {
+      auth,
+      payload: { gameId, aiType },
+    } = withAuth(z.object({ gameId: z.string(), aiType: z.string() })).parse(body);
+    await enforceAuth(auth);
+    let user;
+    switch (aiType) {
+      case "easy":
+        user = await enforceAuth({ username: "AI-Easy", password: "pwd_AI_Easy" });
+        break;
+      case "medium":
+        user = await enforceAuth({ username: "AI-Medium", password: "pwd_AI_Medium" });
+        break;
+      default:
+        throw new Error("Invalid AI type");
+    }
     const game = await joinGame(gameId, user);
 
     // Let everyone know the user joined (`io` instead of `socket` includes

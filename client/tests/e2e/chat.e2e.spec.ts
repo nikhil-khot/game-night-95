@@ -22,7 +22,7 @@ test.describe("Chat in the context of a Nim game", () => {
   let username1: string;
 
   test.beforeEach(async () => {
-    username1 = await createAndLoadGame(page1, page2, "nim", true, false);
+    username1 = await createAndLoadGame(page1, page2, "nim", "player vs player", true, false);
   });
 
   test("avoids race conditions", async () => {

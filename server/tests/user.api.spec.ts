@@ -94,7 +94,6 @@ describe("POST /api/user/:username/preferences", () => {
       .send({
         auth: auth1,
         payload: {
-          profilePictureChoice: "avatar-3",
           banner: { imageUrl: "https://example.com/banner.png", position: "center" },
         },
       });
@@ -102,7 +101,6 @@ describe("POST /api/user/:username/preferences", () => {
     expect(response.body).toStrictEqual({
       theme: "dark",
       fontSize: "medium",
-      profilePictureChoice: "avatar-3",
       banner: { imageUrl: "https://example.com/banner.png", position: "center" },
       updatedAt: expect.anything(),
     });

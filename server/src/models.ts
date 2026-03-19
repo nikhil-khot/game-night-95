@@ -147,7 +147,6 @@ export interface BannerPreferences {
  * `userId`: the user ID of the corresponding User model; also serves as the repo key for this record
  * `theme`: the user's chosen theme (e.g., light or dark mode)
  * `fontSize`: the user's preferred font size for UI text
- * `profilePictureChoice`: optional field indicating the user's choice for profile picture (e.g., "gravatar", "upload", "none")
  * `profilePictureUrl`: optional URL for the user's profile picture, if applicable
  * `banner`: optional field containing the user's banner preferences for their profile
  * `updatedAt`: when the user last updated their preferences
@@ -156,8 +155,7 @@ export interface UserPreferencesRecord {
   userId: RecordId; // References User records; should also be used as repo key
   theme: UserTheme;
   fontSize: UserFontSize;
-  profilePictureChoice?: string;
-  profilePictureUrl?: string;
+  profilePictureUrl: string;
   banner?: BannerPreferences;
   updatedAt: DateISO;
 }

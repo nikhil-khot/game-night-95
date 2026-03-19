@@ -1,7 +1,7 @@
 import { type SubmitEvent, useState } from "react";
 import useLoginContext from "./useLoginContext.ts";
 import useAuth from "./useAuth.ts";
-import { updateUser } from "../services/userService.ts";
+import { updateUser, updateUserPreferences } from "../services/userService.ts";
 import type { UserUpdateRequest } from "@gamenite/shared";
 
 /**
@@ -17,6 +17,7 @@ export default function useEditProfileForm() {
   const [display, setDisplay] = useState(user.display);
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [profilePictureUrl, setProfilePictureUrl] = useState("");
   const [err, setErr] = useState<null | string>(null);
   const auth = useAuth();
 
@@ -26,7 +27,14 @@ export default function useEditProfileForm() {
   const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (user.display === display && password === confirm && password === "") {
+    const hasProfilePictureUpdate = profilePictureUrl !== "";
+
+    if (
+      user.display === display &&
+      password === confirm &&
+      password === "" &&
+      !hasProfilePictureUpdate
+    ) {
       setErr("No changes to submit");
       return;
     }
@@ -51,13 +59,24 @@ export default function useEditProfileForm() {
       return;
     }
 
+    if (hasProfilePictureUpdate) {
+      const prefsResponse = await updateUserPreferences(auth, { profilePictureUrl });
+      if ("error" in prefsResponse) {
+        setErr(prefsResponse.error);
+        return;
+      }
+    }
+
     const updates: UserUpdateRequest = {};
     if (display !== user.display) updates.display = display;
     if (password !== "") updates.password = password;
-    const response = await updateUser(auth, updates);
-    if ("error" in response) {
-      setErr(response.error);
-      return;
+
+    if (Object.keys(updates).length > 0) {
+      const response = await updateUser(auth, updates);
+      if ("error" in response) {
+        setErr(response.error);
+        return;
+      }
     }
 
     // We need to do this — or do something else that resets the login context
@@ -71,6 +90,8 @@ export default function useEditProfileForm() {
     setPassword,
     confirm,
     setConfirm,
+    profilePictureUrl,
+    setProfilePictureUrl,
     err,
     handleSubmit,
   };

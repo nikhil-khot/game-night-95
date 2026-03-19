@@ -25,7 +25,6 @@ function populateUserPreferences(record: UserPreferencesRecord): UserPreferences
   return {
     theme: record.theme,
     fontSize: record.fontSize,
-    profilePictureChoice: record.profilePictureChoice,
     profilePictureUrl: record.profilePictureUrl,
     banner: record.banner,
     updatedAt: new Date(record.updatedAt),

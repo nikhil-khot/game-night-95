@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { render } from "@testing-library/react";
-import ProfileAvatar from "../../client/src/components/ProfileAvatar";
+import ProfileAvatar from "../../src/components/ProfileAvatar";
 
 describe("ProfileAvatar", () => {
   it("renders fallback SVG when no URL provided", () => {

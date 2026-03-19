@@ -12,6 +12,8 @@ describe("ImageUpload", () => {
   it("resizes large images and calls onChange with a File", async () => {
     const onChange = vi.fn();
     // Mock Image loading and canvas methods used by the resizing code
+    // Allow using the global `Image` property name (PascalCase) here
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     const win = window as unknown as { Image?: typeof Image };
     const originalImage = win.Image;
 
@@ -30,6 +32,7 @@ describe("ImageUpload", () => {
 
     // Provide minimal canvas methods used by the component
     // Assign via `any` to avoid TypeScript overload mismatch on `getContext`
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (HTMLCanvasElement.prototype as any).getContext = function () {
       const ctx = {
         drawImage: (..._args: unknown[]) => {},

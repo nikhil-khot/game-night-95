@@ -12,8 +12,10 @@ describe("ImageUpload", () => {
   it("resizes large images and calls onChange with a File", async () => {
     const onChange = vi.fn();
     // Mock Image loading and canvas methods used by the resizing code
-    const originalImage = (window as any).Image;
-    (window as any).Image = class {
+    const win = window as unknown as { Image?: typeof Image };
+    const originalImage = win.Image;
+
+    class MockImage {
       width = 2000;
       height = 1200;
       onload: (() => void) | null = null;
@@ -22,13 +24,19 @@ describe("ImageUpload", () => {
         // call onload asynchronously to mimic browser
         setTimeout(() => this.onload && this.onload());
       }
-    } as any;
+    }
+
+    win.Image = MockImage as unknown as typeof Image;
 
     // Provide minimal canvas methods used by the component
-    HTMLCanvasElement.prototype.getContext = function () {
-      return { drawImage: () => {} } as any;
+    HTMLCanvasElement.prototype.getContext = function (): CanvasRenderingContext2D | null {
+      const ctx = {
+        drawImage: (..._args: unknown[]) => {},
+      } as unknown as CanvasRenderingContext2D;
+      return ctx;
     };
-    HTMLCanvasElement.prototype.toBlob = function (cb: (b: Blob | null) => void) {
+
+    HTMLCanvasElement.prototype.toBlob = function (cb: (b: Blob | null) => void): void {
       cb(new Blob([new Uint8Array(1000)], { type: "image/jpeg" }));
     };
 
@@ -58,6 +66,6 @@ describe("ImageUpload", () => {
     expect(calledFile.size).toBeLessThan(largeFile.size);
 
     // restore mocks
-    (window as any).Image = originalImage;
+    win.Image = originalImage;
   });
 });

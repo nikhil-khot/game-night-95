@@ -8,7 +8,9 @@ import { UserPreferencesRepo, UserRepo } from "../repository.ts";
 const defaultPreferences = {
   theme: "light",
   fontSize: "medium",
-} as const satisfies Pick<UserPreferencesRecord, "theme" | "fontSize">;
+  // server models require a profilePictureUrl string; default to empty
+  profilePictureUrl: "",
+} as const satisfies Pick<UserPreferencesRecord, "theme" | "fontSize" | "profilePictureUrl">;
 
 /**
  * Creates and stores default preferences for a user.

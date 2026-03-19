@@ -29,7 +29,8 @@ describe("ImageUpload", () => {
     win.Image = MockImage as unknown as typeof Image;
 
     // Provide minimal canvas methods used by the component
-    HTMLCanvasElement.prototype.getContext = function (): CanvasRenderingContext2D | null {
+    // Assign via `any` to avoid TypeScript overload mismatch on `getContext`
+    (HTMLCanvasElement.prototype as any).getContext = function () {
       const ctx = {
         drawImage: (..._args: unknown[]) => {},
       } as unknown as CanvasRenderingContext2D;

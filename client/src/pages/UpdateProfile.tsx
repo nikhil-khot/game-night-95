@@ -2,17 +2,44 @@ import { useState } from "react";
 import useLoginContext from "../hooks/useLoginContext";
 import useTimeSince from "../hooks/useTimeSince";
 import useEditProfileForm from "../hooks/useEditProfileForm";
+import ImageUpload from "../components/ImageUpload";
+import ProfileAvatar from "../components/ProfileAvatar";
 
 export default function UpdateProfile() {
   const { user } = useLoginContext();
   const timeSince = useTimeSince();
   const [showPass, setShowPass] = useState(false);
-  const { display, setDisplay, password, setPassword, confirm, setConfirm, err, handleSubmit } =
-    useEditProfileForm();
+  const [uploadedImageName, setUploadedImageName] = useState<string>("");
+  const {
+    display,
+    setDisplay,
+    password,
+    setPassword,
+    confirm,
+    setConfirm,
+    profilePictureUrl,
+    setProfilePictureUrl,
+    err,
+    handleSubmit,
+  } = useEditProfileForm();
+
+  const handleProfileImageChange = (file: File) => {
+    setUploadedImageName(file.name);
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        setProfilePictureUrl(reader.result);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
 
   return (
     <form className="content spacedSection" onSubmit={handleSubmit}>
-      <h2>Profile</h2>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <h2>Profile</h2>
+      </div>
       <div>
         <h3>General information</h3>
         <ul>
@@ -80,6 +107,16 @@ export default function UpdateProfile() {
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
           />
+        </div>
+      </div>
+      <div className="spacedSection">
+        <h3>Upload profile image</h3>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+          <ProfileAvatar imageUrl={profilePictureUrl} />
+          <div>
+            <ImageUpload onChange={handleProfileImageChange} />
+            {uploadedImageName && <div className="smallAndGray">Selected: {uploadedImageName}</div>}
+          </div>
         </div>
       </div>
       <hr />

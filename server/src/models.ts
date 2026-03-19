@@ -98,6 +98,9 @@ export interface MessageRecord {
  * Represents a forum post as it's stored in the database.
  * - `title`: post title
  * - `text`: post contents
+ * - `points`: score of the thread
+ * - `upvoters`: users who upvoted this thread
+ * - `downvoters`: users who downvoted this thread
  * - `createdAt`: when the thread was posted
  * - `createdBy`: username of OP
  * - `comments`: replies to the post
@@ -105,6 +108,9 @@ export interface MessageRecord {
 export interface ThreadRecord {
   title: string;
   text: string;
+  points: number;
+  upvoters: RecordId[]; // References User records who upvoted this thread
+  downvoters: RecordId[]; // References User records who downvoted this thread
   createdAt: DateISO;
   createdBy: RecordId; // References User records
   comments: RecordId[]; // References Comment records

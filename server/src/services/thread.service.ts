@@ -16,6 +16,7 @@ async function populateThreadInfo(threadId: string): Promise<ThreadInfo> {
     threadId,
     title: thread.title,
     text: thread.text,
+    points: thread.points,
     createdBy: await populateSafeUserInfo(thread.createdBy),
     createdAt: new Date(thread.createdAt),
     comments: await Promise.all(thread.comments.map(populateCommentInfo)),
@@ -33,6 +34,7 @@ async function populateThreadSummary(threadId: string): Promise<ThreadSummary> {
   return {
     threadId,
     title: thread.title,
+    points: thread.points,
     createdBy: await populateSafeUserInfo(thread.createdBy),
     createdAt: new Date(thread.createdAt),
     comments: thread.comments.length,
@@ -55,6 +57,9 @@ export async function createThread(
   const id = await ThreadRepo.add({
     title,
     text,
+    points: 0,
+    upvoters: [],
+    downvoters: [],
     createdAt: createdAt.toISOString(),
     createdBy: user.userId,
     comments: [],

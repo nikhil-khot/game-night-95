@@ -17,6 +17,7 @@ export interface ThreadInfo {
   threadId: string;
   title: string;
   text: string;
+  points: number;
   createdAt: Date;
   createdBy: SafeUserInfo;
   comments: CommentInfo[];

@@ -22,13 +22,20 @@ import {
 } from "../services/userPreferences.service.ts";
 
 function populateUserPreferences(record: UserPreferencesRecord): UserPreferences {
-  return {
+  const base: UserPreferences = {
     theme: record.theme,
     fontSize: record.fontSize,
-    profilePictureUrl: record.profilePictureUrl,
     banner: record.banner,
     updatedAt: new Date(record.updatedAt),
   };
+
+  // Only include profilePictureUrl when it's a non-empty string so tests
+  // that expect the property to be absent continue to pass.
+  if (record.profilePictureUrl && record.profilePictureUrl !== "") {
+    return { ...base, profilePictureUrl: record.profilePictureUrl };
+  }
+
+  return base;
 }
 
 /**

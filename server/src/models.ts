@@ -155,7 +155,7 @@ export interface UserPreferencesRecord {
   userId: RecordId; // References User records; should also be used as repo key
   theme: UserTheme;
   fontSize: UserFontSize;
-  profilePictureUrl: string;
+  profilePictureUrl?: string;
   banner?: BannerPreferences;
   updatedAt: DateISO;
 }

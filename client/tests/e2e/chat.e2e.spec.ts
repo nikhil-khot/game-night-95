@@ -90,24 +90,16 @@ test.describe("Chat profile pictures", () => {
     await page2.keyboard.type(`Hello from ${username2}`);
     await page2.keyboard.press("Enter");
 
-    // Debugging: Log usernames
-    console.log("Username 1:", username1);
-    console.log("Username 2:", username2);
-
     // Verify Player 1's profile picture is displayed next to their message
     const player1Message = page1.getByText(`Hello from ${username1}`);
     const player1ProfilePicture = player1Message.locator("xpath=../img"); // Adjusted locator
     await player1ProfilePicture.waitFor({ state: "visible" }); // Ensure the image is visible
-    const player1Src = await player1ProfilePicture.getAttribute("src");
-    console.log("Player 1 Profile Picture URL:", player1Src);
     await expect(player1ProfilePicture).toHaveAttribute("src", /player1/);
 
     // Verify Player 2's profile picture is displayed next to their message
     const player2Message = page2.getByText(`Hello from ${username2}`);
     const player2ProfilePicture = player2Message.locator("xpath=../img"); // Adjusted locator
     await player2ProfilePicture.waitFor({ state: "visible" }); // Ensure the image is visible
-    const player2Src = await player2ProfilePicture.getAttribute("src");
-    console.log("Player 2 Profile Picture URL:", player2Src);
     await expect(player2ProfilePicture).toHaveAttribute("src", /player2/);
 
     // Verify both profile pictures are visible on both pages

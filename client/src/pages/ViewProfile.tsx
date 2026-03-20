@@ -2,6 +2,8 @@ import type { SafeUserInfo } from "@gamenite/shared";
 import { useEffect, useState } from "react";
 import useTimeSince from "../hooks/useTimeSince";
 import { getUserById } from "../services/userService";
+import useFetchUserPreferences from "../hooks/useFetchUserPreferences";
+import ProfileAvatar from "../components/ProfileAvatar";
 
 interface ViewProfileProps {
   username: string;
@@ -11,6 +13,9 @@ export default function ViewProfile({ username }: ViewProfileProps) {
     { type: "waiting" } | { type: "error"; msg: string } | { type: "profile"; user: SafeUserInfo }
   >({ type: "waiting" });
   const timeSince = useTimeSince();
+  const viewProfileUsername = componentState.type === "profile" ? componentState.user.username : "";
+  const profileUrl = useFetchUserPreferences(viewProfileUsername);
+  console.log("Profile URL:", viewProfileUsername);
 
   useEffect(() => {
     let cancel = false;
@@ -45,6 +50,9 @@ export default function ViewProfile({ username }: ViewProfileProps) {
           <h2>Profile for {componentState.user.display}</h2>
           <div>
             <ul>
+              <div>
+                <ProfileAvatar imageUrl={profileUrl} width="100px" height="100px" />
+              </div>
               <li>Username: {componentState.user.username}</li>
               <li>Account created {timeSince(componentState.user.createdAt)}</li>
             </ul>

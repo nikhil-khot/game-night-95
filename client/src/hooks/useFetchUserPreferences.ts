@@ -1,16 +1,19 @@
 import { useEffect, useState } from "react";
 import { getUserPreferences } from "../services/userService";
-import useLoginContext from "./useLoginContext";
 
 export default function useFetchUserPreferences(username: string) {
   const [profilePictureUrl, setProfilePictureUrl] = useState<string>("");
-  const { user } = useLoginContext();
 
   useEffect(() => {
     let cancelled = false;
 
     const load = async () => {
-      const response = await getUserPreferences(user.username);
+      if (!username) {
+        setProfilePictureUrl(""); // Clear the profile picture if no username is provided
+        return;
+      }
+
+      const response = await getUserPreferences(username); // Use the passed `username`
       if (!cancelled && !("error" in response)) {
         setProfilePictureUrl(response.profilePictureUrl ?? "");
       }
@@ -21,6 +24,7 @@ export default function useFetchUserPreferences(username: string) {
     return () => {
       cancelled = true;
     };
-  }, [user.username]);
+  }, [username]); // Depend on the `username` argument
+
   return profilePictureUrl;
 }

@@ -15,7 +15,6 @@ export default function ViewProfile({ username }: ViewProfileProps) {
   const timeSince = useTimeSince();
   const viewProfileUsername = componentState.type === "profile" ? componentState.user.username : "";
   const profileUrl = useFetchUserPreferences(viewProfileUsername);
-  console.log("Profile URL:", viewProfileUsername);
 
   useEffect(() => {
     let cancel = false;

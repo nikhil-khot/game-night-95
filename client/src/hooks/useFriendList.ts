@@ -9,7 +9,10 @@ import { getFriendsList, getPendingRequests } from "../services/friendService.ts
  * @param refreshTrigger - A value that when changed will trigger a refetch
  * @returns A message to display if loading/error, or the list of friends
  */
-export function useFriendList(username: string, refreshTrigger: number = 0): { message: string } | SafeUserInfo[] {
+export function useFriendList(
+  username: string,
+  refreshTrigger: number = 0,
+): { message: string } | SafeUserInfo[] {
   const [friends, setFriends] = useState<SafeUserInfo[] | ErrorMsg | null>(null);
 
   useEffect(() => {
@@ -33,7 +36,10 @@ export function useFriendList(username: string, refreshTrigger: number = 0): { m
  * @param refreshTrigger - A value that when changed will trigger a refetch
  * @returns A message to display if loading/error, or the list of pending requesters
  */
-export function usePendingRequests(username: string, refreshTrigger: number = 0): { message: string } | SafeUserInfo[] {
+export function usePendingRequests(
+  username: string,
+  refreshTrigger: number = 0,
+): { message: string } | SafeUserInfo[] {
   const [pending, setPending] = useState<SafeUserInfo[] | ErrorMsg | null>(null);
 
   useEffect(() => {

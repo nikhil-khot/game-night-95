@@ -4,6 +4,7 @@ import useThreadInfo from "../hooks/useThreadInfo.ts";
 import NewForumComment from "../components/NewForumComment.tsx";
 import useTimeSince from "../hooks/useTimeSince.ts";
 import UserLink from "../components/UserLink.tsx";
+import useThreadScore from "../hooks/useThreadScore.ts";
 
 export default function ThreadPage() {
   const formatTimeSince = useTimeSince();
@@ -12,6 +13,11 @@ export default function ThreadPage() {
   // non-nullish assertion is okay here given that Thread is only called in a
   // route with `:threadId` on the path
   const { threadInfo, setThread } = useThreadInfo(threadId!);
+  const { handleUpvote, handleDownvote } = useThreadScore(
+    threadId!,
+    "message" in threadInfo ? 0 : threadInfo.points,
+    setThread,
+  );
 
   return (
     <div className="content">
@@ -19,12 +25,24 @@ export default function ThreadPage() {
         threadInfo.message
       ) : (
         <div className="spacedSection">
-          <h2>{threadInfo.title}</h2>
-          <div className="notTooWide">{threadInfo.text}</div>
-          <div className="smallAndGray">
-            Posted by <UserLink user={threadInfo.createdBy} />{" "}
-            {formatTimeSince(threadInfo.createdAt)}
+          <div>
+            <h2>{threadInfo.title}</h2>
+            <div className="smallAndGray">
+              Posted by <UserLink user={threadInfo.createdBy} />{" "}
+              {formatTimeSince(threadInfo.createdAt)}
+            </div>
           </div>
+          <div className="notTooWide">{threadInfo.text}</div>
+          <div className="medium">
+            <button className="arrow up" onClick={handleUpvote}>
+              ➤
+            </button>
+            {threadInfo.points} {threadInfo.points === 1 ? "point" : "points"}
+            <button className="arrow down" onClick={handleDownvote}>
+              ➤
+            </button>
+          </div>
+          <h3>Replies</h3>
           <div className="dottedList" role="list">
             {threadInfo.comments.map(({ commentId, text, createdBy, createdAt, editedAt }) => (
               <div className="dottedListItem" role="listitem" key={commentId}>

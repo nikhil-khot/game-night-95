@@ -93,6 +93,30 @@ button.secondary:disabled {
   color: oklch(0.9 0 0);
 }
 
+button.arrow {
+  background: none;
+  border: none;
+  font-size: 1rem;
+}
+
+button.up {
+  color: rgb(80, 151, 80);
+  transform: rotate(-90deg);
+}
+
+button.up:hover {
+  color: rgb(51, 99, 51);
+}
+
+button.down {
+  color: rgb(143, 63, 63);
+  transform: rotate(90deg);
+}
+
+button.down:hover {
+  color: rgb(101, 44, 44);
+}
+
 /** Input fields **/
 textarea {
   resize: block;
@@ -187,4 +211,8 @@ hr {
 .smallAndGray {
   font-size: 0.75rem;
   color: var(--gray-foreground);
+}
+
+.medium {
+  font-size: 0.85rem;
 }

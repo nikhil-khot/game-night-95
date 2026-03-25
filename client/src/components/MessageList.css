@@ -54,3 +54,41 @@ div.chatScroller .chatMe .chatContent {
   margin-left: auto;
   background-color: oklch(0.9 0.05 260);
 }
+.chatContentWrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* Space between the avatar and the message */
+}
+
+.chatMe .chatContentWrapper {
+  justify-content: flex-end; /* Align avatar and message to the right */
+}
+
+.chatOther .chatContentWrapper {
+  justify-content: flex-start; /* Align avatar and message to the left */
+}
+
+.chatContent {
+  background-color: #007bff; /* Blue for sent messages */
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  max-width: 70%;
+  word-wrap: break-word;
+}
+
+.chatMe .chatContent {
+  background-color: #007bff; /* Blue for sent messages */
+}
+
+.chatOther .chatContent {
+  background-color: #e5e5e5; /* Gray for received messages */
+  color: black;
+}
+
+.profile-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}

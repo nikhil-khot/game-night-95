@@ -115,3 +115,73 @@ export async function addCommentToThread(
   await ThreadRepo.set(possibleThreadId, newThread);
   return populateThreadInfo(threadId);
 }
+
+export async function upvoteThread(
+  possibleThreadId: string,
+  userId: UserWithId,
+): Promise<ThreadInfo | null> {
+  const oldThread = await ThreadRepo.find(possibleThreadId);
+  if (!oldThread) return null;
+  const threadId = possibleThreadId; // We know the thread ID is valid at this point
+  const upvoters = oldThread.upvoters;
+  if (upvoters.indexOf(userId.userId) !== -1) {
+    // User has already upvoted, so do nothing
+    return populateThreadInfo(threadId);
+  }
+  const downvoters = oldThread.downvoters;
+  if (downvoters.indexOf(userId.userId) !== -1) {
+    // User had downvoted before, so remove the downvote and add an upvote
+    downvoters.splice(downvoters.indexOf(userId.userId), 1);
+    upvoters.push(userId.userId);
+    await ThreadRepo.set(possibleThreadId, {
+      ...oldThread,
+      upvoters,
+      downvoters,
+      points: oldThread.points + 2,
+    });
+  } else {
+    // User had not voted before, so just add the upvote
+    upvoters.push(userId.userId);
+    await ThreadRepo.set(possibleThreadId, {
+      ...oldThread,
+      upvoters,
+      points: oldThread.points + 1,
+    });
+  }
+  return populateThreadInfo(threadId);
+}
+
+export async function downvoteThread(
+  possibleThreadId: string,
+  userId: UserWithId,
+): Promise<ThreadInfo | null> {
+  const oldThread = await ThreadRepo.find(possibleThreadId);
+  if (!oldThread) return null;
+  const threadId = possibleThreadId; // We know the thread ID is valid at this point
+  const downvoters = oldThread.downvoters;
+  if (downvoters.indexOf(userId.userId) !== -1) {
+    // User has already downvoted, so do nothing
+    return populateThreadInfo(threadId);
+  }
+  const upvoters = oldThread.upvoters;
+  if (upvoters.indexOf(userId.userId) !== -1) {
+    // User had upvoted before, so remove the upvote and add a downvote
+    upvoters.splice(upvoters.indexOf(userId.userId), 1);
+    downvoters.push(userId.userId);
+    await ThreadRepo.set(possibleThreadId, {
+      ...oldThread,
+      upvoters,
+      downvoters,
+      points: oldThread.points - 2,
+    });
+  } else {
+    // User had not voted before, so just add the downvote
+    downvoters.push(userId.userId);
+    await ThreadRepo.set(possibleThreadId, {
+      ...oldThread,
+      downvoters,
+      points: oldThread.points - 1,
+    });
+  }
+  return populateThreadInfo(threadId);
+}

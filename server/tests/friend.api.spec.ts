@@ -10,7 +10,9 @@ const authInvalid = { username: "user1", password: "wrong" };
 
 describe("Friend controller API", () => {
   it("should reject poorly-formed send request payload", async () => {
-    response = await supertest(app).post("/api/friend/send").send({ auth: auth1, payload: { bad: 1 } });
+    response = await supertest(app)
+      .post("/api/friend/send")
+      .send({ auth: auth1, payload: { bad: 1 } });
     expect(response.status).toBe(400);
     expect(response.body).toStrictEqual({ error: "Poorly-formed request" });
   });
@@ -28,11 +30,17 @@ describe("Friend controller API", () => {
       .post("/api/friend/send")
       .send({ auth: auth1, payload: { toUsername: "user2" } });
     expect(response.status).toBe(200);
-    expect(response.body).toMatchObject({ fromUserId: expect.any(String), toUserId: expect.any(String), status: "pending" });
+    expect(response.body).toMatchObject({
+      fromUserId: expect.any(String),
+      toUserId: expect.any(String),
+      status: "pending",
+    });
 
     response = await supertest(app).get("/api/friend/pending").query({ username: "user2" });
     expect(response.status).toBe(200);
-    expect(response.body).toEqual([{ username: "user1", display: expect.any(String), createdAt: expect.any(String) }]);
+    expect(response.body).toEqual([
+      { username: "user1", display: expect.any(String), createdAt: expect.any(String) },
+    ]);
 
     response = await supertest(app)
       .post("/api/friend/respond")
@@ -42,7 +50,9 @@ describe("Friend controller API", () => {
 
     response = await supertest(app).get("/api/friend/list").query({ username: "user1" });
     expect(response.status).toBe(200);
-    expect(response.body).toEqual([{ username: "user2", display: expect.any(String), createdAt: expect.any(String) }]);
+    expect(response.body).toEqual([
+      { username: "user2", display: expect.any(String), createdAt: expect.any(String) },
+    ]);
 
     response = await supertest(app)
       .post("/api/friend/remove")

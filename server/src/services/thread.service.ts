@@ -125,7 +125,13 @@ export async function upvoteThread(
   const threadId = possibleThreadId; // We know the thread ID is valid at this point
   const upvoters = oldThread.upvoters;
   if (upvoters.indexOf(userId.userId) !== -1) {
-    // User has already upvoted, so do nothing
+    // User has already upvoted, so remove them
+    upvoters.splice(upvoters.indexOf(userId.userId), 1);
+    await ThreadRepo.set(possibleThreadId, {
+      ...oldThread,
+      upvoters,
+      points: oldThread.points - 1,
+    });
     return populateThreadInfo(threadId);
   }
   const downvoters = oldThread.downvoters;
@@ -160,7 +166,13 @@ export async function downvoteThread(
   const threadId = possibleThreadId; // We know the thread ID is valid at this point
   const downvoters = oldThread.downvoters;
   if (downvoters.indexOf(userId.userId) !== -1) {
-    // User has already downvoted, so do nothing
+    // User has already downvoted, so remove them
+    downvoters.splice(downvoters.indexOf(userId.userId), 1);
+    await ThreadRepo.set(possibleThreadId, {
+      ...oldThread,
+      downvoters,
+      points: oldThread.points + 1,
+    });
     return populateThreadInfo(threadId);
   }
   const upvoters = oldThread.upvoters;

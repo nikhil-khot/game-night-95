@@ -16,6 +16,13 @@
   flex-grow: 0;
 }
 
+.threadSummary .points {
+  text-align: center;
+  width: 1rem;
+  flex-shrink: 0;
+  flex-grow: 0;
+}
+
 .threadSummary .mid {
   flex-grow: 1;
   color: cornflowerblue;

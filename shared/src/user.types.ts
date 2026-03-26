@@ -67,4 +67,10 @@ export const zUserPreferencesUpdateRequest = z.object({
   fontSize: z.enum(["small", "medium", "large"]).optional(),
   profilePictureUrl: z.string().optional(),
   bannerImageUrl: z.string().optional(),
+  banner: z
+    .object({
+      imageUrl: z.string(),
+      position: z.enum(["top", "center", "bottom"]),
+    })
+    .optional(),
 });

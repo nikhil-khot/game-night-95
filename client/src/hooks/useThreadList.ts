@@ -5,7 +5,10 @@ import { threadList } from "../services/threadService.ts";
 /**
  * Custom hook to get the list of all thread summaries
  * @param maxSummaries - the maximum number of summaries desired (default is all of them)
- * @returns A message to display to the user (Loading... or an error message), or a list
+ * @returns An object with the following properties:
+ *  - `threadOrMessage`: An object with either the field message, with a string to display to the user,
+ *                       or the field threads, with a list of all requested ThreadSummaries
+ *  - `setThreadInList`: A function to update a single ThreadSummary within the list
  */
 export default function useThreadList(maxSummaries?: number):
   | { threadOrMessage: { message: string }; setThreadInList: (newThread: ThreadSummary) => void }

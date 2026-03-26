@@ -3,6 +3,20 @@ import { useState } from "react";
 import useAuth from "./useAuth";
 import { downvoteThread, upvoteThread } from "../services/threadService";
 
+/**
+ * Custom hook to upvote/downvote threads and update their scores
+ * @param threadId - The Id of the thread to update
+ * @param initialPoints - The points of the thread at the time this hook is called
+ * @param upvoters - The upvoters of this thread at the time this hook is called
+ * @param downvoters - The downvoters of the thread at the time this hook is called
+ * @param updateThread - The function to update the ThreadInfo or ThreadSummary that is being used to expose the thread
+ * @returns an object containing:
+ *  - `err`: An error message to display if voting failed for any reason
+ *  - `currPoints`: The current score of the thread
+ *  - `userContribution`: One of "upvote", "downvote", or "none" detailing how the user has interacted with the thread
+ *  - `handleUpvote`: The function to call for upvoting the thread
+ * -  `handleDownvote`: The function to call for downvoting the thread
+ */
 export default function useThreadScore(
   threadId: string,
   initialPoints: number,

@@ -120,6 +120,12 @@ export async function addCommentToThread(
   return populateThreadInfo(threadId);
 }
 
+/**
+ * Upvote a thread
+ * @param possibleThreadId - Ostensible thread ID
+ * @param userId - Upvoting user
+ * @returns the updated thread, or null if the thread does not exist
+ */
 export async function upvoteThread(
   possibleThreadId: string,
   userId: UserWithId,
@@ -161,6 +167,12 @@ export async function upvoteThread(
   return populateThreadInfo(threadId);
 }
 
+/**
+ * Downvote a thread
+ * @param possibleThreadId - Ostensible thread ID
+ * @param userId - Downvoting user
+ * @returns the updated thread, or null if the thread does not exist
+ */
 export async function downvoteThread(
   possibleThreadId: string,
   userId: UserWithId,

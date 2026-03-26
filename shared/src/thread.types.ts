@@ -9,6 +9,9 @@ import { type CommentInfo } from "./comment.types.ts";
  * - `threadId`: database key
  * - `title`: post title
  * - `text`: post contents
+ * - `points`: upvotes - downvotes for this thread
+ * - `upvoters`: users who have upvoted this thread
+ * - `downvoters`: users who have downvoted this thread
  * - `createdAt`: when the thread was posted
  * - `createdBy`: original poster of thread
  * - `comments`: replies to the thread
@@ -17,6 +20,9 @@ export interface ThreadInfo {
   threadId: string;
   title: string;
   text: string;
+  points: number;
+  upvoters: SafeUserInfo[];
+  downvoters: SafeUserInfo[];
   createdAt: Date;
   createdBy: SafeUserInfo;
   comments: CommentInfo[];

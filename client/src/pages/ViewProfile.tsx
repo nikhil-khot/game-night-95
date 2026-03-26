@@ -2,6 +2,8 @@ import type { SafeUserInfo } from "@gamenite/shared";
 import { useEffect, useState } from "react";
 import useTimeSince from "../hooks/useTimeSince";
 import { getUserById } from "../services/userService";
+import useThreadList from "../hooks/useThreadList";
+import ThreadSummaryView from "../components/ThreadSummaryView";
 import useFetchUserPreferences from "../hooks/useFetchUserPreferences";
 import ProfileAvatar from "../components/ProfileAvatar";
 import { useParams } from "react-router-dom";
@@ -18,6 +20,13 @@ export default function ViewProfile({ username: profileUsername }: ViewProfilePr
   const { username } = useParams<{ username: string }>();
   const validUsername = profileUsername || username;
   const { profilePictureUrl, bannerImageUrl } = useFetchUserPreferences(validUsername || "");
+  const { threadOrMessage, setThreadInList } = useThreadList();
+  const filteredThreads =
+    "message" in threadOrMessage
+      ? []
+      : threadOrMessage.threads.filter((thread) => thread.createdBy.username === username);
+  const viewProfileUsername = componentState.type === "profile" ? componentState.user.username : "";
+  const profileUrl = useFetchUserPreferences(viewProfileUsername);
 
   useEffect(() => {
     let cancel = false;
@@ -75,14 +84,37 @@ export default function ViewProfile({ username: profileUsername }: ViewProfilePr
                 <ProfileAvatar imageUrl={profilePictureUrl} width="200px" height="200px" />
               </div>
             </div>
+        <div className="content spacedSection">
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <h2>Profile for {componentState.user.display}</h2>
           </div>
           <div>
+            <h3>General information</h3>
             <ul>
               <p>Username: {componentState.user.username}</p>
               <p>Account created {timeSince(componentState.user.createdAt)}</p>
             </ul>
           </div>
-        </>
+          <hr style={{ marginBottom: 0 }} />
+          <h3>Forum Posts</h3>
+          <>
+            {"message" in threadOrMessage ? (
+              threadOrMessage.message
+            ) : filteredThreads.length > 0 ? (
+              <div className="dottedList" role="list">
+                {filteredThreads.map((thread) => (
+                  <ThreadSummaryView
+                    summary={thread}
+                    setThreadInList={setThreadInList}
+                    key={thread.threadId.toString()}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div>No posts found...</div>
+            )}
+          </>
+        </div>
       );
   }
 }

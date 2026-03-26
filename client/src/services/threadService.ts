@@ -54,7 +54,37 @@ export const addCommentToThread = async (
 };
 
 /**
- * Sends a POST request to create a new thread
+ * Sends a POST request to upvote a thread
+ */
+export const upvoteThread = async (auth: UserAuth, id: string): APIResponse<ThreadInfo> => {
+  try {
+    const res = await api.post<ThreadInfo | ErrorMsg>(`${THREAD_API_URL}/${id}/upvote`, {
+      auth,
+      payload: {},
+    });
+    return res.data;
+  } catch (error) {
+    return exceptionToErrorMsg(error);
+  }
+};
+
+/**
+ * Sends a POST request to downvote a thread
+ */
+export const downvoteThread = async (auth: UserAuth, id: string): APIResponse<ThreadInfo> => {
+  try {
+    const res = await api.post<ThreadInfo | ErrorMsg>(`${THREAD_API_URL}/${id}/downvote`, {
+      auth,
+      payload: {},
+    });
+    return res.data;
+  } catch (error) {
+    return exceptionToErrorMsg(error);
+  }
+};
+
+/**
+ * Sends a POST request to create a thread
  */
 export const createThread = async (
   auth: UserAuth,

@@ -36,7 +36,7 @@ export default function MessageList({ messages }: MessageListProps) {
           ) {
             const response = await getUserPreferences(message.createdBy.username);
             if (response && typeof response === "object" && "profilePictureUrl" in response) {
-              urls[message.createdBy.username] = response.profilePictureUrl || "";
+              urls[message.createdBy.username] = response.profilePictureUrl || ""; // Extract only profilePictureUrl
             }
           }
         }
@@ -80,7 +80,7 @@ export default function MessageList({ messages }: MessageListProps) {
               <div key={message.messageId} className="chatMe">
                 <div className="chatContentWrapper">
                   <div className="chatContent">{message.text}</div>
-                  <ProfileAvatar imageUrl={userUrl || ""} />
+                  <ProfileAvatar imageUrl={userUrl?.profilePictureUrl || ""} />
                 </div>
                 <div className="chatSender">{timeSince(message.createdAt)}</div>
               </div>

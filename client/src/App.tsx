@@ -25,7 +25,6 @@ import { resetDisplayPreferences } from "./util/displayPreferences.ts";
 import ViewProfile from "./pages/ViewProfile.tsx";
 import Friends from "./pages/Friends.tsx";
 
-
 /** If `true`, all incoming socket messages will be logged */
 const DEBUG_SOCKETS = false;
 

@@ -61,7 +61,7 @@ export default function ViewProfile({ username: profileUsername }: ViewProfilePr
       return <div>Loading...</div>;
     case "profile":
       return (
-        <>
+        <div className="content spacedSection">
           <h2>Profile for {componentState.user.display}</h2>
           <div className="view-profile-page">
             <div
@@ -84,36 +84,40 @@ export default function ViewProfile({ username: profileUsername }: ViewProfilePr
                 <ProfileAvatar imageUrl={profilePictureUrl} width="200px" height="200px" />
               </div>
             </div>
-        <div className="content spacedSection">
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <h2>Profile for {componentState.user.display}</h2>
-          </div>
-          <div>
-            <h3>General information</h3>
-            <ul>
-              <p>Username: {componentState.user.username}</p>
-              <p>Account created {timeSince(componentState.user.createdAt)}</p>
-            </ul>
-          </div>
-          <hr style={{ marginBottom: 0 }} />
-          <h3>Forum Posts</h3>
-          <>
-            {"message" in threadOrMessage ? (
-              threadOrMessage.message
-            ) : filteredThreads.length > 0 ? (
-              <div className="dottedList" role="list">
-                {filteredThreads.map((thread) => (
-                  <ThreadSummaryView
-                    summary={thread}
-                    setThreadInList={setThreadInList}
-                    key={thread.threadId.toString()}
-                  />
-                ))}
+            <div className="content spacedSection">
+              <div
+                style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
+              >
+                <h2>Profile for {componentState.user.display}</h2>
               </div>
-            ) : (
-              <div>No posts found...</div>
-            )}
-          </>
+              <div>
+                <h3>General information</h3>
+                <ul>
+                  <p>Username: {componentState.user.username}</p>
+                  <p>Account created {timeSince(componentState.user.createdAt)}</p>
+                </ul>
+              </div>
+            </div>
+            <hr style={{ marginBottom: 0 }} />
+            <h3>Forum Posts</h3>
+            <>
+              {"message" in threadOrMessage ? (
+                threadOrMessage.message
+              ) : filteredThreads.length > 0 ? (
+                <div className="dottedList" role="list">
+                  {filteredThreads.map((thread) => (
+                    <ThreadSummaryView
+                      summary={thread}
+                      setThreadInList={setThreadInList}
+                      key={thread.threadId.toString()}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div>No posts found...</div>
+              )}
+            </>
+          </div>
         </div>
       );
   }

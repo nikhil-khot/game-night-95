@@ -152,29 +152,20 @@ export default function UpdateProfile() {
             {bannerImageName && <div className="smallAndGray">Selected: {bannerImageName}</div>}
           </div>
         </div>
-      </div>
-      <hr />
-      {err && <p className="error-message">{err}</p>}
-      <div>
-        <button className="primary narrow">Submit</button>
-      </div>
-      <div>
-        <button
-          className="secondary narrow"
-          onClick={(e) => {
-            e.preventDefault(); // Prevent form submission
-            navigate(`/profile/view/${user.username}`); // Navigate using React Router
-          }}
-        >
-          View Profile
-        </button>
-      </div>
-      <div className="smallAndGray">After updating your profile, you will be logged out</div>
-    </form>
-        <br />
         {err && <p className="error-message">{err}</p>}
         <div>
           <button className="primary narrow">Submit</button>
+        </div>
+        <div>
+          <button
+            className="secondary narrow"
+            onClick={(e) => {
+              e.preventDefault(); // Prevent form submission
+              navigate(`/profile/view/${user.username}`); // Navigate using React Router
+            }}
+          >
+            View Profile
+          </button>
         </div>
         <div className="smallAndGray">After updating your profile, you will be logged out</div>
       </form>

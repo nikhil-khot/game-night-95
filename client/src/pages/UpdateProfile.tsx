@@ -4,6 +4,8 @@ import useTimeSince from "../hooks/useTimeSince";
 import useEditProfileForm from "../hooks/useEditProfileForm";
 import ImageUpload from "../components/ImageUpload";
 import ProfileAvatar from "../components/ProfileAvatar";
+import useThreadList from "../hooks/useThreadList";
+import ThreadSummaryView from "../components/ThreadSummaryView";
 
 export default function UpdateProfile() {
   const { user } = useLoginContext();
@@ -22,6 +24,11 @@ export default function UpdateProfile() {
     err,
     handleSubmit,
   } = useEditProfileForm();
+  const threadList = useThreadList();
+  const filteredThreads =
+    "message" in threadList
+      ? []
+      : threadList.filter((thread) => thread.createdBy.username === user.username);
 
   const handleProfileImageChange = (file: File) => {
     setUploadedImageName(file.name);
@@ -36,7 +43,7 @@ export default function UpdateProfile() {
   };
 
   return (
-    <form className="content spacedSection" onSubmit={handleSubmit}>
+    <>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h2>Profile</h2>
       </div>
@@ -48,83 +55,103 @@ export default function UpdateProfile() {
         </ul>
       </div>
       <hr />
-      <div className="spacedSection">
-        <h3>Display name</h3>
-        <div style={{ display: "flex", flexDirection: "row", gap: "0.5rem" }}>
-          <input
-            className="widefill notTooWide"
-            value={display}
-            onChange={(e) => setDisplay(e.target.value)}
-          />
-          <button
-            className="secondary narrow"
-            onClick={(e) => {
-              e.preventDefault(); // Don't submit form
-              setDisplay(user.display);
-            }}
-          >
-            Reset
-          </button>
-        </div>
-      </div>
-      <hr />
-      <div className="spacedSection">
-        <h3>Reset password</h3>
-        <div style={{ display: "flex", flexDirection: "row", gap: "0.5rem" }}>
-          <input
-            type={showPass ? "input" : "password"}
-            className="widefill notTooWide"
-            placeholder="New password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <button
-            className="secondary narrow"
-            onClick={(e) => {
-              e.preventDefault(); // Don't submit form
-              setPassword("");
-              setConfirm("");
-            }}
-          >
-            Reset
-          </button>
-          <button
-            className="secondary narrow"
-            aria-label="Toggle show password"
-            onClick={(e) => {
-              e.preventDefault(); // Don't submit form
-              setShowPass((v) => !v);
-            }}
-          >
-            {showPass ? "Hide" : "Reveal"}
-          </button>
-        </div>
-        <div style={{ display: "flex", flexDirection: "row", gap: "0.5rem" }}>
-          <input
-            type={showPass ? "input" : "password"}
-            className="widefill notTooWide"
-            placeholder="Confirm new password"
-            value={confirm}
-            onChange={(e) => setConfirm(e.target.value)}
-          />
-        </div>
-      </div>
-      <div className="spacedSection">
-        <h3>Upload profile image</h3>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-          <ProfileAvatar imageUrl={profilePictureUrl} />
-          <div>
-            <ImageUpload onChange={handleProfileImageChange} />
-            {uploadedImageName && <div className="smallAndGray">Selected: {uploadedImageName}</div>}
+      <form className="content spacedSection" onSubmit={handleSubmit}>
+        <div className="spacedSection">
+          <h3>Display name</h3>
+          <div style={{ display: "flex", flexDirection: "row", gap: "0.5rem" }}>
+            <input
+              className="widefill notTooWide"
+              value={display}
+              onChange={(e) => setDisplay(e.target.value)}
+            />
+            <button
+              className="secondary narrow"
+              onClick={(e) => {
+                e.preventDefault(); // Don't submit form
+                setDisplay(user.display);
+              }}
+            >
+              Reset
+            </button>
           </div>
         </div>
-      </div>
-      <hr />
-      {err && <p className="error-message">{err}</p>}
-      <div>
-        <button className="primary narrow">Submit</button>
-      </div>
-      <div className="smallAndGray">After updating your profile, you will be logged out</div>
-    </form>
+        <br />
+        <div className="spacedSection">
+          <h3>Reset password</h3>
+          <div style={{ display: "flex", flexDirection: "row", gap: "0.5rem" }}>
+            <input
+              type={showPass ? "input" : "password"}
+              className="widefill notTooWide"
+              placeholder="New password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <button
+              className="secondary narrow"
+              onClick={(e) => {
+                e.preventDefault(); // Don't submit form
+                setPassword("");
+                setConfirm("");
+              }}
+            >
+              Reset
+            </button>
+            <button
+              className="secondary narrow"
+              aria-label="Toggle show password"
+              onClick={(e) => {
+                e.preventDefault(); // Don't submit form
+                setShowPass((v) => !v);
+              }}
+            >
+              {showPass ? "Hide" : "Reveal"}
+            </button>
+          </div>
+          <div style={{ display: "flex", flexDirection: "row", gap: "0.5rem" }}>
+            <input
+              type={showPass ? "input" : "password"}
+              className="widefill notTooWide"
+              placeholder="Confirm new password"
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+            />
+          </div>
+        </div>
+        <br />
+        <div className="spacedSection">
+          <h3>Upload profile image</h3>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+            <ProfileAvatar imageUrl={profilePictureUrl} />
+            <div>
+              <ImageUpload onChange={handleProfileImageChange} />
+              {uploadedImageName && (
+                <div className="smallAndGray">Selected: {uploadedImageName}</div>
+              )}
+            </div>
+          </div>
+        </div>
+        <br />
+        {err && <p className="error-message">{err}</p>}
+        <div>
+          <button className="primary narrow">Submit</button>
+        </div>
+        <div className="smallAndGray">After updating your profile, you will be logged out</div>
+      </form>
+      <hr style={{ marginBottom: 0 }} />
+      <h3>Forum Posts</h3>
+      <>
+        {"message" in threadList ? (
+          threadList.message
+        ) : filteredThreads.length > 0 ? (
+          <div className="dottedList" role="list">
+            {filteredThreads.map((thread) => (
+              <ThreadSummaryView {...thread} key={thread.threadId.toString()} />
+            ))}
+          </div>
+        ) : (
+          <div>No posts found...</div>
+        )}
+      </>
+    </>
   );
 }

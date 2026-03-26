@@ -2,6 +2,8 @@ import type { SafeUserInfo } from "@gamenite/shared";
 import { useEffect, useState } from "react";
 import useTimeSince from "../hooks/useTimeSince";
 import { getUserById } from "../services/userService";
+import useThreadList from "../hooks/useThreadList";
+import ThreadSummaryView from "../components/ThreadSummaryView";
 
 interface ViewProfileProps {
   username: string;
@@ -11,6 +13,11 @@ export default function ViewProfile({ username }: ViewProfileProps) {
     { type: "waiting" } | { type: "error"; msg: string } | { type: "profile"; user: SafeUserInfo }
   >({ type: "waiting" });
   const timeSince = useTimeSince();
+  const threadList = useThreadList();
+  const filteredThreads =
+    "message" in threadList
+      ? []
+      : threadList.filter((thread) => thread.createdBy.username === username);
 
   useEffect(() => {
     let cancel = false;
@@ -41,15 +48,33 @@ export default function ViewProfile({ username }: ViewProfileProps) {
       return <div>Loading...</div>;
     case "profile":
       return (
-        <>
-          <h2>Profile for {componentState.user.display}</h2>
+        <div className="content spacedSection">
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <h2>Profile for {componentState.user.display}</h2>
+          </div>
           <div>
+            <h3>General information</h3>
             <ul>
               <li>Username: {componentState.user.username}</li>
               <li>Account created {timeSince(componentState.user.createdAt)}</li>
             </ul>
           </div>
-        </>
+          <hr style={{ marginBottom: 0 }} />
+          <h3>Forum Posts</h3>
+          <>
+            {"message" in threadList ? (
+              threadList.message
+            ) : filteredThreads.length > 0 ? (
+              <div className="dottedList" role="list">
+                {filteredThreads.map((thread) => (
+                  <ThreadSummaryView {...thread} key={thread.threadId.toString()} />
+                ))}
+              </div>
+            ) : (
+              <div>No posts found...</div>
+            )}
+          </>
+        </div>
       );
   }
 }

@@ -67,11 +67,5 @@ export const zUserPreferencesUpdateRequest = z.object({
   theme: z.enum(["light", "dark"]).optional(),
   fontSize: z.enum(["small", "medium", "large"]).optional(),
   profilePictureUrl: z.string().optional(),
-  banner: z
-    .object({
-      imageUrl: z.string().optional(),
-      position: z.enum(["top", "center", "bottom"]).optional(),
-      overlayOpacity: z.number().min(0).max(1).optional(),
-    })
-    .optional(),
+  bannerPictureUrl: z.string().optional(),
 });

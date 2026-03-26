@@ -4,12 +4,14 @@ import useTimeSince from "../hooks/useTimeSince";
 import useEditProfileForm from "../hooks/useEditProfileForm";
 import ImageUpload from "../components/ImageUpload";
 import ProfileAvatar from "../components/ProfileAvatar";
+import BannerAvatar from "../components/BannerAvatar";
 
 export default function UpdateProfile() {
   const { user } = useLoginContext();
   const timeSince = useTimeSince();
   const [showPass, setShowPass] = useState(false);
   const [uploadedImageName, setUploadedImageName] = useState<string>("");
+  const [bannerImageUrl, setBannerImageUrl] = useState<string>("");
   const {
     display,
     setDisplay,
@@ -19,6 +21,8 @@ export default function UpdateProfile() {
     setConfirm,
     profilePictureUrl,
     setProfilePictureUrl,
+    bannerPictureUrl,
+    setBannerPictureUrl,
     err,
     handleSubmit,
   } = useEditProfileForm();
@@ -30,6 +34,16 @@ export default function UpdateProfile() {
     reader.onload = () => {
       if (typeof reader.result === "string") {
         setProfilePictureUrl(reader.result);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleBannerImageChange = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        setBannerImageUrl(reader.result);
       }
     };
     reader.readAsDataURL(file);
@@ -115,6 +129,14 @@ export default function UpdateProfile() {
           <ProfileAvatar imageUrl={profilePictureUrl} />
           <div>
             <ImageUpload onChange={handleProfileImageChange} />
+            {uploadedImageName && <div className="smallAndGray">Selected: {uploadedImageName}</div>}
+          </div>
+        </div>
+        <h3>Upload Banner Image</h3>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+          <BannerAvatar imageUrl={bannerImageUrl} />
+          <div>
+            <ImageUpload onChange={handleBannerImageChange} />
             {uploadedImageName && <div className="smallAndGray">Selected: {uploadedImageName}</div>}
           </div>
         </div>

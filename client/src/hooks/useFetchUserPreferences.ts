@@ -3,6 +3,7 @@ import { getUserPreferences } from "../services/userService";
 
 export default function useFetchUserPreferences(username: string) {
   const [profilePictureUrl, setProfilePictureUrl] = useState<string>("");
+  const [bannerImageUrl, setBannerImageUrl] = useState<string>("");
 
   useEffect(() => {
     let cancelled = false;
@@ -16,6 +17,7 @@ export default function useFetchUserPreferences(username: string) {
       const response = await getUserPreferences(username); // Use the passed `username`
       if (!cancelled && !("error" in response)) {
         setProfilePictureUrl(response.profilePictureUrl ?? "");
+        setBannerImageUrl(response.banner ?? "");
       }
     };
 
@@ -26,5 +28,5 @@ export default function useFetchUserPreferences(username: string) {
     };
   }, [username]); // Depend on the `username` argument
 
-  return profilePictureUrl;
+  return { profilePictureUrl, bannerImageUrl };
 }

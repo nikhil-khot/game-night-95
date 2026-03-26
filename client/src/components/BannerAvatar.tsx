@@ -2,18 +2,19 @@ import React from "react";
 
 interface BannerAvatarProps {
   imageUrl?: string;
-  width?: number;
-  height?: number;
+  width?: string;
+  height?: string;
 }
 
-const DEFAULT_SIZE = 100; // Default size for the square avatar
-
-export default function BannerAvatar({ imageUrl, width = DEFAULT_SIZE, height = DEFAULT_SIZE }: BannerAvatarProps) {
+export default function BannerAvatar({ imageUrl, width, height }: BannerAvatarProps) {
   return (
     <div
       style={{
-        width: `${width}px`,
-        height: `${height}px`,
+        position: "absolute", // Ensure it doesn't affect layout
+        top: 0,
+        left: 0,
+        width: width || "36px",
+        height: height || "36px",
         borderRadius: "8px", // Slightly rounded corners for banners
         overflow: "hidden",
         display: "flex",

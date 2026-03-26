@@ -18,7 +18,7 @@ export default function useEditProfileForm() {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [profilePictureUrl, setProfilePictureUrl] = useState("");
-  const [bannerPictureUrl, setBannerPictureUrl] = useState("");
+  const [bannerImageUrl, setBannerImageUrl] = useState("");
   const [err, setErr] = useState<null | string>(null);
   const auth = useAuth();
 
@@ -29,7 +29,7 @@ export default function useEditProfileForm() {
     e.preventDefault();
 
     const hasProfilePictureUpdate = profilePictureUrl !== "";
-    const hasBannerPictureUpdate = bannerPictureUrl !== "";
+    const hasBannerImageUpdate = bannerImageUrl !== "";
 
     if (
       user.display === display &&
@@ -61,10 +61,10 @@ export default function useEditProfileForm() {
       return;
     }
 
-    if (hasProfilePictureUpdate || hasBannerPictureUpdate) {
+    if (hasProfilePictureUpdate || hasBannerImageUpdate) {
       const prefsResponse = await updateUserPreferences(auth, {
         profilePictureUrl,
-        bannerPictureUrl,
+        bannerImageUrl,
       });
       if ("error" in prefsResponse) {
         setErr(prefsResponse.error);
@@ -97,8 +97,8 @@ export default function useEditProfileForm() {
     setConfirm,
     profilePictureUrl,
     setProfilePictureUrl,
-    bannerPictureUrl,
-    setBannerPictureUrl,
+    bannerImageUrl,
+    setBannerImageUrl,
     err,
     handleSubmit,
   };

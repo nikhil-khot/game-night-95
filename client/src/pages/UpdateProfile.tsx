@@ -5,13 +5,15 @@ import useEditProfileForm from "../hooks/useEditProfileForm";
 import ImageUpload from "../components/ImageUpload";
 import ProfileAvatar from "../components/ProfileAvatar";
 import BannerAvatar from "../components/BannerAvatar";
+import { useNavigate } from "react-router-dom";
 
 export default function UpdateProfile() {
   const { user } = useLoginContext();
+  const navigate = useNavigate();
   const timeSince = useTimeSince();
   const [showPass, setShowPass] = useState(false);
   const [uploadedImageName, setUploadedImageName] = useState<string>("");
-  const [bannerImageUrl, setBannerImageUrl] = useState<string>("");
+  const [bannerImageName, setBannerImageName] = useState<string>("");
   const {
     display,
     setDisplay,
@@ -21,8 +23,8 @@ export default function UpdateProfile() {
     setConfirm,
     profilePictureUrl,
     setProfilePictureUrl,
-    bannerPictureUrl,
-    setBannerPictureUrl,
+    bannerImageUrl,
+    setBannerImageUrl,
     err,
     handleSubmit,
   } = useEditProfileForm();
@@ -40,6 +42,7 @@ export default function UpdateProfile() {
   };
 
   const handleBannerImageChange = (file: File) => {
+    setBannerImageName(file.name);
     const reader = new FileReader();
     reader.onload = () => {
       if (typeof reader.result === "string") {
@@ -137,7 +140,7 @@ export default function UpdateProfile() {
           <BannerAvatar imageUrl={bannerImageUrl} />
           <div>
             <ImageUpload onChange={handleBannerImageChange} />
-            {uploadedImageName && <div className="smallAndGray">Selected: {uploadedImageName}</div>}
+            {bannerImageName && <div className="smallAndGray">Selected: {bannerImageName}</div>}
           </div>
         </div>
       </div>
@@ -145,6 +148,17 @@ export default function UpdateProfile() {
       {err && <p className="error-message">{err}</p>}
       <div>
         <button className="primary narrow">Submit</button>
+      </div>
+      <div>
+        <button
+          className="secondary narrow"
+          onClick={(e) => {
+            e.preventDefault(); // Prevent form submission
+            navigate(`/profile/view/${user.username}`); // Navigate using React Router
+          }}
+        >
+          View Profile
+        </button>
       </div>
       <div className="smallAndGray">After updating your profile, you will be logged out</div>
     </form>

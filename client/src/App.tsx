@@ -22,6 +22,7 @@ import TimeContextKeeper from "./components/UpdatingTimeContext.tsx";
 import Preferences from "./pages/Preferences.tsx";
 import ApplyUserPreferences from "./components/ApplyUserPreferences.tsx";
 import { resetDisplayPreferences } from "./util/displayPreferences.ts";
+import ViewProfile from "./pages/ViewProfile.tsx";
 
 /** If `true`, all incoming socket messages will be logged */
 const DEBUG_SOCKETS = false;
@@ -82,6 +83,7 @@ export default function App() {
             <Route path="/game/new" element={<NewGame />} />
             <Route path="/game/:gameId" element={<Game />} />
             <Route path="/profile/:username" element={<Profile />} />
+            <Route path="/profile/view/:username" element={<ViewProfile />} />
             <Route path="/preferences" element={<Preferences />} />
             <Route path="/*" element={<NoSuchRoute />} />
           </Route>

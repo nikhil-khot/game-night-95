@@ -24,11 +24,11 @@ export default function UpdateProfile() {
     err,
     handleSubmit,
   } = useEditProfileForm();
-  const threadList = useThreadList();
+  const { threadOrMessage, setThreadInList } = useThreadList();
   const filteredThreads =
-    "message" in threadList
+    "message" in threadOrMessage
       ? []
-      : threadList.filter((thread) => thread.createdBy.username === user.username);
+      : threadOrMessage.threads.filter((thread) => thread.createdBy.username === user.username);
 
   const handleProfileImageChange = (file: File) => {
     setUploadedImageName(file.name);
@@ -140,12 +140,16 @@ export default function UpdateProfile() {
       <hr style={{ marginBottom: 0 }} />
       <h3>Forum Posts</h3>
       <>
-        {"message" in threadList ? (
-          threadList.message
+        {"message" in threadOrMessage ? (
+          threadOrMessage.message
         ) : filteredThreads.length > 0 ? (
           <div className="dottedList" role="list">
             {filteredThreads.map((thread) => (
-              <ThreadSummaryView {...thread} key={thread.threadId.toString()} />
+              <ThreadSummaryView
+                summary={thread}
+                setThreadInList={setThreadInList}
+                key={thread.threadId.toString()}
+              />
             ))}
           </div>
         ) : (

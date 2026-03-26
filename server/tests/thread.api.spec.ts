@@ -136,3 +136,201 @@ describe("POST /api/thread/:id/comment", () => {
     ]);
   });
 });
+
+describe("POST /api/thread/:id/upvote", () => {
+  const upvote = { auth: auth2, payload: {} };
+
+  it("should return 400 on on ill-formed payload", async () => {
+    response = await supertest(app)
+      .post(`/api/thread/deadbeefdeadbeefdeadbeef/upvote`)
+      .send({ auth: "bad" });
+    expect(response.status).toBe(400);
+  });
+
+  it("should return 404 on a bad id", async () => {
+    response = await supertest(app)
+      .post(`/api/thread/${randomUUID().toString()}/upvote`)
+      .send(upvote);
+    expect(response.status).toBe(404);
+  });
+
+  it("should return 403 with bad auth", async () => {
+    response = await supertest(app)
+      .post(`/api/thread/deadbeefdeadbeefdeadbeef/upvote`)
+      .send({ auth: { ...auth1, username: "user1", password: "no" }, payload: {} });
+    expect(response.status).toBe(403);
+  });
+
+  it("should succeed with correct information", async () => {
+    response = await supertest(app)
+      .post(`/api/thread/deadbeefdeadbeefdeadbeef/upvote`)
+      .send(upvote);
+    expect(response.status).toBe(200);
+    expect(response.body).toStrictEqual({
+      threadId: "deadbeefdeadbeefdeadbeef",
+      title: "Hello game knights",
+      text: "I'm a big Nim buff and am excited to join this community.",
+      points: 1,
+      upvoters: [{ username: "user2", display: "Sénior Dos", createdAt: expect.anything() }],
+      downvoters: [],
+      comments: [],
+      createdBy: { username: "user1", display: "Yāo", createdAt: expect.anything() },
+      createdAt: new Date("2025-04-02").toISOString(),
+    });
+  });
+});
+
+describe("POST /api/thread/:id/downvote", () => {
+  const downvote = { auth: auth2, payload: {} };
+
+  it("should return 400 on on ill-formed payload", async () => {
+    response = await supertest(app)
+      .post(`/api/thread/deadbeefdeadbeefdeadbeef/downvote`)
+      .send({ auth: "bad" });
+    expect(response.status).toBe(400);
+  });
+
+  it("should return 404 on a bad id", async () => {
+    response = await supertest(app)
+      .post(`/api/thread/${randomUUID().toString()}/downvote`)
+      .send(downvote);
+    expect(response.status).toBe(404);
+  });
+
+  it("should return 403 with bad auth", async () => {
+    response = await supertest(app)
+      .post(`/api/thread/deadbeefdeadbeefdeadbeef/downvote`)
+      .send({ auth: { ...auth1, username: "user1", password: "no" }, payload: {} });
+    expect(response.status).toBe(403);
+  });
+
+  it("should succeed with correct information", async () => {
+    response = await supertest(app)
+      .post(`/api/thread/deadbeefdeadbeefdeadbeef/downvote`)
+      .send(downvote);
+    expect(response.status).toBe(200);
+    expect(response.body).toStrictEqual({
+      threadId: "deadbeefdeadbeefdeadbeef",
+      title: "Hello game knights",
+      text: "I'm a big Nim buff and am excited to join this community.",
+      points: -1,
+      upvoters: [],
+      downvoters: [{ username: "user2", display: "Sénior Dos", createdAt: expect.anything() }],
+      comments: [],
+      createdBy: { username: "user1", display: "Yāo", createdAt: expect.anything() },
+      createdAt: new Date("2025-04-02").toISOString(),
+    });
+  });
+});
+
+describe("POST /api/thread/:id/ upvote/downvote removal behaviour", () => {
+  const vote = { auth: auth2, payload: {} };
+
+  it("should remove subsequent upvotes", async () => {
+    response = await supertest(app).post(`/api/thread/deadbeefdeadbeefdeadbeef/upvote`).send(vote);
+    expect(response.status).toBe(200);
+    expect(response.body).toStrictEqual({
+      threadId: "deadbeefdeadbeefdeadbeef",
+      title: "Hello game knights",
+      text: "I'm a big Nim buff and am excited to join this community.",
+      points: 1,
+      upvoters: [{ username: "user2", display: "Sénior Dos", createdAt: expect.anything() }],
+      downvoters: [],
+      comments: [],
+      createdBy: { username: "user1", display: "Yāo", createdAt: expect.anything() },
+      createdAt: new Date("2025-04-02").toISOString(),
+    });
+    response = await supertest(app).post(`/api/thread/deadbeefdeadbeefdeadbeef/upvote`).send(vote);
+    expect(response.status).toBe(200);
+    expect(response.body).toStrictEqual({
+      threadId: "deadbeefdeadbeefdeadbeef",
+      title: "Hello game knights",
+      text: "I'm a big Nim buff and am excited to join this community.",
+      points: 0,
+      upvoters: [],
+      downvoters: [],
+      comments: [],
+      createdBy: { username: "user1", display: "Yāo", createdAt: expect.anything() },
+      createdAt: new Date("2025-04-02").toISOString(),
+    });
+  });
+
+  it("should remove subsequent downvotes", async () => {
+    response = await supertest(app)
+      .post(`/api/thread/deadbeefdeadbeefdeadbeef/downvote`)
+      .send(vote);
+    expect(response.status).toBe(200);
+    expect(response.body).toStrictEqual({
+      threadId: "deadbeefdeadbeefdeadbeef",
+      title: "Hello game knights",
+      text: "I'm a big Nim buff and am excited to join this community.",
+      points: -1,
+      upvoters: [],
+      downvoters: [{ username: "user2", display: "Sénior Dos", createdAt: expect.anything() }],
+      comments: [],
+      createdBy: { username: "user1", display: "Yāo", createdAt: expect.anything() },
+      createdAt: new Date("2025-04-02").toISOString(),
+    });
+    response = await supertest(app)
+      .post(`/api/thread/deadbeefdeadbeefdeadbeef/downvote`)
+      .send(vote);
+    expect(response.status).toBe(200);
+    expect(response.body).toStrictEqual({
+      threadId: "deadbeefdeadbeefdeadbeef",
+      title: "Hello game knights",
+      text: "I'm a big Nim buff and am excited to join this community.",
+      points: 0,
+      upvoters: [],
+      downvoters: [],
+      comments: [],
+      createdBy: { username: "user1", display: "Yāo", createdAt: expect.anything() },
+      createdAt: new Date("2025-04-02").toISOString(),
+    });
+  });
+
+  it("should flip subsequent downvotes and upvotes", async () => {
+    response = await supertest(app)
+      .post(`/api/thread/deadbeefdeadbeefdeadbeef/downvote`)
+      .send(vote);
+    expect(response.status).toBe(200);
+    expect(response.body).toStrictEqual({
+      threadId: "deadbeefdeadbeefdeadbeef",
+      title: "Hello game knights",
+      text: "I'm a big Nim buff and am excited to join this community.",
+      points: -1,
+      upvoters: [],
+      downvoters: [{ username: "user2", display: "Sénior Dos", createdAt: expect.anything() }],
+      comments: [],
+      createdBy: { username: "user1", display: "Yāo", createdAt: expect.anything() },
+      createdAt: new Date("2025-04-02").toISOString(),
+    });
+    response = await supertest(app).post(`/api/thread/deadbeefdeadbeefdeadbeef/upvote`).send(vote);
+    expect(response.status).toBe(200);
+    expect(response.body).toStrictEqual({
+      threadId: "deadbeefdeadbeefdeadbeef",
+      title: "Hello game knights",
+      text: "I'm a big Nim buff and am excited to join this community.",
+      points: 1,
+      upvoters: [{ username: "user2", display: "Sénior Dos", createdAt: expect.anything() }],
+      downvoters: [],
+      comments: [],
+      createdBy: { username: "user1", display: "Yāo", createdAt: expect.anything() },
+      createdAt: new Date("2025-04-02").toISOString(),
+    });
+    response = await supertest(app)
+      .post(`/api/thread/deadbeefdeadbeefdeadbeef/downvote`)
+      .send(vote);
+    expect(response.status).toBe(200);
+    expect(response.body).toStrictEqual({
+      threadId: "deadbeefdeadbeefdeadbeef",
+      title: "Hello game knights",
+      text: "I'm a big Nim buff and am excited to join this community.",
+      points: -1,
+      upvoters: [],
+      downvoters: [{ username: "user2", display: "Sénior Dos", createdAt: expect.anything() }],
+      comments: [],
+      createdBy: { username: "user1", display: "Yāo", createdAt: expect.anything() },
+      createdAt: new Date("2025-04-02").toISOString(),
+    });
+  });
+});

@@ -35,7 +35,8 @@ export default function useEditProfileForm() {
       user.display === display &&
       password === confirm &&
       password === "" &&
-      !hasProfilePictureUpdate
+      !hasProfilePictureUpdate &&
+      !hasBannerImageUpdate
     ) {
       setErr("No changes to submit");
       return;

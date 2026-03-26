@@ -11,13 +11,20 @@ export default function useFetchUserPreferences(username: string) {
     const load = async () => {
       if (!username) {
         setProfilePictureUrl(""); // Clear the profile picture if no username is provided
+        setBannerImageUrl("");
         return;
       }
 
       const response = await getUserPreferences(username); // Use the passed `username`
-      if (!cancelled && !("error" in response)) {
-        setProfilePictureUrl(response.profilePictureUrl ?? "");
-        setBannerImageUrl(response.banner ?? "");
+      if (!cancelled) {
+        if ("error" in response) {
+          setProfilePictureUrl("");
+          setBannerImageUrl("");
+        } else {
+          setProfilePictureUrl(response.profilePictureUrl ?? "");
+          setBannerImageUrl(response.bannerImageUrl ?? "");
+
+        }
       }
     };
 

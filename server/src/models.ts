@@ -133,15 +133,6 @@ export type UserTheme = "light" | "dark";
 export type UserFontSize = "small" | "medium" | "large";
 
 /**
- * Optional banner customization metadata for a user's profile.
- */
-export interface BannerPreferences {
-  imageUrl?: string;
-  position?: "top" | "center" | "bottom";
-  overlayOpacity?: number;
-}
-
-/**
  * Represents a user's persisted UI/display preferences.
  *
  * `userId`: the user ID of the corresponding User model; also serves as the repo key for this record
@@ -156,7 +147,7 @@ export interface UserPreferencesRecord {
   theme: UserTheme;
   fontSize: UserFontSize;
   profilePictureUrl?: string;
-  banner?: BannerPreferences;
+  bannerImageUrl?: string;
   updatedAt: DateISO;
 }
 

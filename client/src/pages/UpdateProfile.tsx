@@ -137,7 +137,6 @@ export default function UpdateProfile() {
         </div>
         <h3>Upload Banner Image</h3>
         <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-          <BannerAvatar imageUrl={bannerImageUrl} />
           <div>
             <ImageUpload onChange={handleBannerImageChange} />
             {bannerImageName && <div className="smallAndGray">Selected: {bannerImageName}</div>}

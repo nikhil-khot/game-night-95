@@ -31,7 +31,7 @@ export interface UserPreferences {
   theme: "light" | "dark";
   fontSize: "small" | "medium" | "large";
   profilePictureUrl?: string;
-  banner?: string;
+  bannerImageUrl?: string;
   updatedAt: Date;
 }
 
@@ -46,7 +46,7 @@ export interface UserPreferencesRecord {
   theme: "light" | "dark";
   fontSize: "small" | "medium" | "large";
   profilePictureUrl?: string;
-  banner?: string;
+  bannerImageUrl?: string;
   updatedAt: string;
 }
 

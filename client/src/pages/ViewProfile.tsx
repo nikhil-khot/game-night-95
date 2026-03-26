@@ -4,6 +4,8 @@ import useTimeSince from "../hooks/useTimeSince";
 import { getUserById } from "../services/userService";
 import useThreadList from "../hooks/useThreadList";
 import ThreadSummaryView from "../components/ThreadSummaryView";
+import useFetchUserPreferences from "../hooks/useFetchUserPreferences";
+import ProfileAvatar from "../components/ProfileAvatar";
 
 interface ViewProfileProps {
   username: string;
@@ -18,6 +20,8 @@ export default function ViewProfile({ username }: ViewProfileProps) {
     "message" in threadOrMessage
       ? []
       : threadOrMessage.threads.filter((thread) => thread.createdBy.username === username);
+  const viewProfileUsername = componentState.type === "profile" ? componentState.user.username : "";
+  const profileUrl = useFetchUserPreferences(viewProfileUsername);
 
   useEffect(() => {
     let cancel = false;
@@ -55,6 +59,9 @@ export default function ViewProfile({ username }: ViewProfileProps) {
           <div>
             <h3>General information</h3>
             <ul>
+              <div>
+                <ProfileAvatar imageUrl={profileUrl} width="100px" height="100px" />
+              </div>
               <li>Username: {componentState.user.username}</li>
               <li>Account created {timeSince(componentState.user.createdAt)}</li>
             </ul>

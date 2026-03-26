@@ -39,10 +39,24 @@ export interface BannerPreferences {
 export interface UserPreferences {
   theme: "light" | "dark";
   fontSize: "small" | "medium" | "large";
-  profilePictureChoice?: string;
   profilePictureUrl?: string;
   banner?: BannerPreferences;
   updatedAt: Date;
+}
+
+/**
+ * DB-shaped user preferences record.
+ *
+ * Use this when handling data that comes from persistence layers where
+ * timestamps are serialized and the owning `userId` is included.
+ */
+export interface UserPreferencesRecord {
+  userId: string;
+  theme: "light" | "dark";
+  fontSize: "small" | "medium" | "large";
+  profilePictureUrl?: string;
+  banner?: BannerPreferences;
+  updatedAt: string;
 }
 
 /**
@@ -52,7 +66,6 @@ export type UserPreferencesUpdateRequest = z.infer<typeof zUserPreferencesUpdate
 export const zUserPreferencesUpdateRequest = z.object({
   theme: z.enum(["light", "dark"]).optional(),
   fontSize: z.enum(["small", "medium", "large"]).optional(),
-  profilePictureChoice: z.string().optional(),
   profilePictureUrl: z.string().optional(),
   banner: z
     .object({

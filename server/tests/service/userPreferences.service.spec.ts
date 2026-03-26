@@ -40,14 +40,12 @@ describe("updateUserPreferences", () => {
     });
 
     const updated2 = await updateUserPreferences(user!.userId, {
-      profilePictureChoice: "avatar-1",
       banner: { imageUrl: "https://example.com/b.png", position: "top" },
     });
     expect(updated2).toStrictEqual({
       userId: user!.userId,
       theme: "dark",
       fontSize: "medium",
-      profilePictureChoice: "avatar-1",
       banner: { imageUrl: "https://example.com/b.png", position: "top" },
       updatedAt: expect.anything(),
     });

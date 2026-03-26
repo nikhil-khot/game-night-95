@@ -2,6 +2,8 @@ import useLoginContext from "../hooks/useLoginContext.ts";
 import "./Header.css";
 import { useNavigate } from "react-router-dom";
 import { resetDisplayPreferences } from "../util/displayPreferences.ts";
+import ProfileAvatar from "./ProfileAvatar.tsx";
+import useFetchUserPreferences from "../hooks/useFetchUserPreferences.ts";
 
 /**
  * Header component that renders the main title.
@@ -9,11 +11,15 @@ import { resetDisplayPreferences } from "../util/displayPreferences.ts";
 export default function Header() {
   const { user, reset } = useLoginContext();
   const navigate = useNavigate();
+  const profilePictureUrl = useFetchUserPreferences(user.username);
 
   return (
     <div id="header" className="header">
       <div className="title">GameNite!</div>
-      signed in as {user.display}
+      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+        <span>signed in as {user.display}</span>
+        <ProfileAvatar imageUrl={profilePictureUrl} />
+      </div>
       <button
         className="narrowcenter secondary"
         onClick={() => {

@@ -39,6 +39,30 @@ describe("sendFriendRequest/respondToFriendRequest", () => {
     expect(accepted).toMatchObject({ status: "accepted" });
   });
 
+  it("returns already friends when duplicate request after accepted", async () => {
+    await sendFriendRequest("user1", "user2");
+    await respondToFriendRequest("user2", "user1", "accepted");
+
+    await expect(sendFriendRequest("user1", "user2")).resolves.toStrictEqual({
+      error: "You are already friends",
+    });
+  });
+
+  it("returns no friend request found when responding with none pending", async () => {
+    await expect(respondToFriendRequest("user2", "user1", "accepted")).resolves.toStrictEqual({
+      error: "No friend request found between these users",
+    });
+  });
+
+  it("returns already resolved when responding to already accepted request", async () => {
+    await sendFriendRequest("user1", "user2");
+    await respondToFriendRequest("user2", "user1", "accepted");
+
+    await expect(respondToFriendRequest("user2", "user1", "declined")).resolves.toStrictEqual({
+      error: "This request has already been resolved",
+    });
+  });
+
   it("returns not-found errors for unknown users", async () => {
     await expect(sendFriendRequest("nope", "user2")).resolves.toStrictEqual({
       error: "User nope not found",
@@ -93,6 +117,16 @@ describe("getFriends/getPendingRequests/removeFriend", () => {
       error: "User nope not found",
     });
     await expect(removeFriend("ghost", "user2")).resolves.toStrictEqual({
+      error: "User ghost not found",
+    });
+  });
+
+  it("getFriends returns not-found for invalid username", async () => {
+    await expect(getFriends("ghost")).resolves.toStrictEqual({ error: "User ghost not found" });
+  });
+
+  it("getPendingRequests returns not-found for invalid username", async () => {
+    await expect(getPendingRequests("ghost")).resolves.toStrictEqual({
       error: "User ghost not found",
     });
   });

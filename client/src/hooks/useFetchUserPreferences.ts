@@ -23,7 +23,6 @@ export default function useFetchUserPreferences(username: string) {
         } else {
           setProfilePictureUrl(response.profilePictureUrl ?? "");
           setBannerImageUrl(response.bannerImageUrl ?? "");
-
         }
       }
     };

@@ -4,7 +4,6 @@ import useTimeSince from "../hooks/useTimeSince";
 import useEditProfileForm from "../hooks/useEditProfileForm";
 import ImageUpload from "../components/ImageUpload";
 import ProfileAvatar from "../components/ProfileAvatar";
-import BannerAvatar from "../components/BannerAvatar";
 import { useNavigate } from "react-router-dom";
 import useThreadList from "../hooks/useThreadList";
 import ThreadSummaryView from "../components/ThreadSummaryView";
@@ -25,7 +24,6 @@ export default function UpdateProfile() {
     setConfirm,
     profilePictureUrl,
     setProfilePictureUrl,
-    bannerImageUrl,
     setBannerImageUrl,
     err,
     handleSubmit,

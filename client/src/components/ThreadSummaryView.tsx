@@ -3,7 +3,6 @@ import { NavLink, useNavigate } from "react-router-dom";
 import type { ThreadSummary } from "@gamenite/shared";
 import useTimeSince from "../hooks/useTimeSince.ts";
 import UserLink from "./UserLink.tsx";
-import useThreadInfo from "../hooks/useThreadInfo.ts";
 import useThreadScore from "../hooks/useThreadScore.ts";
 
 /**
@@ -15,20 +14,32 @@ export default function ThreadSummaryView({
   createdAt,
   title,
   points,
+  upvoters,
+  downvoters,
   comments,
 }: ThreadSummary) {
   const navigate = useNavigate();
   const timeSince = useTimeSince();
-  const { setThread } = useThreadInfo(threadId);
-  const { currPoints, handleUpvote, handleDownvote } = useThreadScore(threadId, points, setThread);
+  const { currPoints, userContribution, handleUpvote, handleDownvote } = useThreadScore(
+    threadId,
+    points,
+    upvoters,
+    downvoters,
+  );
 
   return (
     <div className="threadSummary" role="listitem">
-      <button className="arrow up" onClick={handleUpvote}>
+      <button
+        className={userContribution === "upvote" ? "arrow up voted" : "arrow up"}
+        onClick={handleUpvote}
+      >
         ➤
       </button>
       <div className="points">{currPoints}</div>
-      <button className="arrow down" onClick={handleDownvote}>
+      <button
+        className={userContribution === "downvote" ? "arrow down voted" : "arrow down"}
+        onClick={handleDownvote}
+      >
         ➤
       </button>
       <div className="postStats" onClick={() => navigate(`/forum/post/${threadId}`)}>

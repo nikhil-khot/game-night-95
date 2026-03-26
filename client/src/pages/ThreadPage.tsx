@@ -5,6 +5,7 @@ import NewForumComment from "../components/NewForumComment.tsx";
 import useTimeSince from "../hooks/useTimeSince.ts";
 import UserLink from "../components/UserLink.tsx";
 import useThreadScore from "../hooks/useThreadScore.ts";
+import useLoginContext from "../hooks/useLoginContext.ts";
 
 export default function ThreadPage() {
   const formatTimeSince = useTimeSince();
@@ -16,8 +17,11 @@ export default function ThreadPage() {
   const { handleUpvote, handleDownvote } = useThreadScore(
     threadId!,
     "message" in threadInfo ? 0 : threadInfo.points,
+    "message" in threadInfo ? [] : threadInfo.upvoters,
+    "message" in threadInfo ? [] : threadInfo.downvoters,
     setThread,
   );
+  const { user } = useLoginContext();
 
   return (
     <div className="content">
@@ -34,11 +38,25 @@ export default function ThreadPage() {
           </div>
           <div className="notTooWide">{threadInfo.text}</div>
           <div className="medium">
-            <button className="arrow up" onClick={handleUpvote}>
+            <button
+              className={
+                threadInfo.upvoters.some((u) => u.username === user.username)
+                  ? "arrow up voted"
+                  : "arrow up"
+              }
+              onClick={handleUpvote}
+            >
               ➤
             </button>
             {threadInfo.points} {threadInfo.points === 1 ? "point" : "points"}
-            <button className="arrow down" onClick={handleDownvote}>
+            <button
+              className={
+                threadInfo.downvoters.some((u) => u.username === user.username)
+                  ? "arrow down voted"
+                  : "arrow down"
+              }
+              onClick={handleDownvote}
+            >
               ➤
             </button>
           </div>

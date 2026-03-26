@@ -94,13 +94,13 @@ button.secondary:disabled {
 }
 
 button.arrow {
+  color: rgba(0, 0, 0, 0.386);
   background: none;
   border: none;
   font-size: 1rem;
 }
 
 button.up {
-  color: rgb(80, 151, 80);
   transform: rotate(-90deg);
 }
 
@@ -108,13 +108,20 @@ button.up:hover {
   color: rgb(51, 99, 51);
 }
 
+button.up.voted {
+  color: rgb(80, 151, 80);
+}
+
 button.down {
-  color: rgb(143, 63, 63);
   transform: rotate(90deg);
 }
 
 button.down:hover {
   color: rgb(101, 44, 44);
+}
+
+button.down.voted {
+  color: rgb(143, 63, 63);
 }
 
 /** Input fields **/

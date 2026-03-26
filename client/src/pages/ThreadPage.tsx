@@ -19,7 +19,7 @@ export default function ThreadPage() {
     "message" in threadInfo ? 0 : threadInfo.points,
     "message" in threadInfo ? [] : threadInfo.upvoters,
     "message" in threadInfo ? [] : threadInfo.downvoters,
-    setThread,
+    { setThread },
   );
   const { user } = useLoginContext();
 

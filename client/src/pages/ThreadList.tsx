@@ -4,7 +4,7 @@ import useThreadList from "../hooks/useThreadList.ts";
 import { useState } from "react";
 
 export default function ThreadList() {
-  const threadList = useThreadList();
+  const { threadOrMessage, setThreadInList } = useThreadList();
   const navigate = useNavigate();
   const [sortByScore, setSortByScore] = useState(false);
 
@@ -25,11 +25,11 @@ export default function ThreadList() {
           </button>
         </div>
         <>
-          {"message" in threadList ? (
-            threadList.message
+          {"message" in threadOrMessage ? (
+            threadOrMessage.message
           ) : (
             <div className="dottedList" role="list">
-              {threadList
+              {threadOrMessage.threads
                 .slice()
                 .sort((a, b) =>
                   sortByScore
@@ -37,7 +37,11 @@ export default function ThreadList() {
                     : new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
                 )
                 .map((thread) => (
-                  <ThreadSummaryView {...thread} key={thread.threadId.toString()} />
+                  <ThreadSummaryView
+                    summary={thread}
+                    setThreadInList={setThreadInList}
+                    key={thread.threadId.toString()}
+                  />
                 ))}
             </div>
           )}

@@ -9,15 +9,12 @@ import useThreadScore from "../hooks/useThreadScore.ts";
  * Summarizes information for a single thread as part of a list of threads
  */
 export default function ThreadSummaryView({
-  threadId,
-  createdBy,
-  createdAt,
-  title,
-  points,
-  upvoters,
-  downvoters,
-  comments,
-}: ThreadSummary) {
+  summary: { threadId, createdBy, createdAt, title, points, upvoters, downvoters, comments },
+  setThreadInList,
+}: {
+  summary: ThreadSummary;
+  setThreadInList: (newThread: ThreadSummary) => void;
+}) {
   const navigate = useNavigate();
   const timeSince = useTimeSince();
   const { currPoints, userContribution, handleUpvote, handleDownvote } = useThreadScore(
@@ -25,6 +22,7 @@ export default function ThreadSummaryView({
     points,
     upvoters,
     downvoters,
+    { setThreadInList },
   );
 
   return (

@@ -109,6 +109,37 @@ export async function joinClub(
 }
 
 /**
+ * Allows a user to leave a club they are a member of.
+ * The owner cannot leave their own club.
+ *
+ * @param username - The username of the user leaving
+ * @param clubName - The name of the club to leave
+ * @returns The updated ClubRecord, or an error message
+ */
+export async function leaveClub(
+  username: string,
+  clubName: string,
+): Promise<ClubRecord | { error: string }> {
+  const user = await getUserByUsername(username);
+  if (!user) return { error: `User ${username} not found` };
+
+  const club = await findClubByName(clubName);
+  if (!club) return { error: `Club "${clubName}" not found` };
+
+  const memberEntry = getMemberEntry(club.record, user.userId);
+  if (!memberEntry) return { error: `You are not a member of "${clubName}"` };
+  if (memberEntry.role === "owner") return { error: "The owner cannot leave their own club" };
+
+  const updated: ClubRecord = {
+    ...club.record,
+    members: club.record.members.filter((m) => m.userId !== user.userId),
+  };
+
+  await ClubRepo.set(club.key, updated);
+  return updated;
+}
+
+/**
  * Removes a member from a club.
  * Only the owner or an admin can remove members.
  * Admins cannot remove other admins or the owner.
@@ -151,6 +182,32 @@ export async function removeMember(
 
   await ClubRepo.set(club.key, updated);
   return updated;
+}
+
+/**
+ * Deletes a club. Only the owner can delete their club.
+ *
+ * @param ownerUsername - The username of the user requesting deletion
+ * @param clubName - The name of the club to delete
+ * @returns { success: true } or error
+ */
+export async function deleteClub(
+  ownerUsername: string,
+  clubName: string,
+): Promise<{ success: true } | { error: string }> {
+  const owner = await getUserByUsername(ownerUsername);
+  if (!owner) return { error: `User ${ownerUsername} not found` };
+
+  const club = await findClubByName(clubName);
+  if (!club) return { error: `Club "${clubName}" not found` };
+
+  const ownerEntry = getMemberEntry(club.record, owner.userId);
+  if (!ownerEntry || ownerEntry.role !== "owner") {
+    return { error: "Only the owner can delete the club" };
+  }
+
+  await ClubRepo.delete(club.key);
+  return { success: true };
 }
 
 /**

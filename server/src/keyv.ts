@@ -59,6 +59,7 @@ export interface Repo<Value> {
    * Removes all key-value pairs from storage
    * @returns
    */
+  delete: (key: Key) => Promise<boolean>;
   clear: () => Promise<void>;
 }
 
@@ -118,6 +119,11 @@ export function createRepo<T = unknown>(repoName: string): Repo<T> {
       if (!(await store.set(key, value))) {
         throw new Error(`Failed to set key ${key} in repository ${repoName}`);
       }
+    },
+
+    delete: async (key) => {
+      const store = getStore();
+      return await store.delete(key);
     },
 
     get: async (key) => {

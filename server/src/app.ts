@@ -9,6 +9,7 @@ import * as game from "./controllers/game.controller.ts";
 import * as user from "./controllers/user.controller.ts";
 import * as thread from "./controllers/thread.controller.ts";
 import * as friend from "./controllers/friend.controller.ts";
+import * as club from "./controllers/club.controller.ts";
 import { type GameServer } from "./types.ts";
 
 export const app = express();
@@ -58,6 +59,18 @@ app.use(
         .post("/remove", friend.postRemoveFriend)
         .get("/list", friend.getList)
         .get("/pending", friend.getPending),
+    )
+    .use(
+      "/club",
+      Router()
+        .post("/create", club.postCreate)
+        .post("/join", club.postJoin)
+        .post("/leave", club.postLeave)
+        .post("/delete", club.postDelete)
+        .post("/remove-member", club.postRemoveMember)
+        .post("/set-member-role", club.postSetMemberRole)
+        .get("/list", club.getList)
+        .get("/:name", club.getByName),
     ),
 );
 

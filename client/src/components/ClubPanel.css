@@ -1,0 +1,190 @@
+.clubPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 1.5rem;
+  background-color: var(--bg-primary, #fff);
+}
+
+.clubPanel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.clubPanel__header h2 {
+  margin: 0;
+  font-size: 1.75rem;
+  color: var(--text-primary, #000);
+}
+
+.clubPanel__createBtn {
+  padding: 0.6rem 1.2rem;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+
+.clubPanel__createBtn:hover {
+  background-color: #45a049;
+}
+
+.clubPanel__noAuth {
+  color: var(--text-muted, #999);
+  font-style: italic;
+  padding: 2rem;
+  text-align: center;
+}
+
+.clubPanel__loading {
+  color: var(--text-muted, #999);
+  padding: 2rem;
+  text-align: center;
+}
+
+.createClubForm {
+  border: 1px solid var(--border-color, #ddd);
+  border-radius: 8px;
+  padding: 1.5rem;
+  background-color: var(--bg-tertiary, #f9f9f9);
+}
+
+.createClubForm h3 {
+  margin: 0 0 1.5rem 0;
+  color: var(--text-primary, #000);
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.formGroup label {
+  font-weight: 600;
+  color: var(--text-primary, #000);
+}
+
+.inputField {
+  padding: 0.75rem;
+  border: 1px solid var(--border-color, #ddd);
+  border-radius: 4px;
+  font-size: 1rem;
+  font-family: inherit;
+  color: var(--text-primary, #000);
+  background-color: var(--bg-secondary, #fff);
+  resize: vertical;
+}
+
+.inputField:disabled {
+  background-color: #f0f0f0;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.inputField:focus {
+  outline: none;
+  border-color: #4caf50;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+}
+
+.formActions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+}
+
+.submitBtn,
+.cancelBtn {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.submitBtn {
+  background-color: #4caf50;
+  color: white;
+}
+
+.submitBtn:hover:not(:disabled) {
+  background-color: #45a049;
+}
+
+.submitBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.cancelBtn {
+  background-color: #f0f0f0;
+  color: var(--text-primary, #000);
+  border: 1px solid var(--border-color, #ddd);
+}
+
+.cancelBtn:hover {
+  background-color: #e0e0e0;
+}
+
+.error {
+  color: #d32f2f;
+  font-size: 0.95rem;
+  background-color: #ffebee;
+  padding: 1rem;
+  border-radius: 4px;
+  border-left: 4px solid #d32f2f;
+  margin: 0;
+}
+
+.success {
+  color: #388e3c;
+  font-size: 0.95rem;
+  background-color: #e8f5e9;
+  padding: 1rem;
+  border-radius: 4px;
+  border-left: 4px solid #388e3c;
+  margin: 0;
+}
+
+.currentClubSection {
+  border: 2px solid #4caf50;
+  border-radius: 8px;
+  padding: 1.5rem;
+  background-color: #f1f8f4;
+}
+
+.currentClubSection h3 {
+  margin: 0 0 0.5rem 0;
+  color: #388e3c;
+}
+
+.currentClubSection p {
+  margin: 0;
+  color: var(--text-secondary, #666);
+}
+
+.clubsListSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.noClubs {
+  color: var(--text-muted, #999);
+  font-style: italic;
+  padding: 2rem;
+  text-align: center;
+  background-color: var(--bg-tertiary, #f5f5f5);
+  border-radius: 4px;
+}

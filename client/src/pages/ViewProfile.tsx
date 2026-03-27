@@ -25,8 +25,6 @@ export default function ViewProfile({ username: profileUsername }: ViewProfilePr
     "message" in threadOrMessage
       ? []
       : threadOrMessage.threads.filter((thread) => thread.createdBy.username === username);
-  const viewProfileUsername = componentState.type === "profile" ? componentState.user.username : "";
-  const profileUrl = useFetchUserPreferences(viewProfileUsername);
 
   useEffect(() => {
     let cancel = false;

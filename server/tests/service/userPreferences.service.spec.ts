@@ -6,6 +6,7 @@ import {
   getUserPreferences,
   updateUserPreferences,
 } from "../../src/services/userPreferences.service.ts";
+import type { UserPreferencesUpdateRequest } from "../../src/services/userPreferences.service.ts";
 
 describe("getOrCreateUserPreferences", () => {
   it("returns defaults for a valid user", async () => {
@@ -49,5 +50,34 @@ describe("updateUserPreferences", () => {
 
     const loaded = await getUserPreferences(user!.userId);
     expect(loaded).toStrictEqual(updated2);
+  });
+});
+
+describe("updateUserPreferences edge cases", () => {
+  it("throws an error when updating preferences for an invalid user", async () => {
+    await expect(
+      updateUserPreferences(randomUUID().toString(), { theme: "dark" })
+    ).rejects.toThrow();
+  });
+
+  it("handles empty updates gracefully", async () => {
+    const user = await getUserByUsername("user3");
+    expect(user).not.toBeNull();
+
+    const updated = await updateUserPreferences(user!.userId, {});
+    expect(updated).toStrictEqual({
+      userId: user!.userId,
+      theme: "light", // Default value
+      fontSize: "medium", // Default value
+      updatedAt: expect.anything(),
+    });
+  });
+
+  it("throws an error for invalid preference fields", async () => {
+    const user = await getUserByUsername("user4");
+    expect(user).not.toBeNull();
+
+    const invalidUpdate = { theme: "dark" } as UserPreferencesUpdateRequest;
+    await expect(updateUserPreferences(user!.userId, invalidUpdate)).rejects.toThrow();
   });
 });

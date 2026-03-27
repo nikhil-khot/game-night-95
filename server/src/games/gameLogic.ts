@@ -31,4 +31,10 @@ export interface GameLogic<GameState, GameView> {
     movePayload: unknown,
     playerIndex: number,
   ) => string;
+  getWinnerIndex: (
+    prevState: GameState,
+    newState: GameState,
+    movePayload: unknown,
+    playerIndex: number,
+  ) => number;
 }

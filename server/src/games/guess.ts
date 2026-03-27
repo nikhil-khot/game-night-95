@@ -53,6 +53,26 @@ export const guessLogic: GameLogic<GuessState, GuessView> = {
     }
     return ` made a guess`;
   },
+  getWinnerIndex: (_prevState, newState, payload, playerIndex) => {
+    let bestIndex = -1;
+    if (allGuessed(newState.guesses)) {
+      for (let i = 0; i < newState.guesses.length; i++) {
+        const guess = newState.guesses[i];
+        let lowest = true;
+        for (const otherGuess of newState.guesses.filter((_, index) => index !== i)) {
+          if (Math.abs(otherGuess - newState.secret) < Math.abs(guess - newState.secret)) {
+            lowest = false;
+            break;
+          }
+        }
+        if (lowest) {
+          bestIndex = i;
+          break;
+        }
+      }
+    }
+    return bestIndex;
+  },
 };
 
 export const guessGameService = new GameService<GuessState, GuessView>(guessLogic);

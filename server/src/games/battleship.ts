@@ -215,6 +215,9 @@ export const battleshipLogic: GameLogic<BattleshipState, BattleshipView> = {
     }
     return ` attacked ${coord} — miss`;
   },
+  getWinnerIndex: (_prevState, newState, payload, playerIndex) => {
+    return -1;
+  },
 };
 
 export const battleshipGameService = new GameService<BattleshipState, BattleshipView>(

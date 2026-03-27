@@ -189,6 +189,14 @@ export async function updateGame(
 
   game.state = result.state;
   game.done = game.done || result.done;
+  if (result.done) {
+    const winner = result.winner;
+    if (winner === -1) {
+      game.winner = "tie";
+    } else {
+      game.winner = game.players[winner];
+    }
+  }
   await GameRepo.set(gameId, game);
 
   return {

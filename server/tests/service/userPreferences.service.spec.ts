@@ -58,7 +58,7 @@ describe("updateUserPreferences additional tests", () => {
     const user = await getUserByUsername("user2");
     expect(user).not.toBeNull();
 
-    const updates = { theme: "dark" as "dark", fontSize: "large" as "large" };
+    const updates: { theme: "dark"; fontSize: "large" } = { theme: "dark", fontSize: "large" };
     const updated = await updateUserPreferences(user!.userId, updates);
 
     expect(updated).toStrictEqual({

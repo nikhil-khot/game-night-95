@@ -115,6 +115,6 @@ export async function loginWithGoogle(code: string): Promise<SafeUserInfo | Erro
     body: JSON.stringify({ code }),
   });
 
-  const data: SafeUserInfo | ErrorMsg = await res.json();
+  const data = (await res.json()) as SafeUserInfo | ErrorMsg;
   return data;
 }

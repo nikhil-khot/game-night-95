@@ -36,5 +36,9 @@
         "statements": 80
       }
     }
+  },
+  "dependencies": {
+    "@types/node-fetch": "^2.6.13",
+    "node-fetch": "^3.3.2"
   }
 }

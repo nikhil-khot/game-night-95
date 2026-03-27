@@ -105,3 +105,16 @@ export const updateUserPreferences = async (
     return exceptionToErrorMsg(error);
   }
 };
+
+export async function loginWithGoogle(code: string): Promise<SafeUserInfo | ErrorMsg> {
+  const res = await fetch("/api/auth/google/callback", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ code }),
+  });
+
+  const data: SafeUserInfo | ErrorMsg = await res.json();
+  return data;
+}

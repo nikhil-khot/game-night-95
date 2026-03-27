@@ -121,4 +121,67 @@ describe("PendingRequests component", () => {
       expect(mockOnActionComplete).toHaveBeenCalled();
     });
   });
+
+  it("shows error when response fails", async () => {
+    mockRespondToFriendRequest.mockResolvedValue({ error: "Request already processed" });
+
+    render(<PendingRequests requests={mockRequests} onActionComplete={mockOnActionComplete} />);
+
+    const acceptButtons = screen.getAllByText("Accept");
+    fireEvent.click(acceptButtons[0]);
+
+    await waitFor(() => {
+      expect(screen.getByText("Request already processed")).toBeInTheDocument();
+    });
+
+    expect(mockOnActionComplete).not.toHaveBeenCalled();
+  });
+
+  it("shows loading state during response", async () => {
+    mockRespondToFriendRequest.mockImplementation(
+      () =>
+        new Promise((resolve) =>
+          setTimeout(
+            () =>
+              resolve({
+                fromUserId: "requester1",
+                toUserId: "testuser",
+                status: "accepted",
+                createdAt: "2024-01-01T00:00:00Z",
+                updatedAt: "2024-01-01T00:00:00Z",
+              }),
+            100,
+          ),
+        ),
+    );
+
+    render(<PendingRequests requests={mockRequests} onActionComplete={mockOnActionComplete} />);
+
+    const acceptButtons = screen.getAllByText("Accept");
+    fireEvent.click(acceptButtons[0]);
+
+    expect(screen.getAllByText("...")).toHaveLength(2); // Both buttons show loading
+
+    await waitFor(() => {
+      expect(screen.queryByText("...")).not.toBeInTheDocument();
+    });
+  });
+
+  it("disables buttons during response", () => {
+    mockRespondToFriendRequest.mockImplementation(
+      () => new Promise(() => {}), // Never resolves
+    );
+
+    render(<PendingRequests requests={mockRequests} onActionComplete={mockOnActionComplete} />);
+
+    const acceptButtons = screen.getAllByText("Accept");
+    const declineButtons = screen.getAllByText("Decline");
+
+    fireEvent.click(acceptButtons[0]);
+
+    expect(acceptButtons[0]).toBeDisabled();
+    expect(declineButtons[0]).toBeDisabled();
+    expect(acceptButtons[0]).toHaveTextContent("...");
+    expect(declineButtons[0]).toHaveTextContent("...");
+  });
 });

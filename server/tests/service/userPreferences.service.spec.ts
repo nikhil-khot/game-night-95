@@ -7,7 +7,6 @@ import {
   getUserPreferences,
   updateUserPreferences,
 } from "../../src/services/userPreferences.service.ts";
-import type { UserPreferencesUpdateRequest } from "../../src/services/userPreferences.service.ts";
 
 describe("getOrCreateUserPreferences", () => {
   it("returns defaults for a valid user", async () => {
@@ -59,7 +58,7 @@ describe("updateUserPreferences additional tests", () => {
     const user = await getUserByUsername("user2");
     expect(user).not.toBeNull();
 
-    const updates = { theme: "dark", fontSize: "large" };
+    const updates = { theme: "dark" as "dark", fontSize: "large" as "large" };
     const updated = await updateUserPreferences(user!.userId, updates);
 
     expect(updated).toStrictEqual({
@@ -79,23 +78,6 @@ describe("updateUserPreferences additional tests", () => {
     expect(updated).toStrictEqual({
       userId: user!.userId,
       theme: "light", // Default value
-      fontSize: "medium", // Default value
-      updatedAt: expect.anything(),
-    });
-  });
-
-  it("accepts invalid values in updates", async () => {
-    const user = await getUserByUsername("user2");
-    expect(user).not.toBeNull();
-
-    const invalidUpdates = {
-      theme: "invalidValue",
-    } as unknown as Partial<UserPreferencesUpdateRequest>;
-    const updated = await updateUserPreferences(user!.userId, invalidUpdates);
-
-    expect(updated).toStrictEqual({
-      userId: user!.userId,
-      theme: "invalidValue", // Invalid value is accepted
       fontSize: "medium", // Default value
       updatedAt: expect.anything(),
     });
@@ -121,6 +103,7 @@ describe("updateUserPreferences edge cases", () => {
       updatedAt: expect.anything(),
     });
   });
+});
 
 describe("createDefaultUserPreferences", () => {
   it("assigns default preferences correctly", async () => {

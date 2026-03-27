@@ -8,6 +8,7 @@ import {
   removeMember,
   setMemberRole,
 } from "../services/clubService.ts";
+import ClubChatSection from "./ClubChatSection.tsx";
 import "./ClubsList.css";
 
 interface ClubsListProps {
@@ -266,6 +267,7 @@ export default function ClubsList({
                       </div>
                     ))}
                   </div>
+                  <ClubChatSection clubName={club.name} />
                 </div>
               )}
             </div>

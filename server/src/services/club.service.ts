@@ -19,6 +19,13 @@ async function findClubByName(name: string): Promise<{ key: string; record: Club
 }
 
 /**
+ * Returns the deterministic chat room id for a club.
+ */
+export function getClubChatId(clubName: string): string {
+  return `club:${clubName}`;
+}
+
+/**
  * Finds which club (if any) a userId currently belongs to.
  */
 async function findClubForUser(
@@ -272,6 +279,19 @@ export async function getClub(clubName: string): Promise<ClubRecord | { error: s
   const club = await findClubByName(clubName);
   if (!club) return { error: `Club "${clubName}" not found` };
   return club.record;
+}
+
+/**
+ * Checks whether a user is a member of a given club.
+ */
+export async function isClubMember(username: string, clubName: string): Promise<boolean> {
+  const user = await getUserByUsername(username);
+  if (!user) return false;
+
+  const club = await findClubByName(clubName);
+  if (!club) return false;
+
+  return club.record.members.some((member) => member.userId === user.userId);
 }
 
 /**

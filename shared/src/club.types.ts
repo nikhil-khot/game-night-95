@@ -67,6 +67,15 @@ export const zLeaveClubPayload = z.object({
 });
 
 /**
+ * Relevant information for creating a new club chat message
+ */
+export type NewClubMessagePayload = z.infer<typeof zNewClubMessagePayload>;
+export const zNewClubMessagePayload = z.object({
+  clubName: z.string(),
+  text: z.string(),
+});
+
+/**
  * Payload for deleting a club (owner only)
  */
 export type DeleteClubPayload = z.infer<typeof zDeleteClubPayload>;

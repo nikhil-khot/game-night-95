@@ -10,6 +10,7 @@ import * as user from "./controllers/user.controller.ts";
 import * as thread from "./controllers/thread.controller.ts";
 import * as friend from "./controllers/friend.controller.ts";
 import * as club from "./controllers/club.controller.ts";
+import * as clubChat from "./controllers/clubChat.controller.ts";
 import { type GameServer } from "./types.ts";
 
 export const app = express();
@@ -85,6 +86,9 @@ io.on("connection", (socket) => {
   socket.on("chatJoin", chat.socketJoin(socket, io));
   socket.on("chatLeave", chat.socketLeave(socket, io));
   socket.on("chatSendMessage", chat.socketSendMessage(socket, io));
+  socket.on("clubChatJoin", clubChat.socketJoin(socket, io));
+  socket.on("clubChatLeave", clubChat.socketLeave(socket, io));
+  socket.on("clubChatSendMessage", clubChat.socketSendMessage(socket, io));
 
   socket.on("gameJoinAsPlayer", game.socketJoinAsPlayer(socket, io));
   socket.on("gameAddAI", game.socketAddAI(socket, io));

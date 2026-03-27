@@ -165,12 +165,6 @@ export const socketAddAI: SocketAPI = (socket, io) => async (body) => {
     // the joiner)
     io.to(gameId).emit("gamePlayersUpdated", game.players);
 
-    // This socket should receive user-specific updates for this game, if it
-    // isn't already
-    if (!socket.rooms.has(userRoom(gameId, user.userId))) {
-      await socket.join(userRoom(gameId, user.userId));
-    }
-
     // If the game is full, it starts automatically
     if (game.players.length === gameServices[game.type].maxPlayers) {
       sendViewUpdates(io, gameId, await startGame(gameId, user));

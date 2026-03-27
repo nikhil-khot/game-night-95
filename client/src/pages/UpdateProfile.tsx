@@ -4,14 +4,17 @@ import useTimeSince from "../hooks/useTimeSince";
 import useEditProfileForm from "../hooks/useEditProfileForm";
 import ImageUpload from "../components/ImageUpload";
 import ProfileAvatar from "../components/ProfileAvatar";
+import { useNavigate } from "react-router-dom";
 import useThreadList from "../hooks/useThreadList";
 import ThreadSummaryView from "../components/ThreadSummaryView";
 
 export default function UpdateProfile() {
   const { user } = useLoginContext();
+  const navigate = useNavigate();
   const timeSince = useTimeSince();
   const [showPass, setShowPass] = useState(false);
   const [uploadedImageName, setUploadedImageName] = useState<string>("");
+  const [bannerImageName, setBannerImageName] = useState<string>("");
   const {
     display,
     setDisplay,
@@ -21,6 +24,7 @@ export default function UpdateProfile() {
     setConfirm,
     profilePictureUrl,
     setProfilePictureUrl,
+    setBannerImageUrl,
     err,
     handleSubmit,
   } = useEditProfileForm();
@@ -37,6 +41,17 @@ export default function UpdateProfile() {
     reader.onload = () => {
       if (typeof reader.result === "string") {
         setProfilePictureUrl(reader.result);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleBannerImageChange = (file: File) => {
+    setBannerImageName(file.name);
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        setBannerImageUrl(reader.result);
       }
     };
     reader.readAsDataURL(file);
@@ -130,10 +145,27 @@ export default function UpdateProfile() {
             </div>
           </div>
         </div>
-        <br />
+        <h3>Upload Banner Image</h3>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+          <div>
+            <ImageUpload onChange={handleBannerImageChange} />
+            {bannerImageName && <div className="smallAndGray">Selected: {bannerImageName}</div>}
+          </div>
+        </div>
         {err && <p className="error-message">{err}</p>}
         <div>
           <button className="primary narrow">Submit</button>
+        </div>
+        <div>
+          <button
+            className="secondary narrow"
+            onClick={(e) => {
+              e.preventDefault(); // Prevent form submission
+              navigate(`/profile/view/${user.username}`); // Navigate using React Router
+            }}
+          >
+            View Profile
+          </button>
         </div>
         <div className="smallAndGray">After updating your profile, you will be logged out</div>
       </form>

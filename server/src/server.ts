@@ -42,7 +42,7 @@ if (!initialized) {
 //    serving stale files created during the build command in step #1.
 //    You can't get any frontend changes to show up in the browser, no
 //    matter what you do.
-if (process.env.MODE === "production") {
+if (process.env.NODE_ENV === "production") {
   // In production mode, we want to serve the frontend code from Express
   app.use(express.static(path.join(import.meta.dirname, "../../client/dist")));
   app.get(/(.*)/, (req, res) =>

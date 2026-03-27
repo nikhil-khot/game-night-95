@@ -20,7 +20,7 @@ router.get("/google", (req: Request, res: Response) => {
   }
 
   const redirectUri =
-    process.env.MODE === "production"
+    process.env.NODE_ENV === "production"
       ? "https://spring26-project-group-110-1.onrender.com/auth/callback"
       : "http://localhost:4530/auth/callback";
 
@@ -50,7 +50,7 @@ router.post("/google/callback", async (req: Request, res: Response) => {
   }
 
   const redirectUri =
-    process.env.MODE === "production"
+    process.env.NODE_ENV === "production"
       ? "https://spring26-project-group-110-1.onrender.com/auth/callback"
       : "http://localhost:4530/auth/callback";
 

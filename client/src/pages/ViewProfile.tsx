@@ -83,11 +83,6 @@ export default function ViewProfile({ username: profileUsername }: ViewProfilePr
               </div>
             </div>
             <div className="content spacedSection">
-              <div
-                style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
-              >
-                <h2>Profile for {componentState.user.display}</h2>
-              </div>
               <div>
                 <h3>General information</h3>
                 <ul>

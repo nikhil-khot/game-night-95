@@ -56,7 +56,7 @@ describe("updateUserPreferences", () => {
 describe("updateUserPreferences edge cases", () => {
   it("throws an error when updating preferences for an invalid user", async () => {
     await expect(
-      updateUserPreferences(randomUUID().toString(), { theme: "dark" })
+      updateUserPreferences(randomUUID().toString(), { theme: "dark" }),
     ).rejects.toThrow();
   });
 
@@ -74,10 +74,21 @@ describe("updateUserPreferences edge cases", () => {
   });
 
   it("throws an error for invalid preference fields", async () => {
-    const user = await getUserByUsername("user4");
+    const user = await getUserByUsername("user2");
     expect(user).not.toBeNull();
 
-    const invalidUpdate = { theme: "dark" } as UserPreferencesUpdateRequest;
-    await expect(updateUserPreferences(user!.userId, invalidUpdate)).rejects.toThrow();
+    const invalidUpdate = { invalidField: "value" } as UserPreferencesUpdateRequest;
+
+    let actualErrorMessage = "";
+    try {
+      await updateUserPreferences(user!.userId, invalidUpdate);
+    } catch (error) {
+      if (error instanceof Error) {
+        actualErrorMessage = error.message;
+      }
+    }
+
+    console.log("Captured error message:", actualErrorMessage);
+    expect(actualErrorMessage).toMatch(/Invalid preference fields: invalidField/);
   });
 });

@@ -74,6 +74,8 @@ export async function updateUserPreferences(
   updatedAt: Date = new Date(),
 ): Promise<UserPreferencesRecord> {
   const current = await getOrCreateUserPreferences(userId);
+  console.log("Validation: updates =", updates);
+  validateUserPreferences(updates);
   const next: UserPreferencesRecord = {
     ...current,
     ...updates,
@@ -82,6 +84,21 @@ export async function updateUserPreferences(
   };
   await UserPreferencesRepo.set(userId, next);
   return next;
+}
+
+/**
+ * Validates that the provided updates object contains only valid preference fields.
+ *
+ * @param updates - Partial preference fields to merge
+ * @returns true if all fields are valid, false otherwise
+ */
+export function validateUserPreferences(updates: UserPreferencesUpdateRequest): boolean {
+  const validFields = ["theme", "fontSize"];
+  const invalidFields = Object.keys(updates).filter((key) => !validFields.includes(key));
+  if (invalidFields.length > 0) {
+    throw new Error(`Invalid preference fields: ${invalidFields.join(", ")}`);
+  }
+  return true;
 }
 
 export type { UserPreferencesUpdateRequest };

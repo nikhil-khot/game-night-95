@@ -64,7 +64,7 @@ export default function ViewProfile({ username: profileUsername }: ViewProfilePr
           <div className="view-profile-page">
             <div
               className="view-profile-banner"
-              style={{ position: "relative", width: "100%", height: "450px" }}
+              style={{ position: "relative", width: "100%", height: "350px" }}
             >
               <BannerAvatar
                 imageUrl={bannerImageUrl || "/resources/images.png"}
@@ -74,7 +74,7 @@ export default function ViewProfile({ username: profileUsername }: ViewProfilePr
               <div
                 style={{
                   position: "absolute", // Position it absolutely within the banner
-                  bottom: "100px", // Move it closer to the bottom
+                  bottom: "-10px", // Move it closer to the bottom
                   left: "7%", // Center horizontally
                   transform: "translateX(-50%)", // Adjust for centering
                 }}

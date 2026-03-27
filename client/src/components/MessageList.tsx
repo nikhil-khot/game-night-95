@@ -26,7 +26,7 @@ export default function MessageList({ messages }: MessageListProps) {
   const timeSince = useTimeSince();
   useEffect(() => {
     async function fetchOtherUserUrls() {
-      const urls: Record<string, string> = { ...otherUserUrls };
+      const urls: Record<string, string> = {};
       for (const message of messages) {
         if (isMessageInfo(message)) {
           // Narrow the type to MessageInfo
@@ -45,7 +45,7 @@ export default function MessageList({ messages }: MessageListProps) {
     }
 
     fetchOtherUserUrls();
-  }, [messages, otherUserUrls, user.username]);
+  }, [messages, user.username]);
 
   useEffect(() => {
     if (!chatWindowRef.current) return;

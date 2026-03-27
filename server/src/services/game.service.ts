@@ -25,17 +25,48 @@ export const gameServices: { [key in GameType]: GameServicer } = {
  */
 async function populateGameInfo(gameId: string): Promise<GameInfo> {
   const game = await GameRepo.get(gameId);
-  return {
-    gameId,
-    createdBy: await populateSafeUserInfo(game.createdBy),
-    chat: game.chat,
-    createdAt: new Date(game.createdAt),
-    players: await Promise.all(game.players.map(populateSafeUserInfo)),
-    type: game.type,
-    mode: game.mode,
-    status: !game.state ? "waiting" : game.done ? "done" : "active",
-    minPlayers: gameServices[game.type].minPlayers,
-  };
+  if (game.winner) {
+    if (game.winner === "tie") {
+      return {
+        gameId,
+        createdBy: await populateSafeUserInfo(game.createdBy),
+        chat: game.chat,
+        createdAt: new Date(game.createdAt),
+        players: await Promise.all(game.players.map(populateSafeUserInfo)),
+        type: game.type,
+        mode: game.mode,
+        status: !game.state ? "waiting" : game.done ? "done" : "active",
+        minPlayers: gameServices[game.type].minPlayers,
+        winner: "tie",
+      };
+    } else {
+      return {
+        gameId,
+        createdBy: await populateSafeUserInfo(game.createdBy),
+        chat: game.chat,
+        createdAt: new Date(game.createdAt),
+        players: await Promise.all(game.players.map(populateSafeUserInfo)),
+        type: game.type,
+        mode: game.mode,
+        status: !game.state ? "waiting" : game.done ? "done" : "active",
+        minPlayers: gameServices[game.type].minPlayers,
+        winner: await populateSafeUserInfo(game.winner),
+      };
+    }
+  } else {
+    return {
+      gameId,
+      createdBy: await populateSafeUserInfo(game.createdBy),
+      chat: game.chat,
+      createdAt: new Date(game.createdAt),
+      players: await Promise.all(game.players.map(populateSafeUserInfo)),
+      type: game.type,
+      mode: game.mode,
+      status: !game.state ? "waiting" : game.done ? "done" : "active",
+      minPlayers: gameServices[game.type].minPlayers,
+      winner: "none",
+    };
+  }
 }
 
 /**

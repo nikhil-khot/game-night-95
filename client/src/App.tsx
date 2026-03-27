@@ -24,6 +24,7 @@ import ApplyUserPreferences from "./components/ApplyUserPreferences.tsx";
 import { resetDisplayPreferences } from "./util/displayPreferences.ts";
 import ViewProfile from "./pages/ViewProfile.tsx";
 import Friends from "./pages/Friends.tsx";
+import Leaderboard from "./pages/Leaderboard.tsx";
 
 /** If `true`, all incoming socket messages will be logged */
 const DEBUG_SOCKETS = false;
@@ -81,6 +82,7 @@ export default function App() {
             <Route path="/forum/post/new" element={<NewThread />} />
             <Route path="/forum/post/:threadId" element={<ThreadPage />} />
             <Route path="/games" element={<GameList />} />
+            <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/game/new" element={<NewGame />} />
             <Route path="/game/:gameId" element={<Game />} />
             <Route path="/friends" element={<Friends />} />

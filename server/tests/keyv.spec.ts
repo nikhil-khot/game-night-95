@@ -1,5 +1,6 @@
 import { createRepo, setDbInitializer } from "../src/keyv.ts";
 import { Keyv } from "keyv";
+import { describe, it, expect, beforeEach } from "vitest";
 
 describe("Keyv Repository", () => {
   beforeEach(() => {

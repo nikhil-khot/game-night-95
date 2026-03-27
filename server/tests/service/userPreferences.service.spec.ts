@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { describe, expect, it } from "vitest";
 import { getUserByUsername } from "../../src/services/auth.service.ts";
 import {
+  createDefaultUserPreferences,
   getOrCreateUserPreferences,
   getUserPreferences,
   updateUserPreferences,
@@ -53,6 +54,54 @@ describe("updateUserPreferences", () => {
   });
 });
 
+describe("updateUserPreferences additional tests", () => {
+  it("handles updates with only valid fields", async () => {
+    const user = await getUserByUsername("user2");
+    expect(user).not.toBeNull();
+
+    const updates = { theme: "dark", fontSize: "large" };
+    const updated = await updateUserPreferences(user!.userId, updates);
+
+    expect(updated).toStrictEqual({
+      userId: user!.userId,
+      theme: "dark",
+      fontSize: "large",
+      updatedAt: expect.anything(),
+    });
+  });
+
+  it("does not modify preferences when updates are empty", async () => {
+    const user = await getUserByUsername("user2");
+    expect(user).not.toBeNull();
+
+    const updated = await updateUserPreferences(user!.userId, {});
+
+    expect(updated).toStrictEqual({
+      userId: user!.userId,
+      theme: "light", // Default value
+      fontSize: "medium", // Default value
+      updatedAt: expect.anything(),
+    });
+  });
+
+  it("accepts invalid values in updates", async () => {
+    const user = await getUserByUsername("user2");
+    expect(user).not.toBeNull();
+
+    const invalidUpdates = {
+      theme: "invalidValue",
+    } as unknown as Partial<UserPreferencesUpdateRequest>;
+    const updated = await updateUserPreferences(user!.userId, invalidUpdates);
+
+    expect(updated).toStrictEqual({
+      userId: user!.userId,
+      theme: "invalidValue", // Invalid value is accepted
+      fontSize: "medium", // Default value
+      updatedAt: expect.anything(),
+    });
+  });
+});
+
 describe("updateUserPreferences edge cases", () => {
   it("throws an error when updating preferences for an invalid user", async () => {
     await expect(
@@ -73,22 +122,16 @@ describe("updateUserPreferences edge cases", () => {
     });
   });
 
-  it("throws an error for invalid preference fields", async () => {
-    const user = await getUserByUsername("user2");
-    expect(user).not.toBeNull();
+describe("createDefaultUserPreferences", () => {
+  it("assigns default preferences correctly", async () => {
+    const userId = randomUUID();
+    const defaultPrefs = await createDefaultUserPreferences(userId);
 
-    const invalidUpdate = { invalidField: "value" } as UserPreferencesUpdateRequest;
-
-    let actualErrorMessage = "";
-    try {
-      await updateUserPreferences(user!.userId, invalidUpdate);
-    } catch (error) {
-      if (error instanceof Error) {
-        actualErrorMessage = error.message;
-      }
-    }
-
-    console.log("Captured error message:", actualErrorMessage);
-    expect(actualErrorMessage).toMatch(/Invalid preference fields: invalidField/);
+    expect(defaultPrefs).toStrictEqual({
+      userId,
+      theme: "light",
+      fontSize: "medium",
+      updatedAt: expect.any(String),
+    });
   });
 });

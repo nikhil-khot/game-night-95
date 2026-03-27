@@ -36,7 +36,7 @@ export default function MessageList({ messages }: MessageListProps) {
           ) {
             const response = await getUserPreferences(message.createdBy.username);
             if (response && typeof response === "object" && "profilePictureUrl" in response) {
-              urls[message.createdBy.username] = response.profilePictureUrl || ""; // Extract only profilePictureUrl
+              urls[message.createdBy.username] = response.profilePictureUrl || "";
             }
           }
         }

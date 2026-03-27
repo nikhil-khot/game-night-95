@@ -32,10 +32,6 @@ export interface UserPreferences {
   fontSize: "small" | "medium" | "large";
   profilePictureUrl?: string;
   bannerImageUrl?: string;
-  banner?: {
-    imageUrl: string;
-    position: "top" | "center" | "bottom";
-  };
   updatedAt: Date;
 }
 
@@ -51,10 +47,6 @@ export interface UserPreferencesRecord {
   fontSize: "small" | "medium" | "large";
   profilePictureUrl?: string;
   bannerImageUrl?: string;
-  banner?: {
-    imageUrl: string;
-    position: "top" | "center" | "bottom";
-  };
   updatedAt: string;
 }
 
@@ -67,10 +59,4 @@ export const zUserPreferencesUpdateRequest = z.object({
   fontSize: z.enum(["small", "medium", "large"]).optional(),
   profilePictureUrl: z.string().optional(),
   bannerImageUrl: z.string().optional(),
-  banner: z
-    .object({
-      imageUrl: z.string(),
-      position: z.enum(["top", "center", "bottom"]),
-    })
-    .optional(),
 });

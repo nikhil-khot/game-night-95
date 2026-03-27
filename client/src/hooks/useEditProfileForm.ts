@@ -62,9 +62,18 @@ export default function useEditProfileForm() {
       return;
     }
 
-    if (hasProfilePictureUpdate || hasBannerImageUpdate) {
+    if (hasProfilePictureUpdate) {
       const prefsResponse = await updateUserPreferences(auth, {
         profilePictureUrl,
+      });
+      if ("error" in prefsResponse) {
+        setErr(prefsResponse.error);
+        return;
+      }
+    }
+
+    if (hasBannerImageUpdate) {
+      const prefsResponse = await updateUserPreferences(auth, {
         bannerImageUrl,
       });
       if ("error" in prefsResponse) {

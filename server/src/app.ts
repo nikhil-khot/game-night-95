@@ -10,6 +10,7 @@ import * as user from "./controllers/user.controller.ts";
 import * as thread from "./controllers/thread.controller.ts";
 import * as friend from "./controllers/friend.controller.ts";
 import { type GameServer } from "./types.ts";
+import authRouter from "./routes/auth.ts";
 
 export const app = express();
 export const httpServer = http.createServer(app);
@@ -60,6 +61,8 @@ app.use(
         .get("/pending", friend.getPending),
     ),
 );
+
+app.use("/api/auth", authRouter);
 
 io.on("connection", (socket) => {
   const socketId = socket.id;

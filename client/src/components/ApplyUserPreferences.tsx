@@ -7,13 +7,17 @@ import { applyDisplayPreferences } from "../util/displayPreferences.ts";
  * Reads the logged-in user's saved display preferences and applies them.
  */
 export default function ApplyUserPreferences() {
-  const { username } = useAuth();
+  const auth = useAuth();
 
   useEffect(() => {
+    if (!auth) {
+      return;
+    }
+
     let cancelled = false;
 
     const load = async () => {
-      const response = await getUserPreferences(username);
+      const response = await getUserPreferences(auth.username);
       if (!cancelled && !("error" in response)) {
         applyDisplayPreferences(response.theme, response.fontSize);
       }
@@ -24,7 +28,7 @@ export default function ApplyUserPreferences() {
     return () => {
       cancelled = true;
     };
-  }, [username]);
+  }, [auth]);
 
   return null;
 }

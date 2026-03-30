@@ -7,8 +7,7 @@ interface ProfileAvatarProps {
 }
 
 export default function ProfileAvatar({ imageUrl, width, height }: ProfileAvatarProps) {
-  const hasImage = imageUrl.trim().length > 0;
-
+  const hasImage = typeof imageUrl === "string" && imageUrl.trim().length > 0;
   return (
     <div
       className="profile-avatar-container"

@@ -25,14 +25,15 @@ function populateUserPreferences(record: UserPreferencesRecord): UserPreferences
   const base: UserPreferences = {
     theme: record.theme,
     fontSize: record.fontSize,
-    banner: record.banner,
     updatedAt: new Date(record.updatedAt),
   };
 
-  // Only include profilePictureUrl when it's a non-empty string so tests
-  // that expect the property to be absent continue to pass.
   if (record.profilePictureUrl && record.profilePictureUrl !== "") {
-    return { ...base, profilePictureUrl: record.profilePictureUrl };
+    base.profilePictureUrl = record.profilePictureUrl;
+  }
+
+  if (record.bannerImageUrl && record.bannerImageUrl !== "") {
+    base.bannerImageUrl = record.bannerImageUrl;
   }
 
   return base;

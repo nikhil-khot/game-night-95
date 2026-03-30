@@ -1,5 +1,5 @@
 import { type ChangeEvent, type SubmitEvent, useState } from "react";
-import { loginUser, signupUser } from "../services/userService.ts";
+import { loginUser, signupUser, loginWithGoogle } from "../services/userService.ts";
 import { type AuthContext } from "../contexts/LoginContext.ts";
 import { useNavigate } from "react-router-dom";
 import type { ErrorMsg, SafeUserInfo } from "@gamenite/shared";
@@ -93,6 +93,30 @@ export default function useLoginForm(setAuth: (auth: AuthContext | null) => void
     }
   };
 
+  /**
+   * Handles Google login.
+   * Takes the OAuth code, sends it to the backend, and logs the user in.
+   *
+   * @param code - The authorization code from Google OAuth.
+   */
+  const handleGoogleLogin = async (code: string) => {
+    setErr(null);
+
+    const user = await loginWithGoogle(code);
+
+    if ("error" in user) {
+      setErr(user.error);
+      return;
+    }
+
+    setAuth({
+      user,
+      pass: "google-oauth",
+      reset: () => setAuth(null),
+    });
+    navigate("/");
+  };
+
   return {
     mode,
     toggleMode: () => setMode((m) => (m === "login" ? "signup" : "login")),
@@ -102,5 +126,6 @@ export default function useLoginForm(setAuth: (auth: AuthContext | null) => void
     err,
     handleInputChange,
     handleSubmit,
+    handleGoogleLogin,
   };
 }

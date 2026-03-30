@@ -94,14 +94,13 @@ describe("POST /api/user/:username/preferences", () => {
       .send({
         auth: auth1,
         payload: {
-          banner: { imageUrl: "https://example.com/banner.png", position: "center" },
+          theme: "dark",
         },
       });
     expect(response.status).toBe(200);
     expect(response.body).toStrictEqual({
       theme: "dark",
       fontSize: "medium",
-      banner: { imageUrl: "https://example.com/banner.png", position: "center" },
       updatedAt: expect.anything(),
     });
   });

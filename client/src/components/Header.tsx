@@ -11,7 +11,7 @@ import useFetchUserPreferences from "../hooks/useFetchUserPreferences.ts";
 export default function Header() {
   const { user, reset } = useLoginContext();
   const navigate = useNavigate();
-  const profilePictureUrl = useFetchUserPreferences(user.username);
+  const { profilePictureUrl } = useFetchUserPreferences(user.username); // Destructure profilePictureUrl
 
   return (
     <div id="header" className="header">

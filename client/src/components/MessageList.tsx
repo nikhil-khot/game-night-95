@@ -80,7 +80,7 @@ export default function MessageList({ messages }: MessageListProps) {
               <div key={message.messageId} className="chatMe">
                 <div className="chatContentWrapper">
                   <div className="chatContent">{message.text}</div>
-                  <ProfileAvatar imageUrl={userUrl || ""} />
+                  <ProfileAvatar imageUrl={userUrl?.profilePictureUrl || ""} />
                 </div>
                 <div className="chatSender">{timeSince(message.createdAt)}</div>
               </div>

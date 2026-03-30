@@ -22,8 +22,10 @@ import TimeContextKeeper from "./components/UpdatingTimeContext.tsx";
 import Preferences from "./pages/Preferences.tsx";
 import ApplyUserPreferences from "./components/ApplyUserPreferences.tsx";
 import { resetDisplayPreferences } from "./util/displayPreferences.ts";
+import ViewProfile from "./pages/ViewProfile.tsx";
 import Friends from "./pages/Friends.tsx";
 import Clubs from "./pages/Clubs.tsx";
+import AuthCallback from "./components/AuthCallback.tsx";
 
 /** If `true`, all incoming socket messages will be logged */
 const DEBUG_SOCKETS = false;
@@ -62,6 +64,7 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login setAuth={(auth) => setAuth(auth)} />} />
+          <Route path="/auth/callback" element={<AuthCallback setAuth={setAuth} />} />
           <Route
             element={
               <LoggedInRoute auth={auth} socket={socket}>
@@ -86,6 +89,7 @@ export default function App() {
             <Route path="/friends" element={<Friends />} />
             <Route path="/clubs" element={<Clubs />} />
             <Route path="/profile/:username" element={<Profile />} />
+            <Route path="/profile/view/:username" element={<ViewProfile />} />
             <Route path="/preferences" element={<Preferences />} />
             <Route path="/*" element={<NoSuchRoute />} />
           </Route>

@@ -12,6 +12,7 @@ import * as friend from "./controllers/friend.controller.ts";
 import * as club from "./controllers/club.controller.ts";
 import * as clubChat from "./controllers/clubChat.controller.ts";
 import { type GameServer } from "./types.ts";
+import authRouter from "./routes/auth.ts";
 
 export const app = express();
 export const httpServer = http.createServer(app);
@@ -74,6 +75,8 @@ app.use(
         .get("/:name", club.getByName),
     ),
 );
+
+app.use("/api/auth", authRouter);
 
 io.on("connection", (socket) => {
   const socketId = socket.id;

@@ -134,7 +134,7 @@ export function createRepo<T = unknown>(repoName: string): Repo<T> {
       return value;
     },
 
-    getMany: async (keys) => {
+    getMany: async (keys: Key[]): Promise<T[]> => {
       const store = getStore();
       const values = await store.getMany(keys);
       return values.filter((v): v is T => {

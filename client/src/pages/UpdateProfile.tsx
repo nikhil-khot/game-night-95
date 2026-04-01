@@ -7,6 +7,9 @@ import ProfileAvatar from "../components/ProfileAvatar";
 import { useNavigate } from "react-router-dom";
 import useThreadList from "../hooks/useThreadList";
 import ThreadSummaryView from "../components/ThreadSummaryView";
+import useGameList from "../hooks/useGameList";
+import { generateStatsFromGames, sortLeaderboardEntries } from "../util/leaderboardProcessing";
+import UserLeaderboardView from "../components/UserLeaderboardView";
 
 export default function UpdateProfile() {
   const { user } = useLoginContext();
@@ -33,6 +36,20 @@ export default function UpdateProfile() {
     "message" in threadOrMessage
       ? []
       : threadOrMessage.threads.filter((thread) => thread.createdBy.username === user.username);
+  const gameList = useGameList();
+
+  const filteredStats =
+    "message" in gameList
+      ? []
+      : sortLeaderboardEntries(
+          Object.entries(
+            generateStatsFromGames(
+              gameList.filter((game) =>
+                game.players.some((player) => player.username === user.username),
+              ),
+            ),
+          ),
+        ).filter(([display, record]) => display === user.display);
 
   const handleProfileImageChange = (file: File) => {
     setUploadedImageName(file.name);
@@ -170,6 +187,22 @@ export default function UpdateProfile() {
         <div className="smallAndGray">After updating your profile, you will be logged out</div>
       </form>
       <hr style={{ marginBottom: 0 }} />
+      <h3>Game Statistics (W/L/T)</h3>
+      {"message" in gameList ? (
+        gameList.message
+      ) : filteredStats.length === 0 ? (
+        <div>No game stats found...</div>
+      ) : (
+        <>
+          <hr style={{ marginBottom: 0, marginTop: 0 }} />
+          <div className="dottedList">
+            {filteredStats.map(([user, record], index) => (
+              <UserLeaderboardView key={user} rank={undefined} user={undefined} record={record} />
+            ))}
+          </div>
+        </>
+      )}
+      <hr style={{ marginBottom: 0, marginTop: 30 }} />
       <h3>Forum Posts</h3>
       <>
         {"message" in threadOrMessage ? (

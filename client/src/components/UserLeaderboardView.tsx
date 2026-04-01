@@ -6,8 +6,8 @@ export default function UserLeaderboardView({
   rank,
   record,
 }: {
-  user: string;
-  rank: number;
+  user: string | undefined;
+  rank: number | undefined;
   record: {
     [game in GameType]: { wins: number; losses: number; ties: number };
   };
@@ -17,9 +17,13 @@ export default function UserLeaderboardView({
   const totalTies = record.nim.ties + record.guess.ties + record.battleship.ties;
   return (
     <div className="leaderboardItem" role="listitem">
-      <div className="userRank">
-        {rank}. {user}
-      </div>
+      {rank && user ? (
+        <div className="userRank">
+          {rank}. {user}
+        </div>
+      ) : (
+        <> </>
+      )}
       <div className="stats">
         Overall: {totalWins} / {totalLosses} / {totalTies}
       </div>

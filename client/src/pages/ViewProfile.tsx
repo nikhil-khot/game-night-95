@@ -8,6 +8,9 @@ import useFetchUserPreferences from "../hooks/useFetchUserPreferences";
 import ProfileAvatar from "../components/ProfileAvatar";
 import { useParams } from "react-router-dom";
 import BannerAvatar from "../components/BannerAvatar";
+import useGameList from "../hooks/useGameList";
+import UserLeaderboardView from "../components/UserLeaderboardView";
+import { generateStatsFromGames, sortLeaderboardEntries } from "../util/leaderboardProcessing";
 
 interface ViewProfileProps {
   username?: string;
@@ -25,6 +28,20 @@ export default function ViewProfile({ username: profileUsername }: ViewProfilePr
     "message" in threadOrMessage
       ? []
       : threadOrMessage.threads.filter((thread) => thread.createdBy.username === username);
+  const gameList = useGameList();
+
+  const filteredStats =
+    "message" in gameList || componentState.type !== "profile"
+      ? []
+      : sortLeaderboardEntries(
+          Object.entries(
+            generateStatsFromGames(
+              gameList.filter((game) =>
+                game.players.some((player) => player.username === username),
+              ),
+            ),
+          ),
+        ).filter(([user, record]) => user === componentState.user.display);
 
   useEffect(() => {
     let cancel = false;
@@ -92,6 +109,27 @@ export default function ViewProfile({ username: profileUsername }: ViewProfilePr
               </div>
             </div>
             <hr style={{ marginBottom: 0 }} />
+            <h3>Game Statistics (W/L/T)</h3>
+            {"message" in gameList ? (
+              gameList.message
+            ) : filteredStats.length === 0 ? (
+              <div>No game stats found...</div>
+            ) : (
+              <>
+                <hr style={{ marginBottom: 0, marginTop: 0 }} />
+                <div className="dottedList">
+                  {filteredStats.map(([user, record], index) => (
+                    <UserLeaderboardView
+                      key={user}
+                      rank={undefined}
+                      user={undefined}
+                      record={record}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+            <hr style={{ marginBottom: 0, marginTop: 30 }} />
             <h3>Forum Posts</h3>
             <>
               {"message" in threadOrMessage ? (

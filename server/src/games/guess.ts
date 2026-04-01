@@ -53,8 +53,8 @@ export const guessLogic: GameLogic<GuessState, GuessView> = {
     }
     return ` made a guess`;
   },
-  getWinnerIndex: (_prevState, newState, payload, playerIndex) => {
-    let bestIndex = -1;
+  getWinnerIndices: (_prevState, newState, payload, playerIndex) => {
+    let bestIndices: number[] = [];
     if (allGuessed(newState.guesses)) {
       for (let i = 0; i < newState.guesses.length; i++) {
         const guess = newState.guesses[i];
@@ -66,12 +66,11 @@ export const guessLogic: GameLogic<GuessState, GuessView> = {
           }
         }
         if (lowest) {
-          bestIndex = i;
-          break;
+          bestIndices = [...bestIndices, i];
         }
       }
     }
-    return bestIndex;
+    return bestIndices;
   },
 };
 

@@ -47,21 +47,13 @@ export interface GameServicer {
     movePayload: unknown,
     playerIndex: number,
     players: string[],
-  ) =>
-    | null
-    | {
-        state: unknown;
-        views: GameViewUpdates;
-        done: false;
-        moveDescription: string;
-      }
-    | {
-        state: unknown;
-        views: GameViewUpdates;
-        done: true;
-        winner: number;
-        moveDescription: string;
-      };
+  ) => null | {
+    state: unknown;
+    views: GameViewUpdates;
+    done: boolean;
+    winners: number[];
+    moveDescription: string;
+  };
 }
 
 export class GameService<State, View> implements GameServicer {
@@ -102,22 +94,13 @@ export class GameService<State, View> implements GameServicer {
     const newState = this._logic.update(state, move, playerIndex);
     if (!newState) return null;
     const done = this._logic.isDone(newState);
-    if (!done) {
-      return {
-        state: newState,
-        views: this._makePlayerViews(players, newState),
-        done: done,
-        moveDescription: this._logic.describeMove(state, newState, move, playerIndex),
-      };
-    } else {
-      return {
-        state: newState,
-        views: this._makePlayerViews(players, newState),
-        done: true,
-        winner: this._logic.getWinnerIndex(state, newState, move, playerIndex),
-        moveDescription: this._logic.describeMove(state, newState, move, playerIndex),
-      };
-    }
+    return {
+      state: newState,
+      views: this._makePlayerViews(players, newState),
+      done: done,
+      winners: done ? [] : this._logic.getWinnerIndices(state, newState, move, playerIndex),
+      moveDescription: this._logic.describeMove(state, newState, move, playerIndex),
+    };
   }
 
   view(state: any, playerIndex: number) {

@@ -25,48 +25,18 @@ export const gameServices: { [key in GameType]: GameServicer } = {
  */
 async function populateGameInfo(gameId: string): Promise<GameInfo> {
   const game = await GameRepo.get(gameId);
-  if (game.winner) {
-    if (game.winner === "tie") {
-      return {
-        gameId,
-        createdBy: await populateSafeUserInfo(game.createdBy),
-        chat: game.chat,
-        createdAt: new Date(game.createdAt),
-        players: await Promise.all(game.players.map(populateSafeUserInfo)),
-        type: game.type,
-        mode: game.mode,
-        status: !game.state ? "waiting" : game.done ? "done" : "active",
-        minPlayers: gameServices[game.type].minPlayers,
-        winner: "tie",
-      };
-    } else {
-      return {
-        gameId,
-        createdBy: await populateSafeUserInfo(game.createdBy),
-        chat: game.chat,
-        createdAt: new Date(game.createdAt),
-        players: await Promise.all(game.players.map(populateSafeUserInfo)),
-        type: game.type,
-        mode: game.mode,
-        status: !game.state ? "waiting" : game.done ? "done" : "active",
-        minPlayers: gameServices[game.type].minPlayers,
-        winner: await populateSafeUserInfo(game.winner),
-      };
-    }
-  } else {
-    return {
-      gameId,
-      createdBy: await populateSafeUserInfo(game.createdBy),
-      chat: game.chat,
-      createdAt: new Date(game.createdAt),
-      players: await Promise.all(game.players.map(populateSafeUserInfo)),
-      type: game.type,
-      mode: game.mode,
-      status: !game.state ? "waiting" : game.done ? "done" : "active",
-      minPlayers: gameServices[game.type].minPlayers,
-      winner: "none",
-    };
-  }
+  return {
+    gameId,
+    createdBy: await populateSafeUserInfo(game.createdBy),
+    chat: game.chat,
+    createdAt: new Date(game.createdAt),
+    players: await Promise.all(game.players.map(populateSafeUserInfo)),
+    type: game.type,
+    mode: game.mode,
+    status: !game.state ? "waiting" : game.done ? "done" : "active",
+    minPlayers: gameServices[game.type].minPlayers,
+    winners: await Promise.all(game.winners.map(populateSafeUserInfo)),
+  };
 }
 
 /**
@@ -93,6 +63,7 @@ export async function createGame(
     createdAt: createdAt.toISOString(),
     createdBy: user.userId,
     players: [user.userId],
+    winners: [],
   });
   return populateGameInfo(gameId);
 }
@@ -221,11 +192,11 @@ export async function updateGame(
   game.state = result.state;
   game.done = game.done || result.done;
   if (result.done) {
-    const winner = result.winner;
-    if (winner === -1) {
-      game.winner = "tie";
+    const winners = result.winners;
+    if (winners.length === 0) {
+      game.winners = [];
     } else {
-      game.winner = game.players[winner];
+      game.winners = winners.map((index) => game.players[index]);
     }
   }
   await GameRepo.set(gameId, game);

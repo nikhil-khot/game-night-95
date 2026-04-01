@@ -17,7 +17,7 @@ export interface GameInfo {
   type: GameType;
   mode: GameMode;
   status: "waiting" | "active" | "done";
-  winner: "none" | "tie" | SafeUserInfo;
+  winners: SafeUserInfo[];
   chat: string;
   players: SafeUserInfo[];
   createdAt: Date;

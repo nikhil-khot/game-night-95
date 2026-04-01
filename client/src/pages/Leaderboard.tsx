@@ -15,19 +15,25 @@ export default function GameList() {
               {Object.entries(
                 gameList.reduce(
                   (acc, game) => {
-                    const winner = game.winner;
-                    if (winner !== "none" && winner !== "tie") {
-                      acc[winner.display] = (acc[winner.display] ?? 0) + 1;
+                    const winners = game.winners;
+                    if (winners.length > 0) {
+                      winners.forEach((winner) => {
+                        acc[winner.display] = (acc[winner.display] ?? 0) + 1;
+                      });
                     }
                     return acc;
                   },
                   {} as Record<string, number>,
                 ),
-              ).map(([user, wins]) => (
-                <div>
-                  {user} has {wins} wins!
-                </div>
-              ))}
+              )
+                .sort((a, b) => {
+                  return b[1] - a[1];
+                })
+                .map(([user, wins]) => (
+                  <div>
+                    {user} has {wins} {wins === 1 ? "win!" : "wins!"}
+                  </div>
+                ))}
             </div>
           )}
         </>

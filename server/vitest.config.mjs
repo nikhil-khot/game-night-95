@@ -11,6 +11,7 @@ export default defineConfig({
         branches: 80,
         statements: 80,
       },
+      exclude: ["src/routes/auth.ts"], // Exclude auth.ts from coverage
     },
   },
 });

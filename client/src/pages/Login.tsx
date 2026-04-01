@@ -16,11 +16,16 @@ export default function Login({ setAuth }: LoginProps) {
     useLoginForm(setAuth);
   const [showPassword, setShowPassword] = useState(false);
 
+  function handleGoogleLogin() {
+    window.location.href = "/api/auth/google";
+  }
+
   return (
     <div className="container">
       <h1>GameNite</h1>
       <form className="login" onSubmit={(e) => handleSubmit(e)}>
         <h2>Log into GameNite</h2>
+
         <input
           type="text"
           value={username}
@@ -29,6 +34,7 @@ export default function Login({ setAuth }: LoginProps) {
           aria-label="Username"
           className="widefill"
         />
+
         <input
           type={showPassword ? "text" : "password"}
           value={password}
@@ -37,6 +43,7 @@ export default function Login({ setAuth }: LoginProps) {
           aria-label="Password"
           className="widefill"
         />
+
         {mode === "signup" && (
           <input
             type={showPassword ? "text" : "password"}
@@ -47,6 +54,7 @@ export default function Login({ setAuth }: LoginProps) {
             className="widefill"
           />
         )}
+
         <div className="labeled-section">
           <input
             type="checkbox"
@@ -56,21 +64,29 @@ export default function Login({ setAuth }: LoginProps) {
           />
           <label htmlFor="showPasswordToggle">Show Password</label>
         </div>
+
         {err && <p className="error-message centered">{err}</p>}
+
         <button type="submit" className="widefill primary">
           {mode === "signup" ? "Sign Up" : "Log In"}
         </button>
+
+        {mode === "login" && (
+          <>
+            <div className="intertext">or</div>
+            <button type="button" className="widefill secondary" onClick={handleGoogleLogin}>
+              Sign in with Google
+            </button>
+          </>
+        )}
+
         <div className="intertext">or</div>
-        <button
-          className="narrowcenter secondary"
-          onClick={(e) => {
-            e.preventDefault();
-            toggleMode();
-          }}
-        >
+
+        <button type="button" className="narrowcenter secondary" onClick={toggleMode}>
           {mode === "signup" ? "Use Existing Account" : "Create New Account"}
         </button>
       </form>
+
       <div className="smallAndGray" style={{ marginTop: "1rem" }}>
         GameNite stores passwords in cleartext; reusing passwords here is a catastrophically bad
         idea

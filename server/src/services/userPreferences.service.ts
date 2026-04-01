@@ -83,3 +83,5 @@ export async function updateUserPreferences(
   await UserPreferencesRepo.set(userId, next);
   return next;
 }
+
+export type { UserPreferencesUpdateRequest };

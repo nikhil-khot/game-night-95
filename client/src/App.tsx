@@ -25,6 +25,7 @@ import { resetDisplayPreferences } from "./util/displayPreferences.ts";
 import ViewProfile from "./pages/ViewProfile.tsx";
 import Friends from "./pages/Friends.tsx";
 import Leaderboard from "./pages/Leaderboard.tsx";
+import AuthCallback from "./components/AuthCallback.tsx";
 
 /** If `true`, all incoming socket messages will be logged */
 const DEBUG_SOCKETS = false;
@@ -63,6 +64,7 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login setAuth={(auth) => setAuth(auth)} />} />
+          <Route path="/auth/callback" element={<AuthCallback setAuth={setAuth} />} />
           <Route
             element={
               <LoggedInRoute auth={auth} socket={socket}>

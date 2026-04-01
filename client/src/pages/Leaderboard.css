@@ -1,8 +1,8 @@
 .leaderboardHeader {
-    display: flex;
-    flex-direction: row;
-    font-weight: bold;
-    border-bottom: 2px solid black;
+  display: flex;
+  flex-direction: row;
+  font-weight: bold;
+  border-bottom: 2px solid black;
 }
 
 .leaderboardHeader .stats {

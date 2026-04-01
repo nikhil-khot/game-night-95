@@ -1,4 +1,4 @@
-.leaderboardItem{
+.leaderboardItem {
   display: flex;
   flex-direction: row;
   border-top: 1px dashed black;

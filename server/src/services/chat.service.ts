@@ -58,6 +58,21 @@ export async function forceChatById(chatId: string, user: UserWithId): Promise<C
 }
 
 /**
+ * Returns an existing chat for a known id, creating an empty chat if needed.
+ */
+export async function getOrCreateChatById(chatId: string): Promise<ChatInfo> {
+  const chat = await ChatRepo.find(chatId);
+  if (!chat) {
+    await ChatRepo.set(chatId, {
+      createdAt: new Date().toISOString(),
+      messages: [],
+      moveLog: [],
+    });
+  }
+  return populateChatInfo(chatId);
+}
+
+/**
  * Adds a message to a chat, updating the chat
  *
  * @param chatId - Ostensible chat id

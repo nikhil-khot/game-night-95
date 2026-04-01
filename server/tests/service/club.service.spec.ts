@@ -2,8 +2,10 @@ import { beforeEach, describe, expect, it } from "vitest";
 import {
   awardPoints,
   createClub,
+  deleteClub,
   getClub,
   joinClub,
+  leaveClub,
   listClubs,
   removeMember,
   setMemberRole,
@@ -98,6 +100,38 @@ describe("member moderation and roles", () => {
     await expect(setMemberRole("user1", "user1", "Alpha", "admin")).resolves.toStrictEqual({
       error: "Cannot change the owner's role",
     });
+  });
+});
+
+describe("leaveClub/deleteClub", () => {
+  it("lets a member leave and prevents owner from leaving", async () => {
+    await createClub("user1", "Alpha", "First club");
+    await joinClub("user2", "Alpha");
+
+    await expect(leaveClub("user2", "Alpha")).resolves.toMatchObject({
+      name: "Alpha",
+      members: [{ role: "owner" }],
+    });
+
+    await expect(leaveClub("user1", "Alpha")).resolves.toStrictEqual({
+      error: "The owner cannot leave their own club",
+    });
+  });
+
+  it("allows owner to delete their club and prevents non-owner delete", async () => {
+    await createClub("user1", "Alpha", "First club");
+    await joinClub("user2", "Alpha");
+
+    await expect(deleteClub("user2", "Alpha")).resolves.toStrictEqual({
+      error: "Only the owner can delete the club",
+    });
+
+    await expect(deleteClub("user1", "Alpha")).resolves.toStrictEqual({
+      success: true,
+    });
+
+    const clubsAfter = await listClubs();
+    expect(clubsAfter).toHaveLength(0);
   });
 });
 

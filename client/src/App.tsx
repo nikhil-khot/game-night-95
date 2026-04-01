@@ -24,6 +24,7 @@ import ApplyUserPreferences from "./components/ApplyUserPreferences.tsx";
 import { resetDisplayPreferences } from "./util/displayPreferences.ts";
 import ViewProfile from "./pages/ViewProfile.tsx";
 import Friends from "./pages/Friends.tsx";
+import Clubs from "./pages/Clubs.tsx";
 import AuthCallback from "./components/AuthCallback.tsx";
 
 /** If `true`, all incoming socket messages will be logged */
@@ -86,6 +87,7 @@ export default function App() {
             <Route path="/game/new" element={<NewGame />} />
             <Route path="/game/:gameId" element={<Game />} />
             <Route path="/friends" element={<Friends />} />
+            <Route path="/clubs" element={<Clubs />} />
             <Route path="/profile/:username" element={<Profile />} />
             <Route path="/profile/view/:username" element={<ViewProfile />} />
             <Route path="/preferences" element={<Preferences />} />

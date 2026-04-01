@@ -98,6 +98,9 @@ export interface MessageRecord {
  * Represents a forum post as it's stored in the database.
  * - `title`: post title
  * - `text`: post contents
+ * - `points`: score of the thread
+ * - `upvoters`: users who upvoted this thread
+ * - `downvoters`: users who downvoted this thread
  * - `createdAt`: when the thread was posted
  * - `createdBy`: username of OP
  * - `comments`: replies to the post
@@ -105,6 +108,9 @@ export interface MessageRecord {
 export interface ThreadRecord {
   title: string;
   text: string;
+  points: number;
+  upvoters: RecordId[]; // References User records who upvoted this thread
+  downvoters: RecordId[]; // References User records who downvoted this thread
   createdAt: DateISO;
   createdBy: RecordId; // References User records
   comments: RecordId[]; // References Comment records
@@ -133,15 +139,6 @@ export type UserTheme = "light" | "dark";
 export type UserFontSize = "small" | "medium" | "large";
 
 /**
- * Optional banner customization metadata for a user's profile.
- */
-export interface BannerPreferences {
-  imageUrl?: string;
-  position?: "top" | "center" | "bottom";
-  overlayOpacity?: number;
-}
-
-/**
  * Represents a user's persisted UI/display preferences.
  *
  * `userId`: the user ID of the corresponding User model; also serves as the repo key for this record
@@ -156,7 +153,7 @@ export interface UserPreferencesRecord {
   theme: UserTheme;
   fontSize: UserFontSize;
   profilePictureUrl?: string;
-  banner?: BannerPreferences;
+  bannerImageUrl?: string;
   updatedAt: DateISO;
 }
 

@@ -5,7 +5,7 @@ import useGameList from "../hooks/useGameList.ts";
 import GameSummaryView from "../components/GameSummaryView.tsx";
 
 export default function Home() {
-  const threadList = useThreadList(4);
+  const { threadOrMessage, setThreadInList } = useThreadList(4);
   const gameList = useGameList(4);
   const navigate = useNavigate();
 
@@ -30,12 +30,16 @@ export default function Home() {
       </div>
       <div className="spacedSection">
         <h2>Recent forum posts</h2>
-        {"message" in threadList ? (
-          <div>{threadList.message}</div>
+        {"message" in threadOrMessage ? (
+          <div>{threadOrMessage.message}</div>
         ) : (
           <div id="threadList" role="list" className="dottedList">
-            {threadList.map((thread) => (
-              <ThreadSummaryView {...thread} key={thread.threadId.toString()} />
+            {threadOrMessage.threads.map((thread) => (
+              <ThreadSummaryView
+                summary={thread}
+                setThreadInList={setThreadInList}
+                key={thread.threadId.toString()}
+              />
             ))}
           </div>
         )}

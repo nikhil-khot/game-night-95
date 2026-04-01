@@ -59,6 +59,7 @@ export interface Repo<Value> {
    * Removes all key-value pairs from storage
    * @returns
    */
+  delete: (key: Key) => Promise<boolean>;
   clear: () => Promise<void>;
 }
 
@@ -120,6 +121,11 @@ export function createRepo<T = unknown>(repoName: string): Repo<T> {
       }
     },
 
+    delete: async (key) => {
+      const store = getStore();
+      return await store.delete(key);
+    },
+
     get: async (key) => {
       const store = getStore();
       const value = await store.get(key);
@@ -128,7 +134,7 @@ export function createRepo<T = unknown>(repoName: string): Repo<T> {
       return value;
     },
 
-    getMany: async (keys) => {
+    getMany: async (keys: Key[]): Promise<T[]> => {
       const store = getStore();
       const values = await store.getMany(keys);
       return values.filter((v): v is T => {

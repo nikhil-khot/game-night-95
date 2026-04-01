@@ -11,21 +11,11 @@ describe("zUserPreferencesUpdateRequest", () => {
     expect(
       zUserPreferencesUpdateRequest.safeParse({
         fontSize: "large",
-        banner: {
-          imageUrl: "https://example.com/banner.png",
-          position: "bottom",
-          overlayOpacity: 0.5,
-        },
       }),
     ).toStrictEqual({
       success: true,
       data: {
         fontSize: "large",
-        banner: {
-          imageUrl: "https://example.com/banner.png",
-          position: "bottom",
-          overlayOpacity: 0.5,
-        },
       },
     });
   });

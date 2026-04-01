@@ -25,22 +25,13 @@ export const zUserUpdateRequest = z.object({
 });
 
 /**
- * Banner display preferences.
- */
-export interface BannerPreferences {
-  imageUrl?: string;
-  position?: "top" | "center" | "bottom";
-  overlayOpacity?: number;
-}
-
-/**
  * User display preferences persisted to the user account.
  */
 export interface UserPreferences {
   theme: "light" | "dark";
   fontSize: "small" | "medium" | "large";
   profilePictureUrl?: string;
-  banner?: BannerPreferences;
+  bannerImageUrl?: string;
   updatedAt: Date;
 }
 
@@ -55,7 +46,7 @@ export interface UserPreferencesRecord {
   theme: "light" | "dark";
   fontSize: "small" | "medium" | "large";
   profilePictureUrl?: string;
-  banner?: BannerPreferences;
+  bannerImageUrl?: string;
   updatedAt: string;
 }
 
@@ -67,11 +58,5 @@ export const zUserPreferencesUpdateRequest = z.object({
   theme: z.enum(["light", "dark"]).optional(),
   fontSize: z.enum(["small", "medium", "large"]).optional(),
   profilePictureUrl: z.string().optional(),
-  banner: z
-    .object({
-      imageUrl: z.string().optional(),
-      position: z.enum(["top", "center", "bottom"]).optional(),
-      overlayOpacity: z.number().min(0).max(1).optional(),
-    })
-    .optional(),
+  bannerImageUrl: z.string().optional(),
 });

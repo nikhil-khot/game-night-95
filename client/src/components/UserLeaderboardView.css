@@ -1,0 +1,18 @@
+.leaderboardItem{
+  display: flex;
+  flex-direction: row;
+  border-top: 1px dashed black;
+  color: var(--gray-foreground);
+}
+
+.leaderboardItem .stats {
+  text-align: center;
+  flex-grow: 1;
+}
+
+.leaderboardItem .userRank {
+  text-align: left;
+  width: 13rem;
+  flex-shrink: 0;
+  flex-grow: 0;
+}

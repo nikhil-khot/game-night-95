@@ -1,75 +1,107 @@
+import type { GameInfo, GameType } from "@gamenite/shared";
 import useGameList from "../hooks/useGameList";
+import UserLeaderboardView from "../components/UserLeaderboardView";
+import "./Leaderboard.css";
+
+function createInitialStats(): {
+  [game in GameType]: { wins: number; losses: number; ties: number };
+} {
+  return {
+    nim: { wins: 0, losses: 0, ties: 0 },
+    guess: { wins: 0, losses: 0, ties: 0 },
+    battleship: { wins: 0, losses: 0, ties: 0 },
+  };
+}
+
+function generateStatsFromGames(gameList: GameInfo[]) {
+  return gameList.reduce(
+    (
+      acc: Record<string, { [game in GameType]: { wins: number; losses: number; ties: number } }>,
+      game,
+    ) => {
+      const winners = game.winners;
+      if (winners.length === 0) {
+        return acc;
+      }
+
+      const ensurePlayer = (displayName: string) => {
+        if (!acc[displayName]) {
+          acc[displayName] = createInitialStats();
+        }
+      };
+
+      if (winners.length === 1) {
+        const winner = winners[0];
+        ensurePlayer(winner.display);
+        acc[winner.display][game.type].wins += 1;
+      } else {
+        winners.forEach((winner) => {
+          ensurePlayer(winner.display);
+          acc[winner.display][game.type].ties += 1;
+        });
+      }
+
+      game.players.forEach((player) => {
+        if (!winners.some((winner) => winner.username === player.username)) {
+          ensurePlayer(player.display);
+          acc[player.display][game.type].losses += 1;
+        }
+      });
+
+      return acc;
+    },
+    {} as Record<string, { [game in GameType]: { wins: number; losses: number; ties: number } }>,
+  );
+}
+
+function sortLeaderboardEntries(
+  entries: Array<[string, { [game in GameType]: { wins: number; losses: number; ties: number } }]>,
+) {
+  return entries.sort((a, b) => {
+    const score = (record: {
+      [game in GameType]: { wins: number; losses: number; ties: number };
+    }) => ({
+      wins: record.nim.wins + record.guess.wins + record.battleship.wins,
+      losses: record.nim.losses + record.guess.losses + record.battleship.losses,
+      ties: record.nim.ties + record.guess.ties + record.battleship.ties,
+    });
+
+    const aScore = score(a[1]);
+    const bScore = score(b[1]);
+
+    if (aScore.wins !== bScore.wins) return bScore.wins - aScore.wins;
+    if (aScore.losses !== bScore.losses) return aScore.losses - bScore.losses;
+    return bScore.ties - aScore.ties;
+  });
+}
 
 export default function GameList() {
   const gameList = useGameList();
+
+  const leaderboardRows =
+    "message" in gameList
+      ? []
+      : sortLeaderboardEntries(Object.entries(generateStatsFromGames(gameList))).map(
+          ([user, record], index) => (
+            <UserLeaderboardView key={user} rank={index + 1} user={user} record={record} />
+          ),
+        );
 
   return (
     <div className="content">
       <div className="spacedSection">
         <h2>Leaderboard</h2>
-        <>
-          {"message" in gameList ? (
-            gameList.message
-          ) : (
-            <div className="dottedList">
-              {Object.entries(
-                gameList.reduce(
-                  (acc, game) => {
-                    const winners = game.winners;
-                    if (winners.length !== 0) {
-                      if (winners.length === 1) {
-                        const winner = winners[0];
-                        if (!acc[winner.display]) {
-                          acc[winner.display] = { wins: 0, losses: 0, ties: 0 };
-                        }
-                        acc[winner.display].wins += 1;
-                      } else if (winners.length > 1) {
-                        winners.forEach((winner) => {
-                          if (!acc[winner.display]) {
-                            acc[winner.display] = { wins: 0, losses: 0, ties: 0 };
-                          }
-                          acc[winner.display].ties += 1;
-                        });
-                      }
-                      game.players.forEach((player) => {
-                        if (!winners.some((winner) => winner.username === player.username)) {
-                          if (!acc[player.display]) {
-                            acc[player.display] = { wins: 0, losses: 0, ties: 0 };
-                          }
-                          acc[player.display].losses += 1;
-                        }
-                      });
-                    }
-                    return acc;
-                  },
-                  {} as Record<string, Record<"wins" | "losses" | "ties", number>>,
-                ),
-              )
-                .sort((a, b) => {
-                  const aWins = a[1].wins;
-                  const bWins = b[1].wins;
-                  if (aWins !== bWins) {
-                    return bWins - aWins; // Sort by wins descending
-                  }
-                  const aLosses = a[1].losses;
-                  const bLosses = b[1].losses;
-                  if (aLosses !== bLosses) {
-                    return aLosses - bLosses; // Sort by losses ascending
-                  }
-                  const aTies = a[1].ties;
-                  const bTies = b[1].ties;
-                  return bTies - aTies; // Sort by ties descending
-                })
-                .map(([user, record]) => (
-                  <div key={user}>
-                    {user} has {record.wins} {record.wins === 1 ? "win, " : "wins, "}
-                    {record.losses} {record.losses === 1 ? "loss, " : "losses, "}
-                    and {record.ties} {record.ties === 1 ? "tie" : "ties"}
-                  </div>
-                ))}
+        {"message" in gameList ? (
+          gameList.message
+        ) : (
+          <>
+            <div className="leaderboardHeader" role="listItem">
+              <div className="userRank">{"\u00a0\u00a0\u00a0\u00a0"}Username</div>
+              <div className="stats">Stats (Win/Loss/Tie)</div>
             </div>
-          )}
-        </>
+            <div className="dottedList">{leaderboardRows}</div>
+          </>
+        )}
       </div>
     </div>
   );

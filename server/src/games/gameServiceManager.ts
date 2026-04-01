@@ -98,7 +98,7 @@ export class GameService<State, View> implements GameServicer {
       state: newState,
       views: this._makePlayerViews(players, newState),
       done: done,
-      winners: done ? [] : this._logic.getWinnerIndices(state, newState, move, playerIndex),
+      winners: done ? this._logic.getWinnerIndices(state, newState, move, playerIndex) : [],
       moveDescription: this._logic.describeMove(state, newState, move, playerIndex),
     };
   }

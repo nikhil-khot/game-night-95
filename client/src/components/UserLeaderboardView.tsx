@@ -1,12 +1,13 @@
-import type { GameType } from "@gamenite/shared";
+import type { GameType, SafeUserInfo } from "@gamenite/shared";
 import "./UserLeaderboardView.css";
+import { NavLink } from "react-router-dom";
 
 export default function UserLeaderboardView({
   user,
   rank,
   record,
 }: {
-  user: string | undefined;
+  user: SafeUserInfo | undefined;
   rank: number | undefined;
   record: {
     [game in GameType]: { wins: number; losses: number; ties: number };
@@ -19,7 +20,7 @@ export default function UserLeaderboardView({
     <div className="leaderboardItem" role="listitem">
       {rank && user ? (
         <div className="userRank">
-          {rank}. {user}
+          {rank}. <NavLink to={`/profile/${user.username}`}>{user.display}</NavLink>
         </div>
       ) : (
         <> </>

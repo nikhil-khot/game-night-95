@@ -9,9 +9,14 @@ export default function Leaderboard() {
   const leaderboardRows =
     "message" in gameList
       ? []
-      : sortLeaderboardEntries(Object.entries(generateStatsFromGames(gameList))).map(
-          ([user, record], index) => (
-            <UserLeaderboardView key={user} rank={index + 1} user={user} record={record} />
+      : sortLeaderboardEntries(generateStatsFromGames(gameList)).map(
+          ([userInfo, record], index) => (
+            <UserLeaderboardView
+              key={userInfo.username}
+              rank={index + 1}
+              user={userInfo}
+              record={record}
+            />
           ),
         );
 

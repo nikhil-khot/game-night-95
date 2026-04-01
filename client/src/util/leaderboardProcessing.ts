@@ -1,4 +1,4 @@
-import type { GameInfo, GameType } from "@gamenite/shared";
+import type { GameInfo, GameType, SafeUserInfo } from "@gamenite/shared";
 
 function createInitialStats(): {
   [game in GameType]: { wins: number; losses: number; ties: number };
@@ -13,7 +13,10 @@ function createInitialStats(): {
 export function generateStatsFromGames(gameList: GameInfo[]) {
   return gameList.reduce(
     (
-      acc: Record<string, { [game in GameType]: { wins: number; losses: number; ties: number } }>,
+      acc: Map<
+        SafeUserInfo,
+        { [game in GameType]: { wins: number; losses: number; ties: number } }
+      >,
       game,
     ) => {
       const winners = game.winners;
@@ -21,40 +24,43 @@ export function generateStatsFromGames(gameList: GameInfo[]) {
         return acc;
       }
 
-      const ensurePlayer = (displayName: string) => {
-        if (!acc[displayName]) {
-          acc[displayName] = createInitialStats();
+      const ensurePlayer = (user: SafeUserInfo) => {
+        if (!acc.has(user)) {
+          acc.set(user, createInitialStats());
         }
       };
 
       if (winners.length === 1) {
         const winner = winners[0];
-        ensurePlayer(winner.display);
-        acc[winner.display][game.type].wins += 1;
+        ensurePlayer(winner);
+        acc.get(winner)![game.type].wins += 1;
       } else {
         winners.forEach((winner) => {
-          ensurePlayer(winner.display);
-          acc[winner.display][game.type].ties += 1;
+          ensurePlayer(winner);
+          acc.get(winner)![game.type].ties += 1;
         });
       }
 
       game.players.forEach((player) => {
         if (!winners.some((winner) => winner.username === player.username)) {
-          ensurePlayer(player.display);
-          acc[player.display][game.type].losses += 1;
+          ensurePlayer(player);
+          acc.get(player)![game.type].losses += 1;
         }
       });
 
       return acc;
     },
-    {} as Record<string, { [game in GameType]: { wins: number; losses: number; ties: number } }>,
+    new Map<SafeUserInfo, { [game in GameType]: { wins: number; losses: number; ties: number } }>(),
   );
 }
 
 export function sortLeaderboardEntries(
-  entries: Array<[string, { [game in GameType]: { wins: number; losses: number; ties: number } }]>,
+  statsMap: Map<
+    SafeUserInfo,
+    { [game in GameType]: { wins: number; losses: number; ties: number } }
+  >,
 ) {
-  return entries.sort((a, b) => {
+  return Array.from(statsMap.entries()).sort((a, b) => {
     const score = (record: {
       [game in GameType]: { wins: number; losses: number; ties: number };
     }) => ({

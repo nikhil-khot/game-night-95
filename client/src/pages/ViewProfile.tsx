@@ -34,14 +34,10 @@ export default function ViewProfile({ username: profileUsername }: ViewProfilePr
     "message" in gameList || componentState.type !== "profile"
       ? []
       : sortLeaderboardEntries(
-          Object.entries(
-            generateStatsFromGames(
-              gameList.filter((game) =>
-                game.players.some((player) => player.username === username),
-              ),
-            ),
+          generateStatsFromGames(
+            gameList.filter((game) => game.players.some((player) => player.username === username)),
           ),
-        ).filter(([user, record]) => user === componentState.user.display);
+        ).filter(([user, record]) => user.username === componentState.user.username);
 
   useEffect(() => {
     let cancel = false;
@@ -119,12 +115,7 @@ export default function ViewProfile({ username: profileUsername }: ViewProfilePr
                 <hr style={{ marginBottom: 0, marginTop: 0 }} />
                 <div className="dottedList">
                   {filteredStats.map(([user, record], index) => (
-                    <UserLeaderboardView
-                      key={user}
-                      rank={undefined}
-                      user={undefined}
-                      record={record}
-                    />
+                    <UserLeaderboardView key={index} rank={undefined} user={user} record={record} />
                   ))}
                 </div>
               </>

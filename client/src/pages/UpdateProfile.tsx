@@ -42,14 +42,12 @@ export default function UpdateProfile() {
     "message" in gameList
       ? []
       : sortLeaderboardEntries(
-          Object.entries(
-            generateStatsFromGames(
-              gameList.filter((game) =>
-                game.players.some((player) => player.username === user.username),
-              ),
+          generateStatsFromGames(
+            gameList.filter((game) =>
+              game.players.some((player) => player.username === user.username),
             ),
           ),
-        ).filter(([display, record]) => display === user.display);
+        ).filter(([userInfo, record]) => userInfo.username === user.username);
 
   const handleProfileImageChange = (file: File) => {
     setUploadedImageName(file.name);
@@ -197,7 +195,7 @@ export default function UpdateProfile() {
           <hr style={{ marginBottom: 0, marginTop: 0 }} />
           <div className="dottedList">
             {filteredStats.map(([user, record], index) => (
-              <UserLeaderboardView key={user} rank={undefined} user={undefined} record={record} />
+              <UserLeaderboardView key={index} rank={undefined} user={undefined} record={record} />
             ))}
           </div>
         </>

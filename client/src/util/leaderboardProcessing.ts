@@ -25,26 +25,36 @@ export function generateStatsFromGames(gameList: GameInfo[]) {
       }
 
       const ensurePlayer = (user: SafeUserInfo) => {
-        if (!acc.has(user)) {
+        const foundUser = [...acc.keys()].find((u) => u.username === user.username);
+        if (!foundUser) {
           acc.set(user, createInitialStats());
+        }
+      };
+
+      const getPlayer = (user: SafeUserInfo) => {
+        const foundUser = [...acc.keys()].find((u) => u.username === user.username);
+        if (foundUser) {
+          return acc.get(foundUser);
+        } else {
+          return undefined;
         }
       };
 
       if (winners.length === 1) {
         const winner = winners[0];
         ensurePlayer(winner);
-        acc.get(winner)![game.type].wins += 1;
+        getPlayer(winner)![game.type].wins += 1;
       } else {
         winners.forEach((winner) => {
           ensurePlayer(winner);
-          acc.get(winner)![game.type].ties += 1;
+          getPlayer(winner)![game.type].ties += 1;
         });
       }
 
       game.players.forEach((player) => {
         if (!winners.some((winner) => winner.username === player.username)) {
           ensurePlayer(player);
-          acc.get(player)![game.type].losses += 1;
+          getPlayer(player)![game.type].losses += 1;
         }
       });
 

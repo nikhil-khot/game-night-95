@@ -11,12 +11,7 @@ export default function Leaderboard() {
       ? []
       : sortLeaderboardEntries(generateStatsFromGames(gameList)).map(
           ([userInfo, record], index) => (
-            <UserLeaderboardView
-              key={userInfo.username}
-              rank={index + 1}
-              user={userInfo}
-              record={record}
-            />
+            <UserLeaderboardView key={index} rank={index + 1} user={userInfo} record={record} />
           ),
         );
 

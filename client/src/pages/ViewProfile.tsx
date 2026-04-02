@@ -105,7 +105,7 @@ export default function ViewProfile({ username: profileUsername }: ViewProfilePr
               </div>
             </div>
             <hr style={{ marginBottom: 0 }} />
-            <h3>Game Statistics (W/L/T)</h3>
+            <h3>Game Statistics (Win/Loss/Tie)</h3>
             {"message" in gameList ? (
               gameList.message
             ) : filteredStats.length === 0 ? (

@@ -1,10 +1,21 @@
-import { type GameInfo, type GameMode, type GameType, type TaggedGameView } from "@gamenite/shared";
+import {
+  type BattleshipState,
+  type GameInfo,
+  type GameMode,
+  type GameType,
+  type TaggedGameView,
+} from "@gamenite/shared";
 import { createChat } from "./chat.service.ts";
 import { populateSafeUserInfo } from "./user.service.ts";
 import { type GameServicer } from "../games/gameServiceManager.ts";
 import { nimGameService } from "../games/nim.ts";
 import { guessGameService } from "../games/guess.ts";
-import { battleshipGameService, randomAIPlacement } from "../games/battleship.ts";
+import {
+  battleshipGameService,
+  mediumAIAttack,
+  randomAIAttack,
+  randomAIPlacement,
+} from "../games/battleship.ts";
 import { type GameViewUpdates, type UserWithId } from "../types.ts";
 import { GameRepo } from "../repository.ts";
 
@@ -199,9 +210,31 @@ export async function updateGame(
   const result = gameServices[game.type].update(game.state, move, playerIndex, game.players);
   if (!result) throw new Error(`user ${user.username} made an invalid move in ${game.type}`);
 
-  game.state = result.state;
-  game.done = game.done || result.done;
-  if (result.done) {
+  let finalState = result.state;
+  let finalViews = result.views;
+  let finalDone = result.done;
+
+  // For player vs AI battleship: auto-apply the AI's attack when it becomes the AI's turn
+  if (game.mode === "player vs ai" && game.type === "battleship" && !result.done) {
+    const bsState = finalState as BattleshipState;
+    if (bsState.phase === "battle" && bsState.nextPlayer === 1) {
+      const aiPlayer = await populateSafeUserInfo(game.players[1]);
+      const aiAttack =
+        aiPlayer.username === "AI-Medium"
+          ? mediumAIAttack(bsState.boards[0])
+          : randomAIAttack(bsState.boards[0]);
+      const aiResult = gameServices[game.type].update(finalState, aiAttack, 1, game.players);
+      if (aiResult) {
+        finalState = aiResult.state;
+        finalViews = aiResult.views;
+        finalDone = finalDone || aiResult.done;
+      }
+    }
+  }
+
+  game.state = finalState;
+  game.done = game.done || finalDone;
+  if (finalDone) {
     const winners = result.winners;
     if (winners.length === 0) {
       game.winners = [];
@@ -212,7 +245,7 @@ export async function updateGame(
   await GameRepo.set(gameId, game);
 
   return {
-    views: result.views,
+    views: finalViews,
     moveDescription: result.moveDescription,
     chatId: game.chat,
   };

@@ -1,21 +1,10 @@
-import {
-  type BattleshipState,
-  type GameInfo,
-  type GameMode,
-  type GameType,
-  type TaggedGameView,
-} from "@gamenite/shared";
+import { type GameInfo, type GameMode, type GameType, type TaggedGameView } from "@gamenite/shared";
 import { createChat } from "./chat.service.ts";
 import { populateSafeUserInfo } from "./user.service.ts";
 import { type GameServicer } from "../games/gameServiceManager.ts";
 import { nimGameService } from "../games/nim.ts";
 import { guessGameService } from "../games/guess.ts";
-import {
-  battleshipGameService,
-  mediumAIAttack,
-  randomAIAttack,
-  randomAIPlacement,
-} from "../games/battleship.ts";
+import { battleshipGameService, randomAIPlacement } from "../games/battleship.ts";
 import { type GameViewUpdates, type UserWithId } from "../types.ts";
 import { GameRepo } from "../repository.ts";
 
@@ -223,7 +212,7 @@ export async function updateGame(
   await GameRepo.set(gameId, game);
 
   return {
-    views: finalViews,
+    views: result.views,
     moveDescription: result.moveDescription,
     chatId: game.chat,
   };

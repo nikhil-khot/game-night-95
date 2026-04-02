@@ -20,7 +20,7 @@ export function generateStatsFromGames(gameList: GameInfo[]) {
       game,
     ) => {
       const winners = game.winners;
-      if (winners.length === 0) {
+      if (winners.length === 0 || game.mode !== "player vs player") {
         return acc;
       }
 

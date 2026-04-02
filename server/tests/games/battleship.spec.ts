@@ -350,7 +350,9 @@ describe(`Battleship's describeMove() logic`, () => {
   it("Should describe a ship placement", () => {
     const state = battleshipLogic.start(2);
     const next = battleshipLogic.update(state, placeMove, 0)!;
-    expect(battleshipLogic.describeMove(state, next, placeMove, 0)).toBe(" placed their ships");
+    expect(battleshipLogic.describeMove(state, next, placeMove, 0)).toBe(
+      " finished placing ships!",
+    );
   });
 
   it("Should describe a miss with the correct coordinate", () => {

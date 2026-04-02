@@ -21,5 +21,5 @@
 }
 
 .menu_selected {
-  background: #cccccc;
+  background: var(--selection-color);
 }

@@ -9,7 +9,7 @@
   padding: 1rem;
   border: 1px solid var(--border-color, #ddd);
   border-radius: 8px;
-  background-color: var(--bg-secondary, #f9f9f9);
+  background-color: var(--selection-color);
 }
 
 .friendsSection h3 {

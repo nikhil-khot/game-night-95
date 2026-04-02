@@ -164,13 +164,11 @@ export const battleshipLogic: GameLogic<BattleshipState, BattleshipView> = {
     }
 
     if (playerIndex === -1) {
-      const ships0 = state.ships[0] as [number, number][][];
-      const ships1 = state.ships[1] as [number, number][][];
       return {
         finished: false,
         phase: "battle",
-        myBoard: buildOpponentView(state.boards[0], ships0),
-        opponentBoard: buildOpponentView(state.boards[1], ships1),
+        myBoard: state.boards[0],
+        opponentBoard: state.boards[1],
         nextPlayer: state.nextPlayer,
         sunkOpponentShipSizes: [],
       };

@@ -243,6 +243,15 @@ describe(`Battleship's viewAs() logic (placement phase)`, () => {
 });
 
 describe(`Battleship's viewAs() logic (battle phase)`, () => {
+  it("Should show both players' unhit ship cells to a watcher (-1)", () => {
+    const state = makeBattleState();
+    const view = battleshipLogic.viewAs(state, -1);
+    if (view.finished || view.phase !== "battle") throw new Error("unexpected view");
+    // Watcher should see unhit ship cells (1) on both boards, not hidden as 0
+    expect(view.myBoard[0][0]).toBe(1);
+    expect(view.opponentBoard[0][0]).toBe(1);
+  });
+
   it("Should hide unhit ship cells on the opponent's board", () => {
     const state = makeBattleState();
     const view = battleshipLogic.viewAs(state, 0);

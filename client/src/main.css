@@ -7,6 +7,7 @@
   --page-foreground: #121212;
   --line-color: #000;
   --text-color: rgba(0, 0, 0, 0.386);
+  --selection-color: #cccccc;
 }
 
 :root[data-theme="dark"] {
@@ -16,6 +17,7 @@
   --page-foreground: #e2e8f0;
   --line-color: #64748b;
   --text-color: rgba(255, 255, 255, 0.386);
+  --selection-color: #3c4757;
 }
 
 :root[data-font-size="small"] {

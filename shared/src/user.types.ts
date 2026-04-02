@@ -54,9 +54,11 @@ export interface UserPreferencesRecord {
  * Represents allowed updates to user display preferences.
  */
 export type UserPreferencesUpdateRequest = z.infer<typeof zUserPreferencesUpdateRequest>;
-export const zUserPreferencesUpdateRequest = z.object({
-  theme: z.enum(["light", "dark"]).optional(),
-  fontSize: z.enum(["small", "medium", "large"]).optional(),
-  profilePictureUrl: z.string().optional(),
-  bannerImageUrl: z.string().optional(),
-});
+export const zUserPreferencesUpdateRequest = z
+  .object({
+    theme: z.enum(["light", "dark"]).optional(),
+    fontSize: z.enum(["small", "medium", "large"]).optional(),
+    profilePictureUrl: z.string().optional(),
+    bannerImageUrl: z.string().optional(),
+  })
+  .strict();

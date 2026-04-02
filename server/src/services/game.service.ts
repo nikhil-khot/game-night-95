@@ -35,6 +35,7 @@ async function populateGameInfo(gameId: string): Promise<GameInfo> {
     mode: game.mode,
     status: !game.state ? "waiting" : game.done ? "done" : "active",
     minPlayers: gameServices[game.type].minPlayers,
+    winners: await Promise.all(game.winners.map(populateSafeUserInfo)),
   };
 }
 
@@ -62,6 +63,7 @@ export async function createGame(
     createdAt: createdAt.toISOString(),
     createdBy: user.userId,
     players: [user.userId],
+    winners: [],
   });
   return populateGameInfo(gameId);
 }
@@ -189,6 +191,14 @@ export async function updateGame(
 
   game.state = result.state;
   game.done = game.done || result.done;
+  if (result.done) {
+    const winners = result.winners;
+    if (winners.length === 0) {
+      game.winners = [];
+    } else {
+      game.winners = winners.map((index) => game.players[index]);
+    }
+  }
   await GameRepo.set(gameId, game);
 
   return {

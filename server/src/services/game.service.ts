@@ -10,7 +10,12 @@ import { populateSafeUserInfo } from "./user.service.ts";
 import { type GameServicer } from "../games/gameServiceManager.ts";
 import { nimGameService } from "../games/nim.ts";
 import { guessGameService } from "../games/guess.ts";
-import { battleshipGameService, randomAIAttack, randomAIPlacement } from "../games/battleship.ts";
+import {
+  battleshipGameService,
+  mediumAIAttack,
+  randomAIAttack,
+  randomAIPlacement,
+} from "../games/battleship.ts";
 import { type GameViewUpdates, type UserWithId } from "../types.ts";
 import { GameRepo } from "../repository.ts";
 
@@ -211,7 +216,11 @@ export async function updateGame(
   if (game.mode === "player vs ai" && game.type === "battleship" && !result.done) {
     const bsState = finalState as BattleshipState;
     if (bsState.phase === "battle" && bsState.nextPlayer === 1) {
-      const aiAttack = randomAIAttack(bsState.boards[0]);
+      const aiPlayer = await populateSafeUserInfo(game.players[1]);
+      const aiAttack =
+        aiPlayer.username === "AI-Medium"
+          ? mediumAIAttack(bsState.boards[0])
+          : randomAIAttack(bsState.boards[0]);
       const aiResult = gameServices[game.type].update(finalState, aiAttack, 1, game.players);
       if (aiResult) {
         finalState = aiResult.state;

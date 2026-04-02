@@ -275,3 +275,48 @@ export function randomAIAttack(opponentBoard: number[][]): [number, number] {
   }
   return available[Math.floor(Math.random() * available.length)];
 }
+
+const DIRECTIONS: [number, number][] = [
+  [-1, 0],
+  [1, 0],
+  [0, -1],
+  [0, 1],
+];
+
+/**
+ * Picks an attack cell for the medium AI.
+ *
+ * If any hit cells (value 2) have at least one unattacked neighbor, the AI
+ * picks randomly among those neighbors — continuing to hunt down partially
+ * revealed ships. Otherwise it falls back to a fully random unattacked cell.
+ *
+ * `opponentBoard` should be the board belonging to the player being attacked.
+ */
+export function mediumAIAttack(opponentBoard: number[][]): [number, number] {
+  const adjacent: [number, number][] = [];
+  const seen = new Set<string>();
+
+  for (let r = 0; r < BOARD_SIZE; r++) {
+    for (let c = 0; c < BOARD_SIZE; c++) {
+      if (opponentBoard[r][c] !== 2) continue;
+      for (const [dr, dc] of DIRECTIONS) {
+        const nr = r + dr;
+        const nc = c + dc;
+        if (nr < 0 || nr >= BOARD_SIZE || nc < 0 || nc >= BOARD_SIZE) continue;
+        const cell = opponentBoard[nr][nc];
+        if (cell === 2 || cell === 3) continue; // already attacked
+        const key = `${nr},${nc}`;
+        if (!seen.has(key)) {
+          adjacent.push([nr, nc]);
+          seen.add(key);
+        }
+      }
+    }
+  }
+
+  if (adjacent.length > 0) {
+    return adjacent[Math.floor(Math.random() * adjacent.length)];
+  }
+
+  return randomAIAttack(opponentBoard);
+}

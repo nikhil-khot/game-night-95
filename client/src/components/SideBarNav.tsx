@@ -33,6 +33,9 @@ export default function SideBarNav() {
       <NavLink to="/friends" className={navClass}>
         Friends
       </NavLink>
+      <NavLink to="/clubs" className={navClass}>
+        Clubs
+      </NavLink>
       <NavLink to="/preferences" className={navClass}>
         Preferences
       </NavLink>

@@ -164,13 +164,11 @@ export const battleshipLogic: GameLogic<BattleshipState, BattleshipView> = {
     }
 
     if (playerIndex === -1) {
-      const ships0 = state.ships[0] as [number, number][][];
-      const ships1 = state.ships[1] as [number, number][][];
       return {
         finished: false,
         phase: "battle",
-        myBoard: buildOpponentView(state.boards[0], ships0),
-        opponentBoard: buildOpponentView(state.boards[1], ships1),
+        myBoard: state.boards[0],
+        opponentBoard: state.boards[1],
         nextPlayer: state.nextPlayer,
         sunkOpponentShipSizes: [],
       };
@@ -223,3 +221,105 @@ export const battleshipLogic: GameLogic<BattleshipState, BattleshipView> = {
 export const battleshipGameService = new GameService<BattleshipState, BattleshipView>(
   battleshipLogic,
 );
+
+/**
+ * Generates a random valid placement for all ships in SHIP_SIZES.
+ * Used by the easy AI bot to place its ships at game start.
+ */
+export function randomAIPlacement(): ShipPlacement[] {
+  const board = emptyBoard();
+  const placements: ShipPlacement[] = [];
+
+  for (let i = 0; i < SHIP_SIZES.length; i++) {
+    const size = SHIP_SIZES[i];
+    let placed = false;
+    while (!placed) {
+      const horizontal = Math.random() < 0.5;
+      const maxRow = horizontal ? BOARD_SIZE - 1 : BOARD_SIZE - size;
+      const maxCol = horizontal ? BOARD_SIZE - size : BOARD_SIZE - 1;
+      const row = Math.floor(Math.random() * (maxRow + 1));
+      const col = Math.floor(Math.random() * (maxCol + 1));
+
+      let valid = true;
+      const cells: [number, number][] = [];
+      for (let j = 0; j < size; j++) {
+        const r = horizontal ? row : row + j;
+        const c = horizontal ? col + j : col;
+        if (board[r][c] !== 0) {
+          valid = false;
+          break;
+        }
+        cells.push([r, c]);
+      }
+
+      if (valid) {
+        for (const [r, c] of cells) board[r][c] = 1;
+        placements.push({ row, col, horizontal });
+        placed = true;
+      }
+    }
+  }
+
+  return placements;
+}
+
+/**
+ * Picks a random unattacked cell on the given board for the easy AI to attack.
+ * `opponentBoard` should be the board belonging to the player being attacked.
+ */
+export function randomAIAttack(opponentBoard: number[][]): [number, number] {
+  const available: [number, number][] = [];
+  for (let r = 0; r < BOARD_SIZE; r++) {
+    for (let c = 0; c < BOARD_SIZE; c++) {
+      if (opponentBoard[r][c] !== 2 && opponentBoard[r][c] !== 3) {
+        available.push([r, c]);
+      }
+    }
+  }
+  return available[Math.floor(Math.random() * available.length)];
+}
+
+const DIRECTIONS: [number, number][] = [
+  [-1, 0],
+  [1, 0],
+  [0, -1],
+  [0, 1],
+];
+
+/**
+ * Picks an attack cell for the medium AI.
+ *
+ * If any hit cells (value 2) have at least one unattacked neighbor, the AI
+ * picks randomly among those neighbors — continuing to hunt down partially
+ * revealed ships. Otherwise it falls back to a fully random unattacked cell.
+ *
+ * `opponentBoard` should be the board belonging to the player being attacked.
+ */
+export function mediumAIAttack(opponentBoard: number[][]): [number, number] {
+  const adjacent: [number, number][] = [];
+  const seen = new Set<string>();
+
+  for (let r = 0; r < BOARD_SIZE; r++) {
+    for (let c = 0; c < BOARD_SIZE; c++) {
+      if (opponentBoard[r][c] !== 2) continue;
+      for (const [dr, dc] of DIRECTIONS) {
+        const nr = r + dr;
+        const nc = c + dc;
+        if (nr < 0 || nr >= BOARD_SIZE || nc < 0 || nc >= BOARD_SIZE) continue;
+        const cell = opponentBoard[nr][nc];
+        if (cell === 2 || cell === 3) continue; // already attacked
+        const key = `${nr},${nc}`;
+        if (!seen.has(key)) {
+          adjacent.push([nr, nc]);
+          seen.add(key);
+        }
+      }
+    }
+  }
+
+  if (adjacent.length > 0) {
+    return adjacent[Math.floor(Math.random() * adjacent.length)];
+  }
+
+  return randomAIAttack(opponentBoard);
+}

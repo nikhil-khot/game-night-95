@@ -544,14 +544,14 @@ export default function BattleshipGame({
 
       <div style={{ display: "flex", gap: "2rem", overflowX: "auto", paddingBottom: "0.5rem" }}>
         <div style={{ flexShrink: 0 }}>
-          <h3 style={{ marginBottom: "0.5rem" }}>You</h3>
+          <h3 style={{ marginBottom: "0.5rem" }}>{isPlayer ? "You" : playerName(0)}</h3>
           <Grid board={myBoard} isOpponentBoard={false} clickable={false} />
         </div>
         <div style={{ flexShrink: 0 }}>
-          <h3 style={{ marginBottom: "0.5rem" }}>Enemy</h3>
+          <h3 style={{ marginBottom: "0.5rem" }}>{isPlayer ? "Enemy" : playerName(1)}</h3>
           <Grid
             board={opponentBoard}
-            isOpponentBoard={true}
+            isOpponentBoard={isPlayer}
             clickable={isMyTurn && isPlayer}
             onCellClick={(row, col) => makeMove([row, col])}
           />

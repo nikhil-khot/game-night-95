@@ -4,7 +4,7 @@ import { populateSafeUserInfo } from "./user.service.ts";
 import { type GameServicer } from "../games/gameServiceManager.ts";
 import { nimGameService } from "../games/nim.ts";
 import { guessGameService } from "../games/guess.ts";
-import { battleshipGameService } from "../games/battleship.ts";
+import { battleshipGameService, randomAIPlacement } from "../games/battleship.ts";
 import { type GameViewUpdates, type UserWithId } from "../types.ts";
 import { GameRepo } from "../repository.ts";
 
@@ -133,7 +133,17 @@ export async function startGame(gameId: string, user: UserWithId): Promise<GameV
   if (!game.players.some((userId) => userId === user.userId)) {
     throw new Error(`user ${user.username} starting game they're not in`);
   }
-  const { state, views } = gameServices[key].create(game.players);
+  let { state, views } = gameServices[key].create(game.players);
+
+  // For player vs AI battleship: auto-place the AI's ships (player index 1)
+  if (game.mode === "player vs ai" && game.type === "battleship") {
+    const aiPlaceMove = { type: "place" as const, ships: randomAIPlacement() };
+    const aiResult = gameServices[key].update(state, aiPlaceMove, 1, game.players);
+    if (aiResult) {
+      state = aiResult.state;
+      views = aiResult.views;
+    }
+  }
 
   game.state = state;
   await GameRepo.set(gameId, game);

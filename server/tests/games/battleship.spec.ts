@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { battleshipLogic } from "../../src/games/battleship.ts";
+import {
+  battleshipLogic,
+  mediumAIAttack,
+  randomAIAttack,
+  randomAIPlacement,
+} from "../../src/games/battleship.ts";
 import type { BattleshipState, ShipPlacement } from "@gamenite/shared";
 import { SHIP_SIZES } from "@gamenite/shared";
 
@@ -243,6 +248,15 @@ describe(`Battleship's viewAs() logic (placement phase)`, () => {
 });
 
 describe(`Battleship's viewAs() logic (battle phase)`, () => {
+  it("Should show both players' unhit ship cells to a watcher (-1)", () => {
+    const state = makeBattleState();
+    const view = battleshipLogic.viewAs(state, -1);
+    if (view.finished || view.phase !== "battle") throw new Error("unexpected view");
+    // Watcher should see unhit ship cells (1) on both boards, not hidden as 0
+    expect(view.myBoard[0][0]).toBe(1);
+    expect(view.opponentBoard[0][0]).toBe(1);
+  });
+
   it("Should hide unhit ship cells on the opponent's board", () => {
     const state = makeBattleState();
     const view = battleshipLogic.viewAs(state, 0);
@@ -365,5 +379,212 @@ describe(`Battleship's describeMove() logic`, () => {
     const desc = battleshipLogic.describeMove(s2, s3, [4, 1], 0);
     expect(desc).toContain("sank");
     expect(desc).toContain("2-cell");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// randomAIPlacement()
+// ---------------------------------------------------------------------------
+
+describe("randomAIPlacement()", () => {
+  it("Should return exactly one placement per ship", () => {
+    const placements = randomAIPlacement();
+    expect(placements).toHaveLength(SHIP_SIZES.length);
+  });
+
+  it("Should return placements whose coordinates are within board bounds", () => {
+    const placements = randomAIPlacement();
+    placements.forEach(({ row, col, horizontal }, i) => {
+      const size = SHIP_SIZES[i];
+      expect(row).toBeGreaterThanOrEqual(0);
+      expect(col).toBeGreaterThanOrEqual(0);
+      if (horizontal) {
+        expect(col + size - 1).toBeLessThanOrEqual(9);
+        expect(row).toBeLessThanOrEqual(9);
+      } else {
+        expect(row + size - 1).toBeLessThanOrEqual(9);
+        expect(col).toBeLessThanOrEqual(9);
+      }
+    });
+  });
+
+  it("Should produce non-overlapping placements that are accepted by the game logic", () => {
+    const placements = randomAIPlacement();
+    const state = battleshipLogic.start(2);
+    const next = battleshipLogic.update(state, { type: "place", ships: placements }, 0);
+    expect(next).not.toBeNull();
+  });
+
+  it("Should place the correct total number of ship cells on the board", () => {
+    const placements = randomAIPlacement();
+    const state = battleshipLogic.start(2);
+    const next = battleshipLogic.update(state, { type: "place", ships: placements }, 0)!;
+    const shipCells = next.boards[0].flat().filter((c) => c === 1).length;
+    const expected = SHIP_SIZES.reduce((sum, s) => sum + s, 0);
+    expect(shipCells).toBe(expected);
+  });
+
+  it("Should produce valid placements across multiple calls (no single lucky result)", () => {
+    for (let i = 0; i < 10; i++) {
+      const placements = randomAIPlacement();
+      const state = battleshipLogic.start(2);
+      expect(battleshipLogic.update(state, { type: "place", ships: placements }, 0)).not.toBeNull();
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// randomAIAttack()
+// ---------------------------------------------------------------------------
+
+describe("randomAIAttack()", () => {
+  it("Should return coordinates within board bounds", () => {
+    const board = emptyBoard();
+    const [row, col] = randomAIAttack(board);
+    expect(row).toBeGreaterThanOrEqual(0);
+    expect(row).toBeLessThanOrEqual(9);
+    expect(col).toBeGreaterThanOrEqual(0);
+    expect(col).toBeLessThanOrEqual(9);
+  });
+
+  it("Should never target a cell already marked as hit (2)", () => {
+    const board = emptyBoard();
+    // Mark all cells as hit except [5][5]
+    for (let r = 0; r < 10; r++) {
+      for (let c = 0; c < 10; c++) {
+        if (r !== 5 || c !== 5) board[r][c] = 2;
+      }
+    }
+    const [row, col] = randomAIAttack(board);
+    expect(row).toBe(5);
+    expect(col).toBe(5);
+  });
+
+  it("Should never target a cell already marked as miss (3)", () => {
+    const board = emptyBoard();
+    // Mark all cells as miss except [3][7]
+    for (let r = 0; r < 10; r++) {
+      for (let c = 0; c < 10; c++) {
+        if (r !== 3 || c !== 7) board[r][c] = 3;
+      }
+    }
+    const [row, col] = randomAIAttack(board);
+    expect(row).toBe(3);
+    expect(col).toBe(7);
+  });
+
+  it("Should target a ship cell (1) that has not been attacked", () => {
+    const board = emptyBoard();
+    board[2][4] = 1; // only unattacked ship cell
+    // Fill everything else with misses
+    for (let r = 0; r < 10; r++) {
+      for (let c = 0; c < 10; c++) {
+        if (r !== 2 || c !== 4) board[r][c] = 3;
+      }
+    }
+    const [row, col] = randomAIAttack(board);
+    expect(row).toBe(2);
+    expect(col).toBe(4);
+  });
+
+  it("Should return a cell that the game logic accepts as a valid AI attack", () => {
+    const state = makeBattleState();
+    // It's player 0's turn; change to player 1 so AI (player 1) can attack
+    const stateForAI = { ...state, nextPlayer: 1 };
+    const attack = randomAIAttack(stateForAI.boards[0]);
+    const next = battleshipLogic.update(stateForAI, attack, 1);
+    expect(next).not.toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// mediumAIAttack()
+// ---------------------------------------------------------------------------
+
+describe("mediumAIAttack()", () => {
+  it("Should return coordinates within board bounds", () => {
+    const board = emptyBoard();
+    const [row, col] = mediumAIAttack(board);
+    expect(row).toBeGreaterThanOrEqual(0);
+    expect(row).toBeLessThanOrEqual(9);
+    expect(col).toBeGreaterThanOrEqual(0);
+    expect(col).toBeLessThanOrEqual(9);
+  });
+
+  it("Should never target a cell already marked as hit (2) or miss (3)", () => {
+    const board = emptyBoard();
+    // Leave only [5][5] unattacked; mark everything else hit or miss alternately
+    for (let r = 0; r < 10; r++) {
+      for (let c = 0; c < 10; c++) {
+        if (r !== 5 || c !== 5) board[r][c] = (r + c) % 2 === 0 ? 2 : 3;
+      }
+    }
+    const [row, col] = mediumAIAttack(board);
+    expect(row).toBe(5);
+    expect(col).toBe(5);
+  });
+
+  it("Should target a cell adjacent to a hit when one exists", () => {
+    const board = emptyBoard();
+    // Single hit at [4][4]; mark all other cells as miss except its neighbors
+    for (let r = 0; r < 10; r++) {
+      for (let c = 0; c < 10; c++) {
+        board[r][c] = 3; // miss
+      }
+    }
+    board[4][4] = 2; // hit
+    board[3][4] = 0; // unattacked neighbor (up)
+    board[5][4] = 0; // unattacked neighbor (down)
+    board[4][3] = 0; // unattacked neighbor (left)
+    board[4][5] = 0; // unattacked neighbor (right)
+
+    const [row, col] = mediumAIAttack(board);
+    const isAdjacent =
+      (row === 3 && col === 4) ||
+      (row === 5 && col === 4) ||
+      (row === 4 && col === 3) ||
+      (row === 4 && col === 5);
+    expect(isAdjacent).toBe(true);
+  });
+
+  it("Should fall back to a random unattacked cell when all hit-cell neighbors are already attacked", () => {
+    const board = emptyBoard();
+    // Hit at [0][0] with all neighbors already attacked
+    for (let r = 0; r < 10; r++) {
+      for (let c = 0; c < 10; c++) {
+        board[r][c] = 3; // miss everywhere
+      }
+    }
+    board[0][0] = 2; // hit
+    board[0][1] = 3; // neighbor right — already attacked
+    board[1][0] = 3; // neighbor down  — already attacked
+    // Only free cell is [9][9]
+    board[9][9] = 0;
+
+    const [row, col] = mediumAIAttack(board);
+    expect(row).toBe(9);
+    expect(col).toBe(9);
+  });
+
+  it("Should fall back to random when there are no hits on the board", () => {
+    // Board with no hits: medium AI behaves like random AI
+    const board = emptyBoard();
+    // Mark all cells as miss except [2][7]
+    for (let r = 0; r < 10; r++) {
+      for (let c = 0; c < 10; c++) {
+        if (r !== 2 || c !== 7) board[r][c] = 3;
+      }
+    }
+    const [row, col] = mediumAIAttack(board);
+    expect(row).toBe(2);
+    expect(col).toBe(7);
+  });
+
+  it("Should return a cell that the game logic accepts as a valid attack", () => {
+    const state = makeBattleState();
+    const stateForAI = { ...state, nextPlayer: 1 };
+    const attack = mediumAIAttack(stateForAI.boards[0]);
+    const next = battleshipLogic.update(stateForAI, attack, 1);
+    expect(next).not.toBeNull();
   });
 });

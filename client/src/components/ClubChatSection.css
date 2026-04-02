@@ -1,0 +1,21 @@
+.clubChatSection {
+  margin-top: 1rem;
+  border-top: 1px solid var(--border-color, #ddd);
+  padding-top: 1rem;
+}
+
+.clubChatSection h4 {
+  margin: 0 0 0.75rem 0;
+  font-size: 1rem;
+  color: var(--text-primary, #000);
+}
+
+.clubChatSection__loading {
+  margin-top: 1rem;
+  color: var(--text-muted, #999);
+  font-size: 0.9rem;
+}
+
+.clubChatSection .chatWindow {
+  max-height: 240px;
+}

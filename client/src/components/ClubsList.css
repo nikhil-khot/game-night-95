@@ -1,0 +1,304 @@
+.clubsList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.noClubs {
+  color: var(--text-muted, #999);
+  font-style: italic;
+  padding: 2rem;
+  text-align: center;
+  background-color: var(--bg-tertiary, #f5f5f5);
+  border-radius: 4px;
+}
+
+.clubsList__items {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 1.5rem;
+}
+
+.clubCard {
+  border: 1px solid var(--border-color, #ddd);
+  border-radius: 8px;
+  background-color: var(--bg-tertiary, #fff);
+  overflow: hidden;
+  transition: box-shadow 0.2s;
+}
+
+.clubCard:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.clubCard__header {
+  padding: 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.clubCard__info {
+  flex: 1;
+}
+
+.clubCard__name {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary, #000);
+}
+
+.clubCard__description {
+  margin: 0 0 0.75rem 0;
+  color: var(--text-secondary, #666);
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.clubCard__memberCount {
+  display: inline-block;
+  font-size: 0.85rem;
+  color: var(--text-muted, #999);
+}
+
+.clubCard__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.clubCard__memberBadge {
+  padding: 0.4rem 0.8rem;
+  background-color: #e3f2fd;
+  color: #1976d2;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.clubCard__memberBadge--owner {
+  background-color: #fff3e0;
+  color: #f57c00;
+}
+
+.clubCard__memberBadge--admin {
+  background-color: #f3e5f5;
+  color: #7b1fa2;
+}
+
+.clubCard__joinBtn {
+  padding: 0.5rem 1rem;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+}
+
+.clubCard__joinBtn:hover:not(:disabled) {
+  background-color: #45a049;
+}
+
+.clubCard__joinBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.clubCard__leaveBtn {
+  padding: 0.5rem 1rem;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+}
+
+.clubCard__leaveBtn:hover:not(:disabled) {
+  background-color: #d32f2f;
+}
+
+.clubCard__leaveBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.clubCard__deleteBtn {
+  padding: 0.5rem 1rem;
+  background-color: #d32f2f;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+}
+
+.clubCard__deleteBtn:hover:not(:disabled) {
+  background-color: #b71c1c;
+}
+
+.clubCard__deleteBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.clubCard__expandBtn {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: var(--bg-secondary, #f9f9f9);
+  border: none;
+  border-top: 1px solid var(--border-color, #ddd);
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--text-primary, #000);
+  transition: background-color 0.2s;
+}
+
+.clubCard__expandBtn:hover {
+  background-color: var(--bg-hover, #f0f0f0);
+}
+
+.clubCard__members {
+  padding: 1.25rem;
+  border-top: 1px solid var(--border-color, #ddd);
+  background-color: var(--bg-secondary, #fafafa);
+}
+
+.clubCard__members h4 {
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+  color: var(--text-primary, #000);
+}
+
+.membersList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.memberItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background-color: var(--bg-tertiary, #fff);
+  border: 1px solid var(--border-color, #eee);
+  border-radius: 4px;
+  gap: 1rem;
+}
+
+.memberInfo {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.memberName {
+  font-weight: 600;
+  color: var(--text-primary, #000);
+  min-width: 100px;
+}
+
+.memberRole {
+  padding: 0.25rem 0.6rem;
+  font-size: 0.75rem;
+  border-radius: 3px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.memberRole--owner {
+  background-color: #fff3e0;
+  color: #e65100;
+}
+
+.memberRole--admin {
+  background-color: #f3e5f5;
+  color: #4a148c;
+}
+
+.memberRole--member {
+  background-color: #e3f2fd;
+  color: #0d47a1;
+}
+
+.memberPoints {
+  font-size: 0.85rem;
+  color: var(--text-muted, #999);
+  margin-left: auto;
+}
+
+.memberActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.promoteBtn,
+.demoteBtn,
+.removeBtn {
+  padding: 0.35rem 0.65rem;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.promoteBtn {
+  background-color: #2196f3;
+  color: white;
+}
+
+.promoteBtn:hover:not(:disabled) {
+  background-color: #1976d2;
+}
+
+.demoteBtn {
+  background-color: #ff9800;
+  color: white;
+}
+
+.demoteBtn:hover:not(:disabled) {
+  background-color: #f57c00;
+}
+
+.removeBtn {
+  background-color: #f44336;
+  color: white;
+}
+
+.removeBtn:hover:not(:disabled) {
+  background-color: #d32f2f;
+}
+
+.promoteBtn:disabled,
+.demoteBtn:disabled,
+.removeBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error {
+  color: #d32f2f;
+  font-size: 0.9rem;
+  background-color: #ffebee;
+  padding: 0.75rem;
+  border-radius: 4px;
+  border-left: 4px solid #d32f2f;
+}

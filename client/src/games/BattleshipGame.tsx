@@ -343,7 +343,7 @@ export default function BattleshipGame({
 
   // ── Finished ──
   if (view.finished) {
-    const winner = view.boards[1].some((row) => row.includes(1)) ? 0 : 1;
+    const winner = view.boards[1].some((row) => row.includes(1)) ? 1 : 0;
     return (
       <div className="content spacedSection">
         <h2>Game Over</h2>

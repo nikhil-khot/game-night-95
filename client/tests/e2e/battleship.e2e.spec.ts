@@ -38,7 +38,11 @@ async function attackCell(page: Page, row: number, col: number): Promise<void> {
   const gridRoot = page
     .locator("h3", { hasText: "Enemy" })
     .locator("xpath=following-sibling::div[1]");
-  const cell = gridRoot.locator("> div").nth(row + 1).locator("> div").nth(col + 1);
+  const cell = gridRoot
+    .locator("> div")
+    .nth(row + 1)
+    .locator("> div")
+    .nth(col + 1);
   await cell.click();
 }
 
@@ -51,11 +55,23 @@ async function attackCell(page: Page, row: number, col: number): Promise<void> {
 //   Submarine  (size 3): row 6, cols 0–2
 //   Destroyer  (size 2): row 8, cols 0–1
 const DEFAULT_SHIP_CELLS: [number, number][] = [
-  [0, 0], [0, 1], [0, 2], [0, 3], [0, 4],
-  [2, 0], [2, 1], [2, 2], [2, 3],
-  [4, 0], [4, 1], [4, 2],
-  [6, 0], [6, 1], [6, 2],
-  [8, 0], [8, 1],
+  [0, 0],
+  [0, 1],
+  [0, 2],
+  [0, 3],
+  [0, 4],
+  [2, 0],
+  [2, 1],
+  [2, 2],
+  [2, 3],
+  [4, 0],
+  [4, 1],
+  [4, 2],
+  [6, 0],
+  [6, 1],
+  [6, 2],
+  [8, 0],
+  [8, 1],
 ];
 
 // ─── Infrastructure ──────────────────────────────────────────────────────────
@@ -87,9 +103,7 @@ test.describe("The game of Battleship — placement phase", () => {
   test("should show a waiting message after a player confirms while their opponent is still placing", async () => {
     await page1.getByRole("button", { name: "Confirm Placement" }).click();
 
-    await expect(
-      page1.getByText("Waiting for opponent to place their ships\u2026"),
-    ).toBeVisible();
+    await expect(page1.getByText("Waiting for opponent to place their ships\u2026")).toBeVisible();
     // Player 2 should still see the active placement UI
     await expect(page2.getByRole("button", { name: "Confirm Placement" })).toBeEnabled();
   });

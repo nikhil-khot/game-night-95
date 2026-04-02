@@ -46,6 +46,7 @@ async function populateGameInfo(gameId: string): Promise<GameInfo> {
     mode: game.mode,
     status: !game.state ? "waiting" : game.done ? "done" : "active",
     minPlayers: gameServices[game.type].minPlayers,
+    winners: await Promise.all(game.winners.map(populateSafeUserInfo)),
   };
 }
 
@@ -73,6 +74,7 @@ export async function createGame(
     createdAt: createdAt.toISOString(),
     createdBy: user.userId,
     players: [user.userId],
+    winners: [],
   });
   return populateGameInfo(gameId);
 }
@@ -208,30 +210,16 @@ export async function updateGame(
   const result = gameServices[game.type].update(game.state, move, playerIndex, game.players);
   if (!result) throw new Error(`user ${user.username} made an invalid move in ${game.type}`);
 
-  let finalState = result.state;
-  let finalViews = result.views;
-  let finalDone = result.done;
-
-  // For player vs AI battleship: auto-apply the AI's attack when it becomes the AI's turn
-  if (game.mode === "player vs ai" && game.type === "battleship" && !result.done) {
-    const bsState = finalState as BattleshipState;
-    if (bsState.phase === "battle" && bsState.nextPlayer === 1) {
-      const aiPlayer = await populateSafeUserInfo(game.players[1]);
-      const aiAttack =
-        aiPlayer.username === "AI-Medium"
-          ? mediumAIAttack(bsState.boards[0])
-          : randomAIAttack(bsState.boards[0]);
-      const aiResult = gameServices[game.type].update(finalState, aiAttack, 1, game.players);
-      if (aiResult) {
-        finalState = aiResult.state;
-        finalViews = aiResult.views;
-        finalDone = finalDone || aiResult.done;
-      }
+  game.state = result.state;
+  game.done = game.done || result.done;
+  if (result.done) {
+    const winners = result.winners;
+    if (winners.length === 0) {
+      game.winners = [];
+    } else {
+      game.winners = winners.map((index) => game.players[index]);
     }
   }
-
-  game.state = finalState;
-  game.done = game.done || finalDone;
   await GameRepo.set(gameId, game);
 
   return {

@@ -47,6 +47,9 @@ export default function SideBarNav() {
       >
         Profile
       </NavLink>
+      <NavLink to="/leaderboard" className={navClass}>
+        Leaderboard
+      </NavLink>
     </div>
   );
 }

@@ -65,7 +65,10 @@ export interface CommentRecord {
 /**
  * Represents a game document in the database.
  * - `type`: picks which game this is
+ * - `mode`: picks whether the game is between players, clubs, or ais
  * - `state`: absent if the game hasn't started, or the id for the game's state
+ * - `done`: if the game has completed or not
+ * - `winner`: list of winners of the game; empty if the game has not finished
  * - `chat`: id for the game's chat
  * - `players`: active players for the game
  * - `createdAt`: when the game was created
@@ -76,6 +79,7 @@ export interface GameRecord {
   mode: GameMode;
   state?: unknown;
   done: boolean;
+  winners: RecordId[];
   chat: RecordId; // References Chat records
   players: RecordId[]; // References User records
   createdAt: DateISO;

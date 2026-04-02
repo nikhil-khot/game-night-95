@@ -88,3 +88,32 @@ describe(`Nim's describeMove() logic`, () => {
     ).toBe(" took two tokens and lost the game");
   });
 });
+
+describe(`Nim's getWinnerIndices() logic`, () => {
+  it("Should return the indice of the appropriate winner if done, or an empty array if not done", () => {
+    expect(
+      nimLogic.getWinnerIndices(
+        { remaining: 4, nextPlayer: 0 },
+        { remaining: 1, nextPlayer: 1 },
+        3,
+        0,
+      ),
+    ).toStrictEqual([]);
+    expect(
+      nimLogic.getWinnerIndices(
+        { remaining: 2, nextPlayer: 1 },
+        { remaining: 0, nextPlayer: 0 },
+        2,
+        1,
+      ),
+    ).toStrictEqual([0]);
+    expect(
+      nimLogic.getWinnerIndices(
+        { remaining: 2, nextPlayer: 0 },
+        { remaining: 0, nextPlayer: 1 },
+        2,
+        0,
+      ),
+    ).toStrictEqual([1]);
+  });
+});

@@ -43,6 +43,7 @@ describe("POST /api/game/create", () => {
       type: "nim",
       mode: "player vs player",
       status: "waiting",
+      winners: [],
       createdBy: {
         username: "user3",
         display: "Frau Drei",

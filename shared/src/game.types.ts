@@ -17,6 +17,7 @@ export interface GameInfo {
   type: GameType;
   mode: GameMode;
   status: "waiting" | "active" | "done";
+  winners: SafeUserInfo[];
   chat: string;
   players: SafeUserInfo[];
   createdAt: Date;

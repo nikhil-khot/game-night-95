@@ -30,6 +30,9 @@ export default function SideBarNav() {
       <NavLink to="/forum" className={navClass}>
         Forum
       </NavLink>
+      <NavLink to="/leaderboard" className={navClass}>
+        Leaderboard
+      </NavLink>
       <NavLink to="/friends" className={navClass}>
         Friends
       </NavLink>
@@ -46,9 +49,6 @@ export default function SideBarNav() {
         onClick={toggleOptions}
       >
         Profile
-      </NavLink>
-      <NavLink to="/leaderboard" className={navClass}>
-        Leaderboard
       </NavLink>
     </div>
   );

@@ -191,7 +191,7 @@ export const battleshipLogic: GameLogic<BattleshipState, BattleshipView> = {
   describeMove: (_prevState, newState, payload, playerIndex) => {
     const move = zBattleshipMove.parse(payload);
     if (!Array.isArray(move)) {
-      return ` placed their ships`;
+      return ` finished placing ships!`;
     }
 
     const [row, col] = move;

@@ -8,6 +8,7 @@
 .leaderboardItem .stats {
   text-align: center;
   flex-grow: 1;
+  flex-basis: 0;
 }
 
 .leaderboardItem .userRank {

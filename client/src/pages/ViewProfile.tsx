@@ -111,14 +111,19 @@ export default function ViewProfile({ username: profileUsername }: ViewProfilePr
             ) : filteredStats.length === 0 ? (
               <div>No game stats found...</div>
             ) : (
-              <>
-                <hr style={{ marginBottom: 0, marginTop: 0 }} />
+              <div>
+                <div className="leaderboardSubheader" role="">
+                  <div className="stats">Overall</div>
+                  <div className="stats">Nim</div>
+                  <div className="stats">Number Guesser</div>
+                  <div className="stats">Battleship</div>
+                </div>
                 <div className="dottedList">
                   {filteredStats.map(([user, record], index) => (
                     <UserLeaderboardView key={index} rank={undefined} user={user} record={record} />
                   ))}
                 </div>
-              </>
+              </div>
             )}
             <hr style={{ marginBottom: 0, marginTop: 30 }} />
             <h3>Forum Posts</h3>

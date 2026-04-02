@@ -26,16 +26,16 @@ export default function UserLeaderboardView({
         <> </>
       )}
       <div className="stats">
-        Overall: {totalWins} / {totalLosses} / {totalTies}
+        {totalWins} / {totalLosses} / {totalTies}
       </div>
       <div className="stats">
-        Nim: {record.nim.wins} / {record.nim.losses} / {record.nim.ties}
+        {record.nim.wins} / {record.nim.losses} / {record.nim.ties}
       </div>
       <div className="stats">
-        Number Guesser: {record.guess.wins} / {record.guess.losses} / {record.guess.ties}
+        {record.guess.wins} / {record.guess.losses} / {record.guess.ties}
       </div>
       <div className="stats">
-        Battleship: {record.battleship.wins} / {record.battleship.losses} / {record.battleship.ties}
+        {record.battleship.wins} / {record.battleship.losses} / {record.battleship.ties}
       </div>
     </div>
   );

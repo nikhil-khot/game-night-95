@@ -27,13 +27,20 @@ export default function Leaderboard() {
         {"message" in gameList ? (
           gameList.message
         ) : (
-          <>
+          <div>
             <div className="leaderboardHeader" role="listItem">
               <div className="userRank">{"\u00a0\u00a0\u00a0\u00a0"}Username</div>
               <div className="stats">Stats (Win/Loss/Tie)</div>
             </div>
+            <div className="leaderboardSubheader" role="">
+              <div className="userRank"></div>
+              <div className="stats">Overall</div>
+              <div className="stats">Nim</div>
+              <div className="stats">Number Guesser</div>
+              <div className="stats">Battleship</div>
+            </div>
             <div className="dottedList">{leaderboardRows}</div>
-          </>
+          </div>
         )}
       </div>
     </div>

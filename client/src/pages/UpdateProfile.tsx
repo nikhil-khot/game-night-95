@@ -185,22 +185,27 @@ export default function UpdateProfile() {
         <div className="smallAndGray">After updating your profile, you will be logged out</div>
       </form>
       <hr style={{ marginBottom: 0 }} />
-      <h3>Game Statistics (W/L/T)</h3>
+      <h3>Game Statistics (Win/Loss/Tie)</h3>
       {"message" in gameList ? (
         gameList.message
       ) : filteredStats.length === 0 ? (
         <div>No game stats found...</div>
       ) : (
-        <>
-          <hr style={{ marginBottom: 0, marginTop: 0 }} />
+        <div>
+          <div className="leaderboardSubheader" role="">
+            <div className="stats">Overall</div>
+            <div className="stats">Nim</div>
+            <div className="stats">Number Guesser</div>
+            <div className="stats">Battleship</div>
+          </div>
           <div className="dottedList">
             {filteredStats.map(([user, record], index) => (
               <UserLeaderboardView key={index} rank={undefined} user={undefined} record={record} />
             ))}
           </div>
-        </>
+        </div>
       )}
-      <hr style={{ marginBottom: 0, marginTop: 30 }} />
+      <hr style={{ marginBottom: 0, marginTop: 35 }} />
       <h3>Forum Posts</h3>
       <>
         {"message" in threadOrMessage ? (

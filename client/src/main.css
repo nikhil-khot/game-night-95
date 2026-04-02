@@ -6,6 +6,7 @@
   --page-background: #ffffff;
   --page-foreground: #121212;
   --line-color: #000;
+  --text-color: rgba(0, 0, 0, 0.386);
 }
 
 :root[data-theme="dark"] {
@@ -14,6 +15,7 @@
   --page-background: #0f172a;
   --page-foreground: #e2e8f0;
   --line-color: #64748b;
+  --text-color: rgba(255, 255, 255, 0.386);
 }
 
 :root[data-font-size="small"] {
@@ -94,7 +96,7 @@ button.secondary:disabled {
 }
 
 button.arrow {
-  color: rgba(0, 0, 0, 0.386);
+  color: var(--text-color);
   background: none;
   border: none;
   font-size: 1rem;

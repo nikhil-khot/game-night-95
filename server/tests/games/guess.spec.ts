@@ -89,3 +89,32 @@ describe(`Guessing game's tagView() logic`, () => {
     });
   });
 });
+
+describe(`Guesses's getWinnerIndices() logic`, () => {
+  it("Should return the indices of the appropriate winners if done, or an empty array if not done", () => {
+    expect(
+      guessLogic.getWinnerIndices(
+        { secret: 44, guesses: [null, 6, 33] },
+        { secret: 44, guesses: [7, 6, 33] },
+        7,
+        0,
+      ),
+    ).toStrictEqual([2]);
+    expect(
+      guessLogic.getWinnerIndices(
+        { secret: 14, guesses: [76, 15, null] },
+        { secret: 14, guesses: [76, 15, 13] },
+        13,
+        2,
+      ),
+    ).toStrictEqual([1, 2]);
+    expect(
+      guessLogic.getWinnerIndices(
+        { secret: 23, guesses: [null, null, 33] },
+        { secret: 23, guesses: [null, 6, 33] },
+        6,
+        1,
+      ),
+    ).toStrictEqual([]);
+  });
+});

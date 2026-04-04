@@ -11,6 +11,7 @@ import BannerAvatar from "../components/BannerAvatar";
 import useGameList from "../hooks/useGameList";
 import UserLeaderboardView from "../components/UserLeaderboardView";
 import { generateStatsFromGames, sortLeaderboardEntries } from "../util/leaderboardProcessing";
+import StatusIndicator from "../components/StatusIndicator";
 
 interface ViewProfileProps {
   username?: string;
@@ -93,6 +94,15 @@ export default function ViewProfile({ username: profileUsername }: ViewProfilePr
                 }}
               >
                 <ProfileAvatar imageUrl={profilePictureUrl} width="200px" height="200px" />
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: "10px",
+                    right: "25px",
+                  }}
+                >
+                  <StatusIndicator status={componentState.user.isOnline ? "online" : "offline"} />
+                </div>
               </div>
             </div>
             <div className="content spacedSection">

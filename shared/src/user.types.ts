@@ -11,6 +11,7 @@ export interface SafeUserInfo {
   username: string;
   display: string;
   createdAt: Date;
+  isOnline?: boolean; // Optional property to indicate if the user is online
 }
 
 /*** TYPES USED IN THE USER API ***/
@@ -54,11 +55,9 @@ export interface UserPreferencesRecord {
  * Represents allowed updates to user display preferences.
  */
 export type UserPreferencesUpdateRequest = z.infer<typeof zUserPreferencesUpdateRequest>;
-export const zUserPreferencesUpdateRequest = z
-  .object({
-    theme: z.enum(["light", "dark"]).optional(),
-    fontSize: z.enum(["small", "medium", "large"]).optional(),
-    profilePictureUrl: z.string().optional(),
-    bannerImageUrl: z.string().optional(),
-  })
-  .strict();
+export const zUserPreferencesUpdateRequest = z.object({
+  theme: z.enum(["light", "dark"]).optional(),
+  fontSize: z.enum(["small", "medium", "large"]).optional(),
+  profilePictureUrl: z.string().optional(),
+  bannerImageUrl: z.string().optional(),
+});

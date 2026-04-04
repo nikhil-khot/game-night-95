@@ -8,10 +8,11 @@ import { z } from "zod";
  * - `createdAt`: when this when the user registered.
  */
 export interface SafeUserInfo {
+  userId: string; // Unique identifier for the user
   username: string;
   display: string;
   createdAt: Date;
-  isOnline?: boolean; // Optional property to indicate if the user is online
+  // Removed isOnline and isActive as they are managed in real-time
 }
 
 /*** TYPES USED IN THE USER API ***/

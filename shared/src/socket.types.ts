@@ -26,6 +26,12 @@ export interface ClientToServerEvents {
   gameMakeMove: (payload: WithAuth<GameMakeMovePayload>) => void;
   gameStart: (payload: WithAuth<string>) => void;
   gameWatch: (payload: WithAuth<string>) => void;
+  // Presence: user announces they are online for this socket
+  userPresenceOnline: (payload: WithAuth<null>) => void;
+  // Presence: user explicitly logs out / goes offline but socket may stay open
+  userPresenceOffline: (payload: WithAuth<null>) => void;
+  // Presence: query whether a specific userId is currently online
+  userPresenceQuery: (payload: WithAuth<string>) => void;
 }
 
 /**
@@ -44,4 +50,6 @@ export interface ServerToClientEvents {
   gamePlayersUpdated: (payload: SafeUserInfo[]) => void;
   gameStateUpdated: (payload: TaggedGameView & { forPlayer: boolean }) => void;
   gameWatched: (payload: GamePlayInfo) => void;
+  // Presence updates for arbitrary users
+  userStatusUpdated: (payload: { userId: string; isOnline: boolean }) => void;
 }

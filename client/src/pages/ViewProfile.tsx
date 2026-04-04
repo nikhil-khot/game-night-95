@@ -12,6 +12,7 @@ import useGameList from "../hooks/useGameList";
 import UserLeaderboardView from "../components/UserLeaderboardView";
 import { generateStatsFromGames, sortLeaderboardEntries } from "../util/leaderboardProcessing";
 import StatusIndicator from "../components/StatusIndicator";
+import useLoginContext from "../hooks/useLoginContext";
 
 interface ViewProfileProps {
   username?: string;
@@ -40,6 +41,9 @@ export default function ViewProfile({ username: profileUsername }: ViewProfilePr
           ),
         ).filter(([user, record]) => user.username === componentState.user.username);
 
+  const { user: loggedInUser, socket, pass } = useLoginContext();
+  const [isOnline, setIsOnline] = useState<boolean>(false);
+
   useEffect(() => {
     let cancel = false;
 
@@ -66,12 +70,36 @@ export default function ViewProfile({ username: profileUsername }: ViewProfilePr
     };
   }, [validUsername]);
 
+  // Subscribe to real-time presence updates for the viewed user
+  useEffect(() => {
+    if (componentState.type !== "profile") return;
+
+    const viewedUserId = componentState.user.userId;
+
+    const handleStatus = ({ userId, isOnline }: { userId: string; isOnline: boolean }) => {
+      if (userId === viewedUserId) {
+        setIsOnline(isOnline);
+      }
+    };
+
+    socket.on("userStatusUpdated", handleStatus);
+
+    // Ask the server for the current status of this user in case they were already online
+    socket.emit("userPresenceQuery", {
+      auth: { username: loggedInUser.username, password: pass },
+      payload: viewedUserId,
+    });
+    return () => {
+      socket.off("userStatusUpdated", handleStatus);
+    };
+  }, [componentState, socket, loggedInUser.username, pass]);
+
   switch (componentState.type) {
     case "error":
       return <div style={{ color: "#f00" }}>{componentState.msg}</div>;
     case "waiting":
       return <div>Loading...</div>;
-    case "profile":
+    case "profile": {
       return (
         <div className="content spacedSection">
           <h2>Profile for {componentState.user.display}</h2>
@@ -101,7 +129,7 @@ export default function ViewProfile({ username: profileUsername }: ViewProfilePr
                     right: "25px",
                   }}
                 >
-                  <StatusIndicator status={componentState.user.isOnline ? "online" : "offline"} />
+                  <StatusIndicator status={isOnline ? "online" : "offline"} />
                 </div>
               </div>
             </div>
@@ -157,5 +185,6 @@ export default function ViewProfile({ username: profileUsername }: ViewProfilePr
           </div>
         </div>
       );
+    }
   }
 }

@@ -179,7 +179,7 @@ export default function UpdateProfile() {
               navigate(`/profile/view/${user.username}`); // Navigate using React Router
             }}
           >
-            View Profile
+            Preview Profile
           </button>
         </div>
         <div className="smallAndGray">After updating your profile, you will be logged out</div>

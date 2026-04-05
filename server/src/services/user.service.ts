@@ -13,11 +13,15 @@ const disallowedUsernames = new Set(["login", "signup", "list"]);
  */
 export async function populateSafeUserInfo(userId: string): Promise<SafeUserInfo> {
   const record = await UserRepo.get(userId);
-  return Promise.resolve({
+  if (!record) {
+    throw new Error("User not found"); // Throw an error for nonexistent users
+  }
+  return {
+    userId, // Include userId in the response
     username: record.username,
     display: record.display,
     createdAt: new Date(record.createdAt),
-  });
+  };
 }
 
 /**
@@ -44,11 +48,12 @@ export async function createUser(
   });
   await updateAuth(username, password, id);
   await createDefaultUserPreferences(id, createdAt);
-  return Promise.resolve({
+  return {
+    userId: id, // Include userId in the returned object
     username,
     createdAt,
     display: username,
-  });
+  };
 }
 
 /**

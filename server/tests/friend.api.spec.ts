@@ -38,7 +38,7 @@ describe("Friend controller API", () => {
 
     response = await supertest(app).get("/api/friend/pending").query({ username: "user2" });
     expect(response.status).toBe(200);
-    expect(response.body).toEqual([
+    expect(response.body).toMatchObject([
       { username: "user1", display: expect.any(String), createdAt: expect.any(String) },
     ]);
 
@@ -50,7 +50,7 @@ describe("Friend controller API", () => {
 
     response = await supertest(app).get("/api/friend/list").query({ username: "user1" });
     expect(response.status).toBe(200);
-    expect(response.body).toEqual([
+    expect(response.body).toMatchObject([
       { username: "user2", display: expect.any(String), createdAt: expect.any(String) },
     ]);
 

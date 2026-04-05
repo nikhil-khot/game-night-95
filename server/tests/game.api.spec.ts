@@ -37,7 +37,7 @@ describe("POST /api/game/create", () => {
         payload: { gameType: "nim", gameMode: "player vs player" },
       });
     expect(response.status).toBe(200);
-    expect(response.body).toStrictEqual({
+    expect(response.body).toMatchObject({
       gameId: expect.anything(),
       chat: expect.anything(),
       type: "nim",

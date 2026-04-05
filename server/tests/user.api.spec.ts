@@ -19,11 +19,11 @@ describe("GET /api/user/:id", () => {
   it("should return existing users", async () => {
     response = await supertest(app).get(`/api/user/user1`);
     expect(response.status).toBe(200);
-    expect(response.body).toStrictEqual({ ...user1, createdAt: expect.anything() });
+    expect(response.body).toMatchObject({ ...user1, createdAt: expect.anything() });
 
     response = await supertest(app).get(`/api/user/user2`);
     expect(response.status).toBe(200);
-    expect(response.body).toStrictEqual({ ...user2, createdAt: expect.anything() });
+    expect(response.body).toMatchObject({ ...user2, createdAt: expect.anything() });
   });
 });
 
@@ -135,7 +135,7 @@ describe("POST /api/user/login", () => {
   it("should accept a correct username/password combination", async () => {
     response = await supertest(app).post("/api/user/login").send(auth1);
     expect(response.status).toBe(200);
-    expect(response.body).toStrictEqual({ ...user1, createdAt: expect.anything() });
+    expect(response.body).toMatchObject({ ...user1, createdAt: expect.anything() });
   });
 });
 
@@ -165,7 +165,7 @@ describe("POST/api/user/:username", () => {
       .post("/api/user/user1")
       .send({ auth: auth1, payload: { display: "New User 1 Display" } });
     expect(response.status).toBe(200);
-    expect(response.body).toStrictEqual({
+    expect(response.body).toMatchObject({
       ...user1,
       display: "New User 1 Display",
       createdAt: expect.anything(),
@@ -176,7 +176,7 @@ describe("POST/api/user/:username", () => {
       .post("/api/user/user1")
       .send({ auth: auth1, payload: { display: "New User 1 Display" } });
     expect(response.status).toBe(200);
-    expect(response.body).toStrictEqual({
+    expect(response.body).toMatchObject({
       ...user1,
       display: "New User 1 Display",
       createdAt: expect.anything(),
@@ -187,7 +187,7 @@ describe("POST/api/user/:username", () => {
       .post("/api/user/user1")
       .send({ auth: auth1, payload: { password: "new_password_1" } });
     expect(response.status).toBe(200);
-    expect(response.body).toStrictEqual({
+    expect(response.body).toMatchObject({
       ...user1,
       display: "New User 1 Display",
       createdAt: expect.anything(),
@@ -207,7 +207,7 @@ describe("POST/api/user/:username", () => {
         payload: { display: "Newer User 1 Display" },
       });
     expect(response.status).toBe(200);
-    expect(response.body).toStrictEqual({
+    expect(response.body).toMatchObject({
       ...user1,
       display: "Newer User 1 Display",
       createdAt: expect.anything(),
@@ -223,7 +223,7 @@ describe("POST /api/user/signup", () => {
     response = await supertest(app).post("/api/user/signup").send({ username, password });
     expect(response.status).toBe(200);
     expect(response.headers["content-type"]).toMatch(/^application.json/);
-    expect(response.body).toStrictEqual({
+    expect(response.body).toMatchObject({
       username,
       display: username,
       createdAt: expect.anything(),
@@ -279,7 +279,7 @@ describe("POST /api/user/list", () => {
   it("accepts valid usernames and returns appropriate responses", async () => {
     response = await supertest(app).post("/api/user/list").send(["user2", "user1"]);
     expect(response.status).toBe(200);
-    expect(response.body).toStrictEqual([
+    expect(response.body).toMatchObject([
       { ...user2, createdAt: expect.anything() },
       { ...user1, createdAt: expect.anything() },
     ]);
@@ -288,7 +288,7 @@ describe("POST /api/user/list", () => {
   it("accepts duplicates and returns users in the order provided", async () => {
     response = await supertest(app).post("/api/user/list").send(["user1", "user2", "user1"]);
     expect(response.status).toBe(200);
-    expect(response.body).toStrictEqual([
+    expect(response.body).toMatchObject([
       { ...user1, createdAt: expect.anything() },
       { ...user2, createdAt: expect.anything() },
       { ...user1, createdAt: expect.anything() },

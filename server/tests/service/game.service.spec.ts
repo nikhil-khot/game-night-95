@@ -145,9 +145,9 @@ describe("createGame", () => {
     it("throws for club vs club when both clubs are the same", async () => {
       const user1 = await enforceAuth({ username: "user1", password: "pwd1111" });
       await createClub("user1", "Alpha", "test");
-      await expect(
-        createGame(user1, "nim", "club vs club", new Date(), "Alpha"),
-      ).rejects.toThrow("two different clubs");
+      await expect(createGame(user1, "nim", "club vs club", new Date(), "Alpha")).rejects.toThrow(
+        "two different clubs",
+      );
     });
 
     it("creates a club vs club game successfully", async () => {

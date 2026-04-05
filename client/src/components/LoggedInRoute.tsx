@@ -27,7 +27,10 @@ export default function LoggedInRoute({ auth, socket, children }: LoggedInRouteP
   const context = useMemo(() => {
     if (!auth || !socket) return null;
     // As soon as we have an authenticated user and a socket, announce presence
-    socket.emit("userPresenceOnline", { auth: { username: auth.user.username, password: auth.pass }, payload: null });
+    socket.emit("userPresenceOnline", {
+      auth: { username: auth.user.username, password: auth.pass },
+      payload: null,
+    });
     return { ...auth, socket };
   }, [auth, socket]);
   return context ? (

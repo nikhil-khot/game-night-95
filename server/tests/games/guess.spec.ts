@@ -16,6 +16,14 @@ describe(`Guessing game's update() logic`, () => {
     expect(
       guessLogic.update({ secret: expect.anything(), guesses: [null, null, null] }, null, 0),
     ).toBeNull();
+    // New test: string payload should also be rejected
+    expect(
+      guessLogic.update(
+        { secret: expect.anything(), guesses: [null, null, null] },
+        "not-a-number",
+        0,
+      ),
+    ).toBeNull();
   });
   it("Should reject moves that are out of range 1 to 100", () => {
     expect(guessLogic.update({ secret: 44, guesses: [null, null, null] }, 0, 0)).toBeNull();

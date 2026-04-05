@@ -29,8 +29,8 @@ describe("FriendsList component", () => {
   const mockOnRemove = vi.fn();
 
   const mockFriends = [
-    { username: "friend1", display: "Friend One", createdAt: new Date() },
-    { username: "friend2", display: "Friend Two", createdAt: new Date() },
+    { userId: "id1", username: "friend1", display: "Friend One", createdAt: new Date() },
+    { userId: "id2", username: "friend2", display: "Friend Two", createdAt: new Date() },
   ];
 
   beforeEach(() => {

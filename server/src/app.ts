@@ -12,6 +12,12 @@ import * as friend from "./controllers/friend.controller.ts";
 import * as club from "./controllers/club.controller.ts";
 import * as clubChat from "./controllers/clubChat.controller.ts";
 import { type GameServer } from "./types.ts";
+import {
+  handleSocketDisconnect,
+  handleUserPresenceOnline,
+  handleUserPresenceOffline,
+  handleUserPresenceQuery,
+} from "./services/presence.service.ts";
 import authRouter from "./routes/auth.ts";
 
 export const app = express();
@@ -83,6 +89,7 @@ io.on("connection", (socket) => {
   console.log(`CONN [${socketId}] connected`);
 
   socket.on("disconnect", () => {
+    handleSocketDisconnect(io, socketId);
     console.log(`CONN [${socketId}] disconnected`);
   });
 
@@ -98,6 +105,9 @@ io.on("connection", (socket) => {
   socket.on("gameMakeMove", game.socketMakeMove(socket, io));
   socket.on("gameStart", game.socketStart(socket, io));
   socket.on("gameWatch", game.socketWatch(socket, io));
+  socket.on("userPresenceOnline", handleUserPresenceOnline(io, socketId));
+  socket.on("userPresenceOffline", handleUserPresenceOffline(io, socketId));
+  socket.on("userPresenceQuery", handleUserPresenceQuery(io, socketId));
 
   socket.onAny((name, payload) => {
     const zPayload = z.object({ auth: z.object({ username: z.string() }), payload: z.any() });

@@ -9,7 +9,7 @@ import useFetchUserPreferences from "../hooks/useFetchUserPreferences.ts";
  * Header component that renders the main title.
  */
 export default function Header() {
-  const { user, reset } = useLoginContext();
+  const { user, reset, socket, pass } = useLoginContext();
   const navigate = useNavigate();
   const { profilePictureUrl } = useFetchUserPreferences(user.username); // Destructure profilePictureUrl
 
@@ -24,6 +24,11 @@ export default function Header() {
         className="narrowcenter secondary"
         onClick={() => {
           resetDisplayPreferences();
+          // Let the server know this user is going offline
+          socket.emit("userPresenceOffline", {
+            auth: { username: user.username, password: pass },
+            payload: null,
+          });
           reset();
           navigate("/login");
         }}

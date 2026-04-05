@@ -24,7 +24,15 @@ export default function LoggedInRoute({ auth, socket, children }: LoggedInRouteP
   // places in the app where `context` appears as part of a dependency array
   // (notably in `useAuth`). If we don't use `useMemo` here, those dependency
   // arrays will change every time the app updates.
-  const context = useMemo(() => (auth && socket ? { ...auth, socket } : null), [auth, socket]);
+  const context = useMemo(() => {
+    if (!auth || !socket) return null;
+    // As soon as we have an authenticated user and a socket, announce presence
+    socket.emit("userPresenceOnline", {
+      auth: { username: auth.user.username, password: auth.pass },
+      payload: null,
+    });
+    return { ...auth, socket };
+  }, [auth, socket]);
   return context ? (
     <LoginContext.Provider value={context}>{children}</LoginContext.Provider>
   ) : (

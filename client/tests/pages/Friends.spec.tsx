@@ -87,7 +87,9 @@ describe("Friends page", () => {
   });
 
   it("passes friends data to FriendsList component", () => {
-    const mockFriends = [{ userId: "id1", username: "friend1", display: "Friend One", createdAt: new Date() }];
+    const mockFriends = [
+      { userId: "id1", username: "friend1", display: "Friend One", createdAt: new Date() },
+    ];
     mockUseFriendList.mockReturnValue(mockFriends);
     mockUsePendingRequests.mockReturnValue({ message: "No pending requests..." });
 

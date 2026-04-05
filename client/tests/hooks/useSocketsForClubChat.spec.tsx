@@ -86,7 +86,12 @@ describe("useSocketsForClubChat", () => {
         {
           messageId: "m1",
           text: "hello",
-          createdBy: { userId: "id2", username: "user1", display: "User One", createdAt: new Date() },
+          createdBy: {
+            userId: "id2",
+            username: "user1",
+            display: "User One",
+            createdAt: new Date(),
+          },
           createdAt: new Date(),
         },
       ],
@@ -140,7 +145,12 @@ describe("useSocketsForClubChat", () => {
         message: {
           messageId: "m3",
           text: "should be ignored",
-          createdBy: { userId: "id4", username: "user2", display: "User Two", createdAt: new Date() },
+          createdBy: {
+            userId: "id4",
+            username: "user2",
+            display: "User Two",
+            createdAt: new Date(),
+          },
           createdAt: new Date(),
         },
       } as ChatNewMessagePayload);

@@ -43,8 +43,9 @@ export default function GamePanel({
           ))}
         </div>
         {
-          // If the game hasn't started and user hasn't joined, they can join if it is a player vs player game
-          userPlayerIndex < 0 && !view && mode === "player vs player" && (
+          // If the game hasn't started and user hasn't joined, they can join if it is a player vs player game,
+          // or a club vs club game (the server enforces club membership)
+          userPlayerIndex < 0 && !view && (mode === "player vs player" || mode === "club vs club") && (
             <div className="buttonContainer">
               <button className="primary narrow" onClick={joinGame}>
                 Join Game
@@ -64,6 +65,9 @@ export default function GamePanel({
                   </button>
                   <button className="primary narrow" onClick={() => addAI("medium")}>
                     Add Medium AI
+                  </button>
+                  <button className="primary narrow" onClick={() => addAI("hard")}>
+                    Add Hard AI
                   </button>
                 </>
               )}

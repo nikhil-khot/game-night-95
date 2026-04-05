@@ -23,6 +23,8 @@ export interface GameInfo {
   createdAt: Date;
   createdBy: SafeUserInfo;
   minPlayers: number;
+  /** Club names [creatorClub, opponentClub] for "club vs club" games */
+  clubs?: [string, string];
 }
 
 /**
@@ -79,6 +81,8 @@ export type GameCreationPayload = z.infer<typeof zGameCreationPayload>;
 export const zGameCreationPayload = z.object({
   gameType: zGameType,
   gameMode: zGameMode,
+  /** Required when gameMode is "club vs club": the opponent club name */
+  opponentClub: z.string().optional(),
 });
 
 /**

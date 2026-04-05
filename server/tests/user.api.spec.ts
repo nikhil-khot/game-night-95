@@ -258,6 +258,32 @@ describe("POST /api/user/signup", () => {
   });
 });
 
+describe("POST /api/user/list (error cases)", () => {
+  it("should return 400 on non-array payload", async () => {
+    const response = await supertest(app).post("/api/user/list").send({ not: "an array" });
+    expect(response.status).toBe(400);
+    expect(response.body).toStrictEqual({ error: "Poorly-formed request" });
+  });
+});
+
+describe("POST /api/user/:username (error cases)", () => {
+  it("should 403 if auth is valid but username does not match route", async () => {
+    const response = await supertest(app)
+      .post("/api/user/user2")
+      .send({ auth: { username: "user1", password: "pwd1111" }, payload: { display: "Mismatch" } });
+    expect(response.status).toBe(403);
+    expect(response.body).toStrictEqual({ error: "Invalid credentials" });
+  });
+});
+
+describe("POST /api/user/list (error cases)", () => {
+  it("should return error if any username does not exist", async () => {
+    const response = await supertest(app).post("/api/user/list").send(["user1", "nonexistentuser"]);
+    expect(response.status).toBe(200);
+    expect(response.body).toStrictEqual({ error: "Usernames do not all exist" });
+  });
+});
+
 describe("POST /api/user/list", () => {
   it("should return 400 on ill-formed payload", async () => {
     response = await supertest(app).post("/api/user/list").send(auth1);

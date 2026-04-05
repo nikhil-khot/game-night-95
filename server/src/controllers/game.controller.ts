@@ -6,6 +6,7 @@ import {
 } from "@gamenite/shared";
 import { type RestAPI, type GameViewUpdates, type SocketAPI, type GameServer } from "../types.ts";
 import {
+  addAIToGame,
   createGame,
   gameServices,
   getGameById,
@@ -42,6 +43,7 @@ export const postCreate: RestAPI<GameInfo> = async (req, res) => {
     body.data.payload.gameType,
     body.data.payload.gameMode,
     new Date(),
+    body.data.payload.opponentClub,
   );
   res.send(game);
 };
@@ -147,28 +149,8 @@ export const socketAddAI: SocketAPI = (socket, io) => async (body) => {
       auth,
       payload: { gameId, aiType },
     } = withAuth(z.object({ gameId: z.string(), aiType: z.string() })).parse(body);
-    await enforceAuth(auth);
-    let user;
-    switch (aiType) {
-      case "easy":
-        user = await enforceAuth({ username: "AI-Easy", password: "pwd_AI_Easy" });
-        break;
-      case "medium":
-        user = await enforceAuth({ username: "AI-Medium", password: "pwd_AI_Medium" });
-        break;
-      default:
-        throw new Error("Invalid AI type");
-    }
-    const game = await joinGame(gameId, user);
-
-    // Let everyone know the user joined (`io` instead of `socket` includes
-    // the joiner)
-    io.to(gameId).emit("gamePlayersUpdated", game.players);
-
-    // If the game is full, it starts automatically
-    if (game.players.length === gameServices[game.type].maxPlayers) {
-      sendViewUpdates(io, gameId, await startGame(gameId, user));
-    }
+    const user = await enforceAuth(auth);
+    sendViewUpdates(io, gameId, await addAIToGame(gameId, user, aiType));
   } catch (err) {
     logSocketError(socket, err);
   }

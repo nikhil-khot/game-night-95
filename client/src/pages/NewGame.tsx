@@ -2,8 +2,18 @@ import useNewGameForm from "../hooks/useNewGameForm.ts";
 import { gameModes, gameNames } from "../util/consts.ts";
 
 export default function NewGame() {
-  const { gameType, handleGameTypeChange, gameMode, handleGameModeChange, err, handleSubmit } =
-    useNewGameForm();
+  const {
+    gameType,
+    handleGameTypeChange,
+    gameMode,
+    handleGameModeChange,
+    myClub,
+    opponentClub,
+    setOpponentClub,
+    otherClubs,
+    err,
+    handleSubmit,
+  } = useNewGameForm();
 
   return (
     <form className="content spacedSection" onSubmit={handleSubmit}>
@@ -35,6 +45,28 @@ export default function NewGame() {
           ))}
         </select>
       </div>
+      {gameMode === "club vs club" && (
+        <div>
+          <span>
+            <strong>Your club:</strong>&nbsp;
+            {myClub ?? <em>You are not in a club</em>}
+          </span>
+          &nbsp;&nbsp;&nbsp;vs&nbsp;&nbsp;&nbsp;
+          <select
+            value={opponentClub}
+            aria-label="Opponent club selection"
+            onChange={(e) => setOpponentClub(e.target.value)}
+            disabled={!myClub}
+          >
+            <option value="">— Select opponent club —</option>
+            {otherClubs.map((name) => (
+              <option key={name} value={name}>
+                {name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
       {err && <p className="error-message">{err}</p>}
       <div>
         <button className="primary narrow">Create New Game</button>

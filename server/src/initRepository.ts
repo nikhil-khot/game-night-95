@@ -131,15 +131,11 @@ async function resetStoredUsers() {
   await createUser("user1", "pwd1111", new Date());
   await createUser("user2", "pwd2222", new Date());
   await createUser("user3", "pwd3333", new Date());
-  await createUser("AI-Easy", "pwd_AI_Easy", new Date());
-  await createUser("AI-Medium", "pwd_AI_Medium", new Date());
 
   await updateUser("user0", { display: "The Knight Of Games" });
   await updateUser("user1", { display: "Yāo" });
   await updateUser("user2", { display: "Sénior Dos" });
   await updateUser("user3", { display: "Frau Drei" });
-  await updateUser("AI-Easy", { display: "Easy AI" });
-  await updateUser("AI-Medium", { display: "Medium AI" });
 }
 
 export async function resetEverythingToDefaults() {

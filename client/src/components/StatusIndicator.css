@@ -1,0 +1,25 @@
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.status-dot {
+  width: 20px; /* Further increased size */
+  height: 20px; /* Further increased size */
+  border-radius: 50%;
+}
+
+.status-indicator.online .status-dot {
+  background-color: #4caf50;
+}
+
+.status-indicator.offline .status-dot {
+  background-color: #f44336;
+}
+
+.status-text {
+  text-transform: capitalize;
+}

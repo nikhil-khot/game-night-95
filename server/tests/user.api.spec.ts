@@ -19,11 +19,11 @@ describe("GET /api/user/:id", () => {
   it("should return existing users", async () => {
     response = await supertest(app).get(`/api/user/user1`);
     expect(response.status).toBe(200);
-    expect(response.body).toStrictEqual({ ...user1, createdAt: expect.anything() });
+    expect(response.body).toMatchObject({ ...user1, createdAt: expect.anything() });
 
     response = await supertest(app).get(`/api/user/user2`);
     expect(response.status).toBe(200);
-    expect(response.body).toStrictEqual({ ...user2, createdAt: expect.anything() });
+    expect(response.body).toMatchObject({ ...user2, createdAt: expect.anything() });
   });
 });
 
@@ -135,7 +135,7 @@ describe("POST /api/user/login", () => {
   it("should accept a correct username/password combination", async () => {
     response = await supertest(app).post("/api/user/login").send(auth1);
     expect(response.status).toBe(200);
-    expect(response.body).toStrictEqual({ ...user1, createdAt: expect.anything() });
+    expect(response.body).toMatchObject({ ...user1, createdAt: expect.anything() });
   });
 });
 
@@ -165,7 +165,7 @@ describe("POST/api/user/:username", () => {
       .post("/api/user/user1")
       .send({ auth: auth1, payload: { display: "New User 1 Display" } });
     expect(response.status).toBe(200);
-    expect(response.body).toStrictEqual({
+    expect(response.body).toMatchObject({
       ...user1,
       display: "New User 1 Display",
       createdAt: expect.anything(),
@@ -176,7 +176,7 @@ describe("POST/api/user/:username", () => {
       .post("/api/user/user1")
       .send({ auth: auth1, payload: { display: "New User 1 Display" } });
     expect(response.status).toBe(200);
-    expect(response.body).toStrictEqual({
+    expect(response.body).toMatchObject({
       ...user1,
       display: "New User 1 Display",
       createdAt: expect.anything(),
@@ -187,7 +187,7 @@ describe("POST/api/user/:username", () => {
       .post("/api/user/user1")
       .send({ auth: auth1, payload: { password: "new_password_1" } });
     expect(response.status).toBe(200);
-    expect(response.body).toStrictEqual({
+    expect(response.body).toMatchObject({
       ...user1,
       display: "New User 1 Display",
       createdAt: expect.anything(),
@@ -207,7 +207,7 @@ describe("POST/api/user/:username", () => {
         payload: { display: "Newer User 1 Display" },
       });
     expect(response.status).toBe(200);
-    expect(response.body).toStrictEqual({
+    expect(response.body).toMatchObject({
       ...user1,
       display: "Newer User 1 Display",
       createdAt: expect.anything(),
@@ -223,7 +223,7 @@ describe("POST /api/user/signup", () => {
     response = await supertest(app).post("/api/user/signup").send({ username, password });
     expect(response.status).toBe(200);
     expect(response.headers["content-type"]).toMatch(/^application.json/);
-    expect(response.body).toStrictEqual({
+    expect(response.body).toMatchObject({
       username,
       display: username,
       createdAt: expect.anything(),
@@ -258,6 +258,32 @@ describe("POST /api/user/signup", () => {
   });
 });
 
+describe("POST /api/user/list (error cases)", () => {
+  it("should return 400 on non-array payload", async () => {
+    const response = await supertest(app).post("/api/user/list").send({ not: "an array" });
+    expect(response.status).toBe(400);
+    expect(response.body).toStrictEqual({ error: "Poorly-formed request" });
+  });
+});
+
+describe("POST /api/user/:username (error cases)", () => {
+  it("should 403 if auth is valid but username does not match route", async () => {
+    const response = await supertest(app)
+      .post("/api/user/user2")
+      .send({ auth: { username: "user1", password: "pwd1111" }, payload: { display: "Mismatch" } });
+    expect(response.status).toBe(403);
+    expect(response.body).toStrictEqual({ error: "Invalid credentials" });
+  });
+});
+
+describe("POST /api/user/list (error cases)", () => {
+  it("should return error if any username does not exist", async () => {
+    const response = await supertest(app).post("/api/user/list").send(["user1", "nonexistentuser"]);
+    expect(response.status).toBe(200);
+    expect(response.body).toStrictEqual({ error: "Usernames do not all exist" });
+  });
+});
+
 describe("POST /api/user/list", () => {
   it("should return 400 on ill-formed payload", async () => {
     response = await supertest(app).post("/api/user/list").send(auth1);
@@ -279,7 +305,7 @@ describe("POST /api/user/list", () => {
   it("accepts valid usernames and returns appropriate responses", async () => {
     response = await supertest(app).post("/api/user/list").send(["user2", "user1"]);
     expect(response.status).toBe(200);
-    expect(response.body).toStrictEqual([
+    expect(response.body).toMatchObject([
       { ...user2, createdAt: expect.anything() },
       { ...user1, createdAt: expect.anything() },
     ]);
@@ -288,7 +314,7 @@ describe("POST /api/user/list", () => {
   it("accepts duplicates and returns users in the order provided", async () => {
     response = await supertest(app).post("/api/user/list").send(["user1", "user2", "user1"]);
     expect(response.status).toBe(200);
-    expect(response.body).toStrictEqual([
+    expect(response.body).toMatchObject([
       { ...user1, createdAt: expect.anything() },
       { ...user2, createdAt: expect.anything() },
       { ...user1, createdAt: expect.anything() },

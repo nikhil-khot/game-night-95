@@ -238,14 +238,14 @@ describe("joinGame - AI and club vs club cases", () => {
       await ClubRepo.clear();
     });
 
-    it("throws when the joining user is not in the opponent club", async () => {
+    it("throws when the joining user is not in either participating club", async () => {
       const user1 = await enforceAuth({ username: "user1", password: "pwd1111" });
       const user2 = await enforceAuth({ username: "user2", password: "pwd2222" });
       await createClub("user1", "Alpha", "test");
       await createClub("user3", "Beta", "test");
       const game = await createGame(user1, "nim", "club vs club", new Date(), "Beta");
       await expect(joinGame(game.gameId, user2)).rejects.toThrow(
-        'not a member of opponent club "Beta"',
+        "is not a member of either participating club",
       );
     });
 

@@ -7,6 +7,7 @@ import {
 import { type RestAPI, type GameViewUpdates, type SocketAPI, type GameServer } from "../types.ts";
 import {
   addAIToGame,
+  buildGamePlayersInfo,
   createGame,
   gameServices,
   getGameById,
@@ -123,7 +124,8 @@ export const socketJoinAsPlayer: SocketAPI = (socket, io) => async (body) => {
 
     // Let everyone know the user joined (`io` instead of `socket` includes
     // the joiner)
-    io.to(gameId).emit("gamePlayersUpdated", game.players);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    io.to(gameId).emit("gamePlayersUpdated", await buildGamePlayersInfo(gameId));
 
     // This socket should receive user-specific updates for this game, if it
     // isn't already
@@ -131,8 +133,12 @@ export const socketJoinAsPlayer: SocketAPI = (socket, io) => async (body) => {
       await socket.join(userRoom(gameId, user.userId));
     }
 
-    // If the game is full, it starts automatically
-    if (game.players.length === gameServices[game.type].maxPlayers) {
+    // For non-club-vs-club: auto-start when the player slot cap is reached.
+    // Club vs club games must be started manually (many members may join).
+    if (
+      game.mode !== "club vs club" &&
+      game.players.length === gameServices[game.type].maxPlayers
+    ) {
       sendViewUpdates(io, gameId, await startGame(gameId, user));
     }
   } catch (err) {

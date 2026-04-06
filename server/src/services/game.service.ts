@@ -1,12 +1,25 @@
-import { type GameInfo, type GameMode, type GameType, type TaggedGameView } from "@gamenite/shared";
+import {
+  type BattleshipState,
+  type GameInfo,
+  type GameMode,
+  type GameType,
+  type TaggedGameView,
+} from "@gamenite/shared";
 import { createChat } from "./chat.service.ts";
 import { populateSafeUserInfo } from "./user.service.ts";
 import { type GameServicer } from "../games/gameServiceManager.ts";
 import { nimGameService } from "../games/nim.ts";
 import { guessGameService } from "../games/guess.ts";
-import { battleshipGameService, randomAIPlacement } from "../games/battleship.ts";
+import {
+  battleshipGameService,
+  hardAIAttack,
+  mediumAIAttack,
+  randomAIAttack,
+  randomAIPlacement,
+} from "../games/battleship.ts";
 import { type GameViewUpdates, type UserWithId } from "../types.ts";
 import { GameRepo } from "../repository.ts";
+import { awardPoints, findUserClub, isClubMember } from "./club.service.ts";
 
 /**
  * The service interface for individual games
@@ -36,6 +49,7 @@ async function populateGameInfo(gameId: string): Promise<GameInfo> {
     status: !game.state ? "waiting" : game.done ? "done" : "active",
     minPlayers: gameServices[game.type].minPlayers,
     winners: await Promise.all(game.winners.map(populateSafeUserInfo)),
+    clubs: game.clubs,
   };
 }
 
@@ -53,7 +67,18 @@ export async function createGame(
   type: GameType,
   mode: GameMode,
   createdAt: Date,
+  opponentClub?: string,
 ): Promise<GameInfo> {
+  let clubs: [string, string] | undefined;
+  if (mode === "club vs club") {
+    if (!opponentClub) throw new Error("club vs club games require an opponent club");
+    const myClub = await findUserClub(user.username);
+    if (!myClub)
+      throw new Error(`${user.username} must be in a club to create a club vs club game`);
+    if (myClub === opponentClub) throw new Error("club vs club games require two different clubs");
+    clubs = [myClub, opponentClub];
+  }
+
   const chat = await createChat(createdAt);
   const gameId = await GameRepo.add({
     type,
@@ -64,6 +89,7 @@ export async function createGame(
     createdBy: user.userId,
     players: [user.userId],
     winners: [],
+    clubs,
   });
   return populateGameInfo(gameId);
 }
@@ -102,11 +128,52 @@ export async function joinGame(gameId: string, user: UserWithId): Promise<GameIn
   if (game.players.length === gameServices[game.type].maxPlayers) {
     throw new Error(`user ${user.username} joining full`);
   }
+  if (game.aiType) {
+    throw new Error(`user ${user.username} joining a game that already has an AI opponent`);
+  }
+
+  if (game.mode === "club vs club") {
+    const clubs = game.clubs;
+    if (clubs) {
+      const inOpponentClub = await isClubMember(user.username, clubs[1]);
+      if (!inOpponentClub)
+        throw new Error(`user ${user.username} is not a member of opponent club "${clubs[1]}"`);
+    }
+  }
 
   game.players = [...game.players, user.userId];
   await GameRepo.set(gameId, game);
 
   return populateGameInfo(gameId);
+}
+
+/**
+ * Adds an AI opponent to a "player vs ai" game and immediately starts it.
+ *
+ * @param gameId - Ostensible game id
+ * @param user - Authenticated player who is in the game
+ * @param aiType - Difficulty string: "easy" | "medium" | "hard"
+ * @returns the initial view updates (same as startGame)
+ * @throws if the game is invalid, already started, not "player vs ai", or already has an AI
+ */
+export async function addAIToGame(
+  gameId: string,
+  user: UserWithId,
+  aiType: string,
+): Promise<GameViewUpdates> {
+  const game = await GameRepo.find(gameId);
+  if (!game) throw new Error(`invalid game ${gameId}`);
+  if (game.state) throw new Error("game has already started");
+  if (game.mode !== "player vs ai") throw new Error("game is not in player vs ai mode");
+  if (game.aiType) throw new Error("an AI opponent has already been added");
+  if (!game.players.some((id) => id === user.userId)) {
+    throw new Error(`user ${user.username} is not in this game`);
+  }
+
+  game.aiType = aiType;
+  await GameRepo.set(gameId, game);
+
+  return startGame(gameId, user);
 }
 
 /**
@@ -127,7 +194,8 @@ export async function startGame(gameId: string, user: UserWithId): Promise<GameV
 
   const key: GameType = game.type;
 
-  if (game.players.length < gameServices[key].minPlayers) {
+  const effectivePlayers = game.players.length + (game.aiType ? 1 : 0);
+  if (effectivePlayers < gameServices[key].minPlayers) {
     throw new Error(`user ${user.username} starting underpopulated game`);
   }
   if (!game.players.some((userId) => userId === user.userId)) {
@@ -199,20 +267,56 @@ export async function updateGame(
   const result = gameServices[game.type].update(game.state, move, playerIndex, game.players);
   if (!result) throw new Error(`user ${user.username} made an invalid move in ${game.type}`);
 
-  game.state = result.state;
-  game.done = game.done || result.done;
-  if (result.done) {
+  let finalState = result.state;
+  let finalViews = result.views;
+  let finalDone = result.done;
+
+  // For player vs AI battleship: auto-apply the AI's attack when it becomes the AI's turn
+  if (game.mode === "player vs ai" && game.type === "battleship" && !result.done) {
+    const bsState = finalState as BattleshipState;
+    if (bsState.phase === "battle" && bsState.nextPlayer === 1) {
+      const aiAttack =
+        game.aiType === "hard"
+          ? hardAIAttack(bsState.boards[0])
+          : game.aiType === "medium"
+            ? mediumAIAttack(bsState.boards[0])
+            : randomAIAttack(bsState.boards[0]);
+      const aiResult = gameServices[game.type].update(finalState, aiAttack, 1, game.players);
+      if (aiResult) {
+        finalState = aiResult.state;
+        finalViews = aiResult.views;
+        finalDone = finalDone || aiResult.done;
+      }
+    }
+  }
+
+  game.state = finalState;
+  game.done = game.done || finalDone;
+  if (finalDone) {
     const winners = result.winners;
     if (winners.length === 0) {
       game.winners = [];
     } else {
-      game.winners = winners.map((index) => game.players[index]);
+      game.winners = winners
+        .filter((index) => index < game.players.length)
+        .map((index) => game.players[index]);
+    }
+
+    if (game.mode === "club vs club") {
+      const clubs = game.clubs;
+      if (clubs) {
+        // Award 10 points to the winner, 2 participation points to the loser
+        for (let i = 0; i < game.players.length; i++) {
+          const points = game.winners.includes(game.players[i]) ? 10 : 2;
+          await awardPoints(game.players[i], clubs[i], points);
+        }
+      }
     }
   }
   await GameRepo.set(gameId, game);
 
   return {
-    views: result.views,
+    views: finalViews,
     moveDescription: result.moveDescription,
     chatId: game.chat,
   };

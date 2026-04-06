@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   battleshipLogic,
+  hardAIAttack,
   mediumAIAttack,
   randomAIAttack,
   randomAIPlacement,
@@ -584,6 +585,214 @@ describe("mediumAIAttack()", () => {
     const state = makeBattleState();
     const stateForAI = { ...state, nextPlayer: 1 };
     const attack = mediumAIAttack(stateForAI.boards[0]);
+    const next = battleshipLogic.update(stateForAI, attack, 1);
+    expect(next).not.toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// getWinnerIndices()
+// ---------------------------------------------------------------------------
+
+describe(`Battleship's getWinnerIndices() logic`, () => {
+  it("Should return [0] when player 1's ships are all sunk and player 0's remain", () => {
+    const state = makeBattleState();
+    const boards = state.boards.map((b) => b.map((r) => [...r]));
+    // Sink all of player 1's ships
+    for (let row = 0; row < SHIP_SIZES.length; row++) {
+      for (let col = 0; col < SHIP_SIZES[row]; col++) {
+        boards[1][row][col] = 2;
+      }
+    }
+    const doneState = { ...state, boards };
+    expect(battleshipLogic.getWinnerIndices(state, doneState, [4, 1], 0)).toStrictEqual([0]);
+  });
+
+  it("Should return [1] when player 0's ships are all sunk and player 1's remain", () => {
+    const state = makeBattleState();
+    const boards = state.boards.map((b) => b.map((r) => [...r]));
+    // Sink all of player 0's ships
+    for (let row = 0; row < SHIP_SIZES.length; row++) {
+      for (let col = 0; col < SHIP_SIZES[row]; col++) {
+        boards[0][row][col] = 2;
+      }
+    }
+    const doneState = { ...state, boards };
+    expect(battleshipLogic.getWinnerIndices(state, doneState, [4, 1], 1)).toStrictEqual([1]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// hardAIAttack()
+// ---------------------------------------------------------------------------
+
+describe("hardAIAttack()", () => {
+  it("Should return coordinates within board bounds", () => {
+    const board = emptyBoard();
+    const [row, col] = hardAIAttack(board);
+    expect(row).toBeGreaterThanOrEqual(0);
+    expect(row).toBeLessThanOrEqual(9);
+    expect(col).toBeGreaterThanOrEqual(0);
+    expect(col).toBeLessThanOrEqual(9);
+  });
+
+  it("Should only target parity cells (r+c even) in hunting mode (no hits)", () => {
+    const board = emptyBoard();
+    // Run 20 times to confirm the parity pattern is consistent
+    for (let i = 0; i < 20; i++) {
+      const [r, c] = hardAIAttack(board);
+      expect((r + c) % 2).toBe(0);
+    }
+  });
+
+  it("Should target the single remaining parity cell in hunting mode", () => {
+    const board = emptyBoard();
+    // Mark every cell as miss except [4][4] (4+4=8, even — a parity cell)
+    for (let r = 0; r < 10; r++) {
+      for (let c = 0; c < 10; c++) {
+        if (r !== 4 || c !== 4) board[r][c] = 3;
+      }
+    }
+    const [row, col] = hardAIAttack(board);
+    expect(row).toBe(4);
+    expect(col).toBe(4);
+  });
+
+  it("Should fall back to random when all parity cells are exhausted", () => {
+    const board = emptyBoard();
+    // Attack all even-parity cells; leave only [1][0] (1+0=1, odd) unattacked
+    for (let r = 0; r < 10; r++) {
+      for (let c = 0; c < 10; c++) {
+        if (r === 1 && c === 0) continue;
+        board[r][c] = 3;
+      }
+    }
+    const [row, col] = hardAIAttack(board);
+    expect(row).toBe(1);
+    expect(col).toBe(0);
+  });
+
+  it("Should target a neighbor of an isolated hit in targeting mode", () => {
+    const board = emptyBoard();
+    board[5][5] = 2; // single isolated hit
+    // Mark everything as miss except the four cardinal neighbors of [5][5]
+    for (let r = 0; r < 10; r++) {
+      for (let c = 0; c < 10; c++) {
+        if (board[r][c] === 2) continue;
+        const isNeighbor =
+          (r === 4 && c === 5) ||
+          (r === 6 && c === 5) ||
+          (r === 5 && c === 4) ||
+          (r === 5 && c === 6);
+        if (!isNeighbor) board[r][c] = 3;
+      }
+    }
+    const [row, col] = hardAIAttack(board);
+    const isNeighbor =
+      (row === 4 && col === 5) ||
+      (row === 6 && col === 5) ||
+      (row === 5 && col === 4) ||
+      (row === 5 && col === 6);
+    expect(isNeighbor).toBe(true);
+  });
+
+  it("Should extend a horizontal line of hits along the same row", () => {
+    const board = emptyBoard();
+    board[5][3] = 2;
+    board[5][4] = 2;
+    board[5][5] = 2; // horizontal line: cols 3-5
+    // Mark everything as miss except the two line extensions
+    for (let r = 0; r < 10; r++) {
+      for (let c = 0; c < 10; c++) {
+        if (board[r][c] === 2) continue;
+        if (r === 5 && (c === 2 || c === 6)) continue;
+        board[r][c] = 3;
+      }
+    }
+    const [row, col] = hardAIAttack(board);
+    expect(row).toBe(5);
+    expect([2, 6]).toContain(col);
+  });
+
+  it("Should extend a vertical line of hits along the same column", () => {
+    const board = emptyBoard();
+    board[3][5] = 2;
+    board[4][5] = 2;
+    board[5][5] = 2; // vertical line: rows 3-5
+    // Mark everything as miss except the two line extensions
+    for (let r = 0; r < 10; r++) {
+      for (let c = 0; c < 10; c++) {
+        if (board[r][c] === 2) continue;
+        if (c === 5 && (r === 2 || r === 6)) continue;
+        board[r][c] = 3;
+      }
+    }
+    const [row, col] = hardAIAttack(board);
+    expect(col).toBe(5);
+    expect([2, 6]).toContain(row);
+  });
+
+  it("Should fall back to any neighbor for an L-shaped hit group", () => {
+    const board = emptyBoard();
+    board[5][5] = 2;
+    board[5][6] = 2;
+    board[6][5] = 2; // L-shape — not axis-aligned
+    // Leave only [4][5] unattacked; mark everything else
+    for (let r = 0; r < 10; r++) {
+      for (let c = 0; c < 10; c++) {
+        if (board[r][c] === 2) continue;
+        if (r === 4 && c === 5) continue;
+        board[r][c] = 3;
+      }
+    }
+    const [row, col] = hardAIAttack(board);
+    expect(row).toBe(4);
+    expect(col).toBe(5);
+  });
+
+  it("Should prioritize the largest connected hit group", () => {
+    const board = emptyBoard();
+    // Group A (size 3, horizontal): [1][0], [1][1], [1][2]
+    board[1][0] = 2;
+    board[1][1] = 2;
+    board[1][2] = 2;
+    // Group B (size 1): [8][8]
+    board[8][8] = 2;
+    // Mark everything as miss except [1][3] — only extension of the larger group
+    for (let r = 0; r < 10; r++) {
+      for (let c = 0; c < 10; c++) {
+        if (board[r][c] === 2) continue;
+        if (r === 1 && c === 3) continue;
+        board[r][c] = 3;
+      }
+    }
+    const [row, col] = hardAIAttack(board);
+    expect(row).toBe(1);
+    expect(col).toBe(3);
+  });
+
+  it("Should fall back to hunting when all hit-cell neighbors are already attacked", () => {
+    const board = emptyBoard();
+    board[0][0] = 2; // isolated hit at corner — only two possible neighbors
+    board[0][1] = 3; // right neighbor attacked
+    board[1][0] = 3; // down neighbor attacked
+    // Leave only one parity cell available: [4][4]
+    for (let r = 0; r < 10; r++) {
+      for (let c = 0; c < 10; c++) {
+        if (board[r][c] !== 0) continue;
+        if (r === 4 && c === 4) continue;
+        board[r][c] = 3;
+      }
+    }
+    const [row, col] = hardAIAttack(board);
+    expect(row).toBe(4);
+    expect(col).toBe(4);
+  });
+
+  it("Should return a cell that the game logic accepts as a valid attack", () => {
+    const state = makeBattleState();
+    const stateForAI = { ...state, nextPlayer: 1 };
+    const attack = hardAIAttack(stateForAI.boards[0]);
     const next = battleshipLogic.update(stateForAI, attack, 1);
     expect(next).not.toBeNull();
   });

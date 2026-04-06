@@ -29,8 +29,8 @@ describe("PendingRequests component", () => {
   const mockOnActionComplete = vi.fn();
 
   const mockRequests = [
-    { username: "requester1", display: "Requester One", createdAt: new Date() },
-    { username: "requester2", display: "Requester Two", createdAt: new Date() },
+    { userId: "id1", username: "requester1", display: "Requester One", createdAt: new Date() },
+    { userId: "id2", username: "requester2", display: "Requester Two", createdAt: new Date() },
   ];
 
   beforeEach(() => {

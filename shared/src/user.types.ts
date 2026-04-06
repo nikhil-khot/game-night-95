@@ -8,10 +8,11 @@ import { z } from "zod";
  * - `createdAt`: when this when the user registered.
  */
 export interface SafeUserInfo {
-  userId: string;
+  userId: string; // Unique identifier for the user
   username: string;
   display: string;
   createdAt: Date;
+  // Removed isOnline and isActive as they are managed in real-time
 }
 
 /*** TYPES USED IN THE USER API ***/
@@ -55,11 +56,9 @@ export interface UserPreferencesRecord {
  * Represents allowed updates to user display preferences.
  */
 export type UserPreferencesUpdateRequest = z.infer<typeof zUserPreferencesUpdateRequest>;
-export const zUserPreferencesUpdateRequest = z
-  .object({
-    theme: z.enum(["light", "dark"]).optional(),
-    fontSize: z.enum(["small", "medium", "large"]).optional(),
-    profilePictureUrl: z.string().optional(),
-    bannerImageUrl: z.string().optional(),
-  })
-  .strict();
+export const zUserPreferencesUpdateRequest = z.object({
+  theme: z.enum(["light", "dark"]).optional(),
+  fontSize: z.enum(["small", "medium", "large"]).optional(),
+  profilePictureUrl: z.string().optional(),
+  bannerImageUrl: z.string().optional(),
+});

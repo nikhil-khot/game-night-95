@@ -57,6 +57,20 @@ describe("Club controller API", () => {
     expect(res.body).toEqual([]);
   });
 
+  it("should not allow creating a club with a duplicate name", async () => {
+    // First creation should succeed
+    let res = await supertest(app)
+      .post("/api/club/create")
+      .send({ auth: auth1, payload: { name: "Beta", description: "Second club" } });
+    expect(res.status).toBe(200);
+    // Second creation with same name should fail
+    res = await supertest(app)
+      .post("/api/club/create")
+      .send({ auth: auth1, payload: { name: "Beta", description: "Duplicate club" } });
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty("error");
+  });
+
   it("handles club not found on join/leave/delete", async () => {
     let res = await supertest(app)
       .post("/api/club/join")

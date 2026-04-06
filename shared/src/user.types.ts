@@ -8,6 +8,7 @@ import { z } from "zod";
  * - `createdAt`: when this when the user registered.
  */
 export interface SafeUserInfo {
+  userId: string;
   username: string;
   display: string;
   createdAt: Date;

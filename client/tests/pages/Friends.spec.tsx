@@ -197,7 +197,9 @@ describe("Friends page", () => {
   });
 
   it("opens a private chat when a friend is selected", async () => {
-    const mockFriends = [{ username: "friend1", display: "Friend One", createdAt: new Date() }];
+    const mockFriends = [
+      { userId: "id8", username: "friend1", display: "Friend One", createdAt: new Date() },
+    ];
     mockUseFriendList.mockReturnValue(mockFriends);
     mockUsePendingRequests.mockReturnValue({ message: "No pending requests..." });
     mockOpenFriendChat.mockResolvedValue({ chatId: "friend:a:b" });
@@ -216,7 +218,9 @@ describe("Friends page", () => {
   });
 
   it("shows friend chat errors", async () => {
-    const mockFriends = [{ username: "friend1", display: "Friend One", createdAt: new Date() }];
+    const mockFriends = [
+      { userId: "id9", username: "friend1", display: "Friend One", createdAt: new Date() },
+    ];
     mockUseFriendList.mockReturnValue(mockFriends);
     mockUsePendingRequests.mockReturnValue({ message: "No pending requests..." });
     mockOpenFriendChat.mockResolvedValue({ error: "Not allowed" });

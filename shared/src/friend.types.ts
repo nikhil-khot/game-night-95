@@ -54,6 +54,21 @@ export const zRemoveFriendPayload = z.object({
 });
 
 /**
+ * Payload for opening a private message chat with an accepted friend.
+ */
+export type OpenFriendChatPayload = z.infer<typeof zOpenFriendChatPayload>;
+export const zOpenFriendChatPayload = z.object({
+  targetUsername: z.string(),
+});
+
+/**
+ * Information required for clients to join a private friend chat room.
+ */
+export interface FriendChatInfo {
+  chatId: string;
+}
+
+/**
  * Response from friend list endpoint - returns SafeUserInfo for each friend
  */
 export type FriendListResponse = z.infer<typeof zFriendListResponse>;

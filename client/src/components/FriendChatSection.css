@@ -1,0 +1,22 @@
+.friendChatSection {
+  margin-top: 0;
+  border-top: none;
+  padding-top: 0;
+  display: grid;
+  grid-template-rows: min-content 1fr min-content;
+  height: 100%;
+}
+
+.friendChatSection h3 {
+  margin: 0 0 0.75rem 0;
+}
+
+.friendChatSection__loading {
+  margin-top: 0.5rem;
+  color: var(--text-muted, #999);
+  font-style: italic;
+}
+
+.friendChatSection .chatWindow {
+  max-height: none;
+}

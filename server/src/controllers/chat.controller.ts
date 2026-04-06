@@ -1,11 +1,12 @@
 import { withAuth, zNewMessageRequest } from "@gamenite/shared";
 import { type SocketAPI } from "../types.ts";
 import { z } from "zod";
-import { addMessageToChat, forceChatById } from "../services/chat.service.ts";
+import { addMessageToChat, forceChatById, getOrCreateChatById } from "../services/chat.service.ts";
 import { populateSafeUserInfo } from "../services/user.service.ts";
 import { createMessage } from "../services/message.service.ts";
 import { logSocketError } from "./socket.controller.ts";
 import { enforceAuth } from "../services/auth.service.ts";
+import { enforceFriendChatAccess } from "../services/friendChat.service.ts";
 
 /**
  * Handle a socket request to join a chat: send the connection the chat's
@@ -69,6 +70,67 @@ export const socketSendMessage: SocketAPI = (socket, io) => async (body) => {
 
     // Send the message to everyone, including the sender
     io.to(chatId).emit("chatNewMessage", { chatId, message });
+  } catch (err) {
+    logSocketError(socket, err);
+  }
+};
+
+/**
+ * Handle a socket request to join a private friend chat.
+ */
+export const socketFriendJoin: SocketAPI = (socket) => async (body) => {
+  try {
+    const { auth, payload: chatId } = withAuth(z.string()).parse(body);
+    const user = await enforceAuth(auth);
+    await enforceFriendChatAccess(chatId, user.userId);
+    const chat = await getOrCreateChatById(chatId);
+    await socket.join(chatId);
+
+    socket.emit("friendChatJoined", chat);
+    socket
+      .to(chatId)
+      .emit("friendChatUserJoined", { chatId, user: await populateSafeUserInfo(user.userId) });
+  } catch (err) {
+    logSocketError(socket, err);
+  }
+};
+
+/**
+ * Handle a socket request to leave a private friend chat.
+ */
+export const socketFriendLeave: SocketAPI = (socket) => async (body) => {
+  try {
+    const { auth, payload: chatId } = withAuth(z.string()).parse(body);
+    const user = await enforceAuth(auth);
+    await enforceFriendChatAccess(chatId, user.userId);
+    if (!socket.rooms.has(chatId)) {
+      throw new Error(`user ${user.username} left friend chat they weren't in`);
+    }
+    await socket.leave(chatId);
+    socket
+      .to(chatId)
+      .emit("friendChatUserLeft", { chatId, user: await populateSafeUserInfo(user.userId) });
+  } catch (err) {
+    logSocketError(socket, err);
+  }
+};
+
+/**
+ * Handle a socket request to send a message to a private friend chat.
+ */
+export const socketFriendSendMessage: SocketAPI = (socket, io) => async (body) => {
+  try {
+    const {
+      auth,
+      payload: { chatId, text },
+    } = withAuth(zNewMessageRequest).parse(body);
+    const user = await enforceAuth(auth);
+    await enforceFriendChatAccess(chatId, user.userId);
+    const now = new Date();
+    const message = await createMessage(user, text, now);
+    await addMessageToChat(chatId, user, message.messageId);
+
+    io.to(chatId).emit("friendChatNewMessage", { chatId, message });
   } catch (err) {
     logSocketError(socket, err);
   }

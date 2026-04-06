@@ -58,6 +58,7 @@ app.use(
       Router()
         .post("/send", friend.postSendRequest)
         .post("/respond", friend.postRespondRequest)
+        .post("/chat", friend.postOpenChat)
         .post("/remove", friend.postRemoveFriend)
         .get("/list", friend.getList)
         .get("/pending", friend.getPending),
@@ -89,6 +90,9 @@ io.on("connection", (socket) => {
   socket.on("chatJoin", chat.socketJoin(socket, io));
   socket.on("chatLeave", chat.socketLeave(socket, io));
   socket.on("chatSendMessage", chat.socketSendMessage(socket, io));
+  socket.on("friendChatJoin", chat.socketFriendJoin(socket, io));
+  socket.on("friendChatLeave", chat.socketFriendLeave(socket, io));
+  socket.on("friendChatSendMessage", chat.socketFriendSendMessage(socket, io));
   socket.on("clubChatJoin", clubChat.socketJoin(socket, io));
   socket.on("clubChatLeave", clubChat.socketLeave(socket, io));
   socket.on("clubChatSendMessage", clubChat.socketSendMessage(socket, io));

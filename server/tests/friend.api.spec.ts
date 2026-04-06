@@ -94,4 +94,40 @@ describe("Friend controller API", () => {
     expect(response.status).toBe(400);
     expect(response.body).toStrictEqual({ error: "Poorly-formed request" });
   });
+
+  it("opens a private chat after friendship is accepted", async () => {
+    await supertest(app)
+      .post("/api/friend/send")
+      .send({ auth: auth1, payload: { toUsername: "user2" } });
+    await supertest(app)
+      .post("/api/friend/respond")
+      .send({ auth: auth2, payload: { fromUsername: "user1", response: "accepted" } });
+
+    response = await supertest(app)
+      .post("/api/friend/chat")
+      .send({ auth: auth1, payload: { targetUsername: "user2" } });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toStrictEqual({
+      chatId: expect.stringMatching(/^friend:/),
+    });
+
+    const secondOpen = await supertest(app)
+      .post("/api/friend/chat")
+      .send({ auth: auth2, payload: { targetUsername: "user1" } });
+
+    expect(secondOpen.status).toBe(200);
+    expect(secondOpen.body).toStrictEqual(response.body);
+  });
+
+  it("rejects opening private chat when users are not accepted friends", async () => {
+    response = await supertest(app)
+      .post("/api/friend/chat")
+      .send({ auth: auth1, payload: { targetUsername: "user3" } });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toStrictEqual({
+      error: "You can only message users who are already your friend",
+    });
+  });
 });

@@ -37,6 +37,14 @@ async function findFriendRecord(
 }
 
 /**
+ * Returns true if two users currently have an accepted friendship.
+ */
+export async function areUsersFriends(userIdA: string, userIdB: string): Promise<boolean> {
+  const existing = await findFriendRecord(userIdA, userIdB);
+  return existing?.record.status === "accepted";
+}
+
+/**
  * Sends a friend request from one user to another.
  *
  * @param fromUsername - Username of the user sending the request

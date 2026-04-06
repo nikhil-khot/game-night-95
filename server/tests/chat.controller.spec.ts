@@ -10,9 +10,11 @@ import {
 import { createChat } from "../src/services/chat.service.ts";
 import { populateSafeUserInfo } from "../src/services/user.service.ts";
 import { getUserByUsername } from "../src/services/auth.service.ts";
-import { respondToFriendRequest, sendFriendRequest } from "../src/services/friendRequest.service.ts";
-import { buildFriendChatId } from "../src/services/friendChat.service.ts";
-import { openFriendChat } from "../src/services/friendChat.service.ts";
+import {
+  respondToFriendRequest,
+  sendFriendRequest,
+} from "../src/services/friendRequest.service.ts";
+import { buildFriendChatId, openFriendChat } from "../src/services/friendChat.service.ts";
 
 // Mock the logSocketError function so we can test error conditions in sockets
 vi.mock(import("../src/controllers/socket.controller.ts"), () => {
@@ -142,7 +144,10 @@ describe("friend chat sockets", () => {
     const chatId = await acceptFriendship();
     await openFriendChat("user1", "user2");
 
-    await socketFriendSendMessage(mockSocket, mockServer)({
+    await socketFriendSendMessage(
+      mockSocket,
+      mockServer,
+    )({
       auth,
       payload: { chatId, text: "hello private chat" },
     });

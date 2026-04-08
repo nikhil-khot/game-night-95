@@ -3,7 +3,6 @@
   display: flex;
   flex-direction: column;
   width: 200px;
-  gap: 1rem;
   padding-block: 1rem;
   background-color: var(--gray-background);
   grid-area: sidebar;
@@ -15,11 +14,7 @@
   align-items: center;
   min-height: 2.5rem;
   width: 100%;
-  border-radius: 0.5rem;
+  height: 100%;
   color: cornflowerblue;
   text-decoration: none;
-}
-
-.menu_selected {
-  background: var(--selection-color);
 }

@@ -6,7 +6,7 @@
   --page-background: #ffffff;
   --page-foreground: #121212;
   --line-color: #000;
-  --text-color: rgba(0, 0, 0, 0.386);
+  --arrow-color: rgba(157, 157, 157);
   --selection-color: #cccccc;
 }
 
@@ -16,7 +16,7 @@
   --page-background: #0f172a;
   --page-foreground: #e2e8f0;
   --line-color: #64748b;
-  --text-color: rgba(255, 255, 255, 0.386);
+  --arrow-color: rgba(107, 112, 124);
   --selection-color: #3c4757;
 }
 
@@ -38,8 +38,16 @@
 }
 
 body {
-  background-color: var(--page-background);
-  color: var(--page-foreground);
+  background-color: #008080;
+  color: var(--page-foreground) !important;
+}
+
+a:link {
+  color: cornflowerblue !important;
+}
+
+a:visited {
+  color: cornflowerblue !important;
 }
 
 /** Buttons **/
@@ -98,7 +106,7 @@ button.secondary:disabled {
 }
 
 button.arrow {
-  color: var(--text-color);
+  color: var(--arrow-color);
   background: none;
   border: none;
   font-size: 1rem;

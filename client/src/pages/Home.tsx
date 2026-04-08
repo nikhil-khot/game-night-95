@@ -3,6 +3,7 @@ import ThreadSummaryView from "../components/ThreadSummaryView.tsx";
 import { useNavigate } from "react-router-dom";
 import useGameList from "../hooks/useGameList.ts";
 import GameSummaryView from "../components/GameSummaryView.tsx";
+import { Button } from "@react95/core";
 
 export default function Home() {
   const { threadOrMessage, setThreadInList } = useThreadList(4);
@@ -23,9 +24,9 @@ export default function Home() {
           </div>
         )}
         <div>
-          <button className="primary narrow" onClick={() => navigate("/game/new")}>
+          <Button className="primary" onClick={() => navigate("/game/new")}>
             Create New Game
-          </button>
+          </Button>
         </div>
       </div>
       <div className="spacedSection">
@@ -44,9 +45,9 @@ export default function Home() {
           </div>
         )}
         <div>
-          <button className="primary narrow" onClick={() => navigate("/forum/post/new")}>
+          <Button className="primary" onClick={() => navigate("/forum/post/new")}>
             Create New Post
-          </button>
+          </Button>
         </div>
       </div>
     </div>

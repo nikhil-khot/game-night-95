@@ -1,6 +1,12 @@
 import type { APIResponse } from "../util/types.ts";
 import { api, exceptionToErrorMsg } from "./api.ts";
-import type { ErrorMsg, SafeUserInfo, UserAuth, FriendRecord } from "@gamenite/shared";
+import type {
+  ErrorMsg,
+  SafeUserInfo,
+  UserAuth,
+  FriendRecord,
+  FriendChatInfo,
+} from "@gamenite/shared";
 
 const FRIEND_API_URL = `/api/friend`;
 
@@ -100,6 +106,28 @@ export const getPendingRequests = async (username: string): APIResponse<SafeUser
     const res = await api.get<SafeUserInfo[] | ErrorMsg>(
       `${FRIEND_API_URL}/pending?username=${username}`,
     );
+    return res.data;
+  } catch (error) {
+    return exceptionToErrorMsg(error);
+  }
+};
+
+/**
+ * Opens (or creates) a private chat with a friend.
+ *
+ * @param auth - The authenticated user
+ * @param targetUsername - The friend to message
+ * @returns Friend chat info with chatId, or an error message
+ */
+export const openFriendChat = async (
+  auth: UserAuth,
+  targetUsername: string,
+): APIResponse<FriendChatInfo> => {
+  try {
+    const res = await api.post<FriendChatInfo | ErrorMsg>(`${FRIEND_API_URL}/chat`, {
+      auth,
+      payload: { targetUsername },
+    });
     return res.data;
   } catch (error) {
     return exceptionToErrorMsg(error);

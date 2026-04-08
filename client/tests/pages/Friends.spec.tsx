@@ -1,13 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import Friends from "../../src/pages/Friends.tsx";
 import * as useFriendList from "../../src/hooks/useFriendList.ts";
+import * as friendService from "../../src/services/friendService.ts";
 import type { SafeUserInfo } from "@gamenite/shared";
 
 // Mock the hooks
 vi.mock("../../src/hooks/useFriendList.ts", () => ({
   useFriendList: vi.fn(),
   usePendingRequests: vi.fn(),
+}));
+
+vi.mock("../../src/services/friendService.ts", () => ({
+  openFriendChat: vi.fn(),
 }));
 
 // Mock useAuth hook
@@ -31,12 +36,25 @@ vi.mock("../../src/components/FriendsList.tsx", () => ({
   default: ({
     friends,
     onRemove,
+    onSelect,
+    selectedUsername,
   }: {
     friends: SafeUserInfo[] | { message: string };
     onRemove: () => void;
+    onSelect: (friendUsername: string) => void;
+    selectedUsername: string | null;
   }) => (
-    <div data-testid="friends-list" onClick={onRemove}>
-      FriendsList: {JSON.stringify(friends)}
+    <div>
+      <div data-testid="friends-list" onClick={onRemove}>
+        FriendsList: {JSON.stringify(friends)}
+      </div>
+      <div data-testid="selected-friend">{selectedUsername ?? "none"}</div>
+      {Array.isArray(friends) &&
+        friends.map((friend) => (
+          <button key={friend.username} onClick={() => onSelect(friend.username)}>
+            Open {friend.username}
+          </button>
+        ))}
     </div>
   ),
 }));
@@ -55,8 +73,17 @@ vi.mock("../../src/components/PendingRequests.tsx", () => ({
   ),
 }));
 
+vi.mock("../../src/components/FriendChatSection.tsx", () => ({
+  default: ({ friendUsername, chatId }: { friendUsername: string; chatId: string }) => (
+    <div data-testid="friend-chat-section">
+      Chatting with {friendUsername} in {chatId}
+    </div>
+  ),
+}));
+
 const mockUseFriendList = vi.mocked(useFriendList.useFriendList);
 const mockUsePendingRequests = vi.mocked(useFriendList.usePendingRequests);
+const mockOpenFriendChat = vi.mocked(friendService.openFriendChat);
 
 describe("Friends page", () => {
   const mockAuth = { username: "testuser", password: "testpass" };
@@ -64,6 +91,7 @@ describe("Friends page", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockUseAuth.mockReturnValue(mockAuth);
+    mockOpenFriendChat.mockResolvedValue({ chatId: "friend:one:two" });
   });
 
   it("renders the page title", () => {
@@ -84,6 +112,7 @@ describe("Friends page", () => {
     expect(screen.getByRole("heading", { level: 3, name: "Add Friend" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 3, name: "Pending Requests" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 3, name: "Friends" })).toBeInTheDocument();
+    expect(screen.getByText("Select a friend to start chatting.")).toBeInTheDocument();
   });
 
   it("passes friends data to FriendsList component", () => {
@@ -165,5 +194,44 @@ describe("Friends page", () => {
 
     expect(mockUseFriendList).toHaveBeenCalledWith("testuser", 0);
     expect(mockUsePendingRequests).toHaveBeenCalledWith("testuser", 0);
+  });
+
+  it("opens a private chat when a friend is selected", async () => {
+    const mockFriends = [
+      { userId: "id8", username: "friend1", display: "Friend One", createdAt: new Date() },
+    ];
+    mockUseFriendList.mockReturnValue(mockFriends);
+    mockUsePendingRequests.mockReturnValue({ message: "No pending requests..." });
+    mockOpenFriendChat.mockResolvedValue({ chatId: "friend:a:b" });
+
+    render(<Friends />);
+
+    fireEvent.click(screen.getByText("Open friend1"));
+
+    await waitFor(() => {
+      expect(mockOpenFriendChat).toHaveBeenCalledWith(mockAuth, "friend1");
+    });
+    expect(screen.getByTestId("friend-chat-section")).toHaveTextContent(
+      "Chatting with friend1 in friend:a:b",
+    );
+    expect(screen.getByTestId("selected-friend")).toHaveTextContent("friend1");
+  });
+
+  it("shows friend chat errors", async () => {
+    const mockFriends = [
+      { userId: "id9", username: "friend1", display: "Friend One", createdAt: new Date() },
+    ];
+    mockUseFriendList.mockReturnValue(mockFriends);
+    mockUsePendingRequests.mockReturnValue({ message: "No pending requests..." });
+    mockOpenFriendChat.mockResolvedValue({ error: "Not allowed" });
+
+    render(<Friends />);
+
+    fireEvent.click(screen.getByText("Open friend1"));
+
+    await waitFor(() => {
+      expect(screen.getByText("Not allowed")).toBeInTheDocument();
+    });
+    expect(screen.queryByTestId("friend-chat-section")).not.toBeInTheDocument();
   });
 });

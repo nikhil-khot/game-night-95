@@ -1,10 +1,20 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { GameServer, GameServerSocket } from "../src/types.ts";
 import { logSocketError } from "../src/controllers/socket.controller.ts";
-import { socketJoin } from "../src/controllers/chat.controller.ts";
+import {
+  socketFriendJoin,
+  socketFriendLeave,
+  socketFriendSendMessage,
+  socketJoin,
+} from "../src/controllers/chat.controller.ts";
 import { createChat } from "../src/services/chat.service.ts";
 import { populateSafeUserInfo } from "../src/services/user.service.ts";
 import { getUserByUsername } from "../src/services/auth.service.ts";
+import {
+  respondToFriendRequest,
+  sendFriendRequest,
+} from "../src/services/friendRequest.service.ts";
+import { buildFriendChatId, openFriendChat } from "../src/services/friendChat.service.ts";
 
 // Mock the logSocketError function so we can test error conditions in sockets
 vi.mock(import("../src/controllers/socket.controller.ts"), () => {
@@ -33,6 +43,7 @@ const MockGameServerSocket = vi.fn(
     leave = vi.fn();
     emit = vi.fn();
     to = vi.fn(() => this); // allows chaining
+    rooms = new Set<string>();
   },
 );
 
@@ -41,9 +52,22 @@ const MockGameServerSocket = vi.fn(
 // We're counting on the fact that the functions we're testing don't depend on
 // functionality that we're not implementing
 const mockServer = new MockGameServer() as unknown as GameServer;
-const mockSocket = new MockGameServerSocket() as unknown as GameServerSocket;
 const auth = { username: "user1", password: "pwd1111" };
 const badAuth = { username: "user2", password: "nope" };
+
+function createMockSocket() {
+  return new MockGameServerSocket() as unknown as GameServerSocket & {
+    rooms: Set<string>;
+  };
+}
+
+async function acceptFriendship() {
+  await sendFriendRequest("user1", "user2");
+  await respondToFriendRequest("user2", "user1", "accepted");
+  const user1 = await getUserByUsername("user1");
+  const user2 = await getUserByUsername("user2");
+  return buildFriendChatId(user1!.userId, user2!.userId);
+}
 
 afterEach(() => {
   // This can be more elegantly achieved by setting mockReset: true in the vitest config
@@ -52,12 +76,14 @@ afterEach(() => {
 
 describe("socketJoin", () => {
   it("should check auth and reject invalid auth", async () => {
+    const mockSocket = createMockSocket();
     const chat = await createChat(new Date());
     await socketJoin(mockSocket, mockServer)({ auth: badAuth, payload: chat.chatId });
     expect(logSocketError).toHaveBeenCalledExactlyOnceWith(mockSocket, new Error("Invalid auth"));
   });
 
   it("should reject an invalid chat id", async () => {
+    const mockSocket = createMockSocket();
     await socketJoin(mockSocket, mockServer)({ auth, payload: "hi" });
     expect(logSocketError).toHaveBeenCalledExactlyOnceWith(
       mockSocket,
@@ -66,6 +92,7 @@ describe("socketJoin", () => {
   });
 
   it("should proceed without errors, add the user to the room connection, and send chatJoined and chatUserJoined messages", async () => {
+    const mockSocket = createMockSocket();
     const chat = await createChat(new Date());
     const record = await getUserByUsername(auth.username);
     const user = await populateSafeUserInfo(record!.userId);
@@ -78,5 +105,74 @@ describe("socketJoin", () => {
       chatId: chat.chatId,
       user,
     });
+  });
+});
+
+describe("friend chat sockets", () => {
+  it("joins an accepted friend chat and emits friendChatJoined", async () => {
+    const mockSocket = createMockSocket();
+    const chatId = await acceptFriendship();
+    const record = await getUserByUsername(auth.username);
+    const user = await populateSafeUserInfo(record!.userId);
+
+    await socketFriendJoin(mockSocket, mockServer)({ auth, payload: chatId });
+
+    expect(logSocketError).not.toHaveBeenCalled();
+    expect(mockSocket.join).toHaveBeenCalledWith(chatId);
+    expect(mockSocket.emit).toHaveBeenCalledWith(
+      "friendChatJoined",
+      expect.objectContaining({ chatId }),
+    );
+    expect(mockSocket.emit).toHaveBeenCalledWith("friendChatUserJoined", { chatId, user });
+  });
+
+  it("leaves a joined friend chat and emits friendChatUserLeft", async () => {
+    const mockSocket = createMockSocket();
+    const chatId = await acceptFriendship();
+    const record = await getUserByUsername(auth.username);
+    const user = await populateSafeUserInfo(record!.userId);
+    mockSocket.rooms.add(chatId);
+
+    await socketFriendLeave(mockSocket, mockServer)({ auth, payload: chatId });
+
+    expect(mockSocket.leave).toHaveBeenCalledWith(chatId);
+    expect(mockSocket.emit).toHaveBeenCalledWith("friendChatUserLeft", { chatId, user });
+  });
+
+  it("sends a message to an accepted friend chat", async () => {
+    const mockSocket = createMockSocket();
+    const chatId = await acceptFriendship();
+    await openFriendChat("user1", "user2");
+
+    await socketFriendSendMessage(
+      mockSocket,
+      mockServer,
+    )({
+      auth,
+      payload: { chatId, text: "hello private chat" },
+    });
+
+    expect(mockServer.to).toHaveBeenCalledWith(chatId);
+    expect(mockServer.emit).toHaveBeenCalledWith(
+      "friendChatNewMessage",
+      expect.objectContaining({
+        chatId,
+        message: expect.objectContaining({ text: "hello private chat" }),
+      }),
+    );
+  });
+
+  it("rejects joining a friend chat without access", async () => {
+    const mockSocket = createMockSocket();
+    const user1 = await getUserByUsername("user1");
+    const user2 = await getUserByUsername("user2");
+    const chatId = buildFriendChatId(user1!.userId, user2!.userId);
+
+    await socketFriendJoin(mockSocket, mockServer)({ auth, payload: chatId });
+
+    expect(logSocketError).toHaveBeenCalledExactlyOnceWith(
+      mockSocket,
+      new Error("Friend chat is only available between accepted friends"),
+    );
   });
 });

@@ -6,6 +6,7 @@ import {
   removeFriend,
   getFriendsList,
   getPendingRequests,
+  openFriendChat,
 } from "../../src/services/friendService.ts";
 
 // Mock axios
@@ -199,6 +200,30 @@ describe("friendService", () => {
       const result = await getPendingRequests("nonexistent");
 
       expect(result).toEqual(errorResponse);
+    });
+  });
+
+  describe("openFriendChat", () => {
+    it("opens a private chat successfully", async () => {
+      const mockResponse = { chatId: "friend:user1:user2" };
+
+      mockApi.post.mockResolvedValue({ data: mockResponse });
+
+      const result = await openFriendChat(mockAuth, "frienduser");
+
+      expect(result).toEqual(mockResponse);
+      expect(mockApi.post).toHaveBeenCalledWith("/api/friend/chat", {
+        auth: mockAuth,
+        payload: { targetUsername: "frienduser" },
+      });
+    });
+
+    it("handles open private chat network errors", async () => {
+      mockApi.post.mockRejectedValue(new Error("Network error"));
+
+      const result = await openFriendChat(mockAuth, "frienduser");
+
+      expect(result).toEqual({ error: "Network error" });
     });
   });
 });

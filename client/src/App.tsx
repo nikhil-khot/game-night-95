@@ -27,6 +27,8 @@ import Friends from "./pages/Friends.tsx";
 import Leaderboard from "./pages/Leaderboard.tsx";
 import Clubs from "./pages/Clubs.tsx";
 import AuthCallback from "./components/AuthCallback.tsx";
+import "@react95/core/GlobalStyle";
+import "@react95/core/themes/win95.css";
 
 /** If `true`, all incoming socket messages will be logged */
 const DEBUG_SOCKETS = false;

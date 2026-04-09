@@ -57,7 +57,7 @@ export interface UserPreferencesRecord {
  */
 export type UserPreferencesUpdateRequest = z.infer<typeof zUserPreferencesUpdateRequest>;
 export const zUserPreferencesUpdateRequest = z.object({
-  theme: z.enum(["light", "dark"]).optional(),
+  theme: z.enum(["win95", "light", "dark"]).optional(),
   fontSize: z.enum(["small", "medium", "large"]).optional(),
   profilePictureUrl: z.string().optional(),
   bannerImageUrl: z.string().optional(),

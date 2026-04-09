@@ -20,6 +20,16 @@
   --selection-color: #3c4757;
 }
 
+:root[data-theme="win95"] {
+  --gray-background: #f7f7f7;
+  --gray-foreground: #555;
+  --page-background: #008080;
+  --page-foreground: #121212;
+  --line-color: #000;
+  --arrow-color: rgba(157, 157, 157);
+  --selection-color: #cccccc;
+}
+
 :root[data-font-size="small"] {
   font-size: 14px;
 }
@@ -38,7 +48,7 @@
 }
 
 body {
-  background-color: #008080;
+  background-color: var(--page-background) !important;
   color: var(--page-foreground) !important;
 }
 
@@ -234,4 +244,9 @@ hr {
 
 .medium {
   font-size: 0.85rem;
+}
+
+/** Inner frame background for theme support **/
+.innerFrame {
+  background-color: var(--gray-foreground);
 }

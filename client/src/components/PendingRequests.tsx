@@ -4,6 +4,7 @@ import useAuth from "../hooks/useAuth.ts";
 import { respondToFriendRequest } from "../services/friendService.ts";
 import UserLink from "./UserLink.tsx";
 import "./PendingRequests.css";
+import { Button } from "@react95/core";
 
 interface PendingRequestsProps {
   requests: { message: string } | SafeUserInfo[];
@@ -47,20 +48,20 @@ export default function PendingRequests({ requests, onActionComplete }: PendingR
               <UserLink user={requester} />
             </div>
             <div className="buttonGroup">
-              <button
+              <Button
                 className="acceptBtn"
                 onClick={() => handleRespond(requester.username, "accepted")}
                 disabled={processingId === requester.username}
               >
                 {processingId === requester.username ? "..." : "Accept"}
-              </button>
-              <button
+              </Button>
+              <Button
                 className="declineBtn"
                 onClick={() => handleRespond(requester.username, "declined")}
                 disabled={processingId === requester.username}
               >
                 {processingId === requester.username ? "..." : "Decline"}
-              </button>
+              </Button>
             </div>
           </div>
         ))}

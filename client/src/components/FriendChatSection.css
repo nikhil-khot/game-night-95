@@ -18,5 +18,5 @@
 }
 
 .friendChatSection .chatWindow {
-  max-height: none;
+  max-height: 100%;
 }

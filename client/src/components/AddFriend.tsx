@@ -2,6 +2,7 @@ import { useState } from "react";
 import useAuth from "../hooks/useAuth.ts";
 import { sendFriendRequest } from "../services/friendService.ts";
 import "./AddFriend.css";
+import { Button, Input } from "@react95/core";
 
 interface AddFriendProps {
   onSuccess: () => void;
@@ -44,7 +45,7 @@ export default function AddFriend({ onSuccess }: AddFriendProps) {
     <div className="addFriendForm">
       <form onSubmit={handleSubmit}>
         <div className="formGroup">
-          <input
+          <Input
             type="text"
             placeholder="Enter username..."
             value={username}
@@ -52,9 +53,14 @@ export default function AddFriend({ onSuccess }: AddFriendProps) {
             disabled={loading}
             className="inputField"
           />
-          <button type="submit" disabled={loading || !username.trim()} className="primary">
+          <Button
+            type="submit"
+            disabled={loading || !username.trim()}
+            className="primary"
+            style={{ color: "white" }}
+          >
             {loading ? "Sending..." : "Send Request"}
-          </button>
+          </Button>
         </div>
       </form>
       {error && <p className="error">{error}</p>}

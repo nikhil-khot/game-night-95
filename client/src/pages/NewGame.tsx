@@ -17,7 +17,13 @@ export default function NewGame() {
 
   return (
     <div className="content">
-      <Frame w="15rem" bgColor="$material" boxShadow="$out" padding="$4" className="outerFrame">
+      <Frame
+        bgColor="$material"
+        boxShadow="$out"
+        padding="$4"
+        className="outerFrame"
+        style={{ width: "fit-content" }}
+      >
         <Frame h="100%" boxShadow="$in" className="innerFrame">
           <div className="content">
             <form className="spacedSection" onSubmit={handleSubmit}>

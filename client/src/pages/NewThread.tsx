@@ -6,7 +6,13 @@ export default function NewThread() {
 
   return (
     <div className="content">
-      <Frame w="39rem" bgColor="$material" boxShadow="$out" padding="$4" className="outerFrame">
+      <Frame
+        bgColor="$material"
+        boxShadow="$out"
+        padding="$4"
+        className="outerFrame"
+        style={{ width: "fit-content" }}
+      >
         <Frame h="100%" boxShadow="$in" className="innerFrame">
           <div className="content">
             <form className="spacedSection" onSubmit={handleSubmit}>
@@ -17,13 +23,14 @@ export default function NewThread() {
                   className="notTooWide widefill"
                   value={title}
                   onChange={(e) => handleInputChange(e, "title")}
+                  style={{ minWidth: "40rem" }}
                 />
               </div>
               <div className="tightSection">
                 <div className="smallAndGray">Post contents</div>
                 <TextArea
                   className="notTooWide"
-                  style={{ minHeight: "10rem" }}
+                  style={{ minHeight: "10rem", minWidth: "40rem" }}
                   value={contents}
                   onChange={(e) => handleInputChange(e, "contents")}
                 ></TextArea>

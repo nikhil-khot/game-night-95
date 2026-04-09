@@ -498,6 +498,9 @@ export async function getInvitedGames(userId: string): Promise<GameInfo[]> {
 
   const invitedGameIds = keys.filter((_, index) => games[index].invited?.includes(userId));
   return Promise.all(invitedGameIds.map((id) => populateGameInfo(id)));
+}
+
+/**
  * Build the GamePlayersInfo payload for gamePlayersUpdated socket events.
  */
 export async function buildGamePlayersInfo(gameId: string): Promise<GamePlayersInfo> {

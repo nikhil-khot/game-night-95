@@ -107,12 +107,12 @@ export default function GamePanel({
                 Join Game
               </button>
             </div>
-          )
-        }
-        {
-          // If the game hasn't started and the user has joined, show invite and AI/start buttons
-          userPlayerIndex >= 0 && !view && (
-            <div className="buttonContainer" style={{ display: "flex", gap: 8 }}>
+          )}
+
+        {/* Controls (invite / AI / start) for players who have joined but the game hasn't started */}
+        {userPlayerIndex >= 0 && !hasStarted && (
+          <div className="buttonContainer">
+            <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
               <button
                 className="primary narrow"
                 disabled={players.length >= 4}
@@ -124,24 +124,16 @@ export default function GamePanel({
                 <>
                   <button className="primary narrow" onClick={() => addAI("easy")}>
                     Add Easy AI
-          )}
-
-        {/* Controls for players who have joined but game hasn't started */}
-        {userPlayerIndex >= 0 && !hasStarted && (
-          <div className="buttonContainer">
-            {mode === "player vs ai" && (
-              <>
-                <button className="primary narrow" onClick={() => addAI("easy")}>
-                  Add Easy AI
-                </button>
-                <button className="primary narrow" onClick={() => addAI("medium")}>
-                  Add Medium AI
-                </button>
-                <button className="primary narrow" onClick={() => addAI("hard")}>
-                  Add Hard AI
-                </button>
-              </>
-            )}
+                  </button>
+                  <button className="primary narrow" onClick={() => addAI("medium")}>
+                    Add Medium AI
+                  </button>
+                  <button className="primary narrow" onClick={() => addAI("hard")}>
+                    Add Hard AI
+                  </button>
+                </>
+              )}
+            </div>
             {isClubVsClub
               ? clubVsClubReady && (
                   <button className="primary narrow" onClick={startGame}>
@@ -152,16 +144,9 @@ export default function GamePanel({
                   <button className="primary narrow" onClick={startGame}>
                     Start Game
                   </button>
-                </>
-              )}
-              {players.length >= minPlayers && (
-                <button className="primary narrow" onClick={startGame}>
-                  Start Game
-                </button>
-              )}
-            </div>
-          )
-        }
+                )}
+          </div>
+        )}
         {inviteOpen && (
           <div className="inviteDialog">
             <div
@@ -231,7 +216,6 @@ export default function GamePanel({
                 Cancel
               </button>
             </div>
-                )}
           </div>
         )}
       </div>

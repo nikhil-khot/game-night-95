@@ -22,6 +22,9 @@ export interface ClientToServerEvents {
   chatJoin: (payload: WithAuth<string>) => void;
   chatLeave: (payload: WithAuth<string>) => void;
   chatSendMessage: (payload: WithAuth<NewMessagePayload>) => void;
+  friendChatJoin: (payload: WithAuth<string>) => void;
+  friendChatLeave: (payload: WithAuth<string>) => void;
+  friendChatSendMessage: (payload: WithAuth<NewMessagePayload>) => void;
   clubChatJoin: (payload: WithAuth<string>) => void;
   clubChatLeave: (payload: WithAuth<string>) => void;
   clubChatSendMessage: (payload: WithAuth<NewClubMessagePayload>) => void;
@@ -47,6 +50,10 @@ export interface ServerToClientEvents {
   chatNewMessage: (payload: ChatNewMessagePayload) => void;
   chatUserJoined: (payload: ChatUserJoinedPayload) => void;
   chatUserLeft: (payload: ChatUserLeftPayload) => void;
+  friendChatJoined: (payload: ChatInfo) => void;
+  friendChatNewMessage: (payload: ChatNewMessagePayload) => void;
+  friendChatUserJoined: (payload: ChatUserJoinedPayload) => void;
+  friendChatUserLeft: (payload: ChatUserLeftPayload) => void;
   clubChatJoined: (payload: ChatInfo) => void;
   clubChatNewMessage: (payload: ChatNewMessagePayload) => void;
   clubChatUserJoined: (payload: ChatUserJoinedPayload) => void;

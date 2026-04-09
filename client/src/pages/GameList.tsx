@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import GameSummaryView from "../components/GameSummaryView.tsx";
 import useGameList from "../hooks/useGameList.ts";
+import { Button } from "@react95/core";
 
 export default function GameList() {
   const gameList = useGameList();
@@ -11,9 +12,9 @@ export default function GameList() {
       <div className="spacedSection">
         <h2>All games</h2>
         <div>
-          <button className="primary narrow" onClick={() => navigate("/game/new")}>
+          <Button className="primary" onClick={() => navigate("/game/new")}>
             Create New Game
-          </button>
+          </Button>
         </div>
         <>
           {"message" in gameList ? (

@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import ThreadSummaryView from "../components/ThreadSummaryView.tsx";
 import useThreadList from "../hooks/useThreadList.ts";
 import { useState } from "react";
+import { Button } from "@react95/core";
 
 export default function ThreadList() {
   const { threadOrMessage, setThreadInList } = useThreadList();
@@ -13,16 +14,16 @@ export default function ThreadList() {
       <div className="spacedSection">
         <h2>All forum posts</h2>
         <div>
-          <button className="primary narrow" onClick={() => navigate("/forum/post/new")}>
+          <Button className="primary" onClick={() => navigate("/forum/post/new")}>
             Create New Post
-          </button>
-          <button
+          </Button>
+          <Button
             style={{ marginLeft: "0.5rem" }}
-            className="secondary narrow"
+            className="secondary"
             onClick={() => setSortByScore(!sortByScore)}
           >
             Sort Posts by {sortByScore ? "Time" : "Score"}
-          </button>
+          </Button>
         </div>
         <>
           {"message" in threadOrMessage ? (

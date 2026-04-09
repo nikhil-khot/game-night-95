@@ -1,5 +1,6 @@
 import type { NimMove, NimView } from "@gamenite/shared";
 import type { GameProps } from "../util/types.ts";
+import { Button } from "@react95/core";
 
 export default function NimGame({
   view,
@@ -45,27 +46,27 @@ export default function NimGame({
       )}
       {userPlayerIndex >= 0 && (
         <div style={{ display: "flex", flexDirection: "row", gap: "0.5rem" }}>
-          <button
-            className="secondary narrow"
+          <Button
+            className="secondary"
             disabled={disabled || view.remaining < 1}
             onClick={() => makeMove(1)}
           >
             Take one
-          </button>
-          <button
+          </Button>
+          <Button
             disabled={disabled || view.remaining < 2}
-            className="secondary narrow"
+            className="secondary"
             onClick={() => makeMove(2)}
           >
             Take two
-          </button>
-          <button
+          </Button>
+          <Button
             disabled={disabled || view.remaining < 3}
-            className="secondary narrow"
+            className="secondary"
             onClick={() => makeMove(3)}
           >
             Take three
-          </button>
+          </Button>
         </div>
       )}
     </div>

@@ -6,11 +6,12 @@ import {
   type DisplayFontSize,
   type DisplayTheme,
 } from "../util/displayPreferences.ts";
+import { Button } from "@react95/core";
 
 /** Preferences page for display settings. */
 export default function Preferences() {
   const auth = useAuth();
-  const [theme, setTheme] = useState<DisplayTheme>("light");
+  const [theme, setTheme] = useState<DisplayTheme>("win95");
   const [fontSize, setFontSize] = useState<DisplayFontSize>("medium");
   const [status, setStatus] = useState<string>("");
 
@@ -55,6 +56,7 @@ export default function Preferences() {
           value={theme}
           onChange={(event) => setTheme(event.target.value as DisplayTheme)}
         >
+          <option value="win95">Win95</option>
           <option value="light">Light</option>
           <option value="dark">Dark</option>
         </select>
@@ -74,9 +76,9 @@ export default function Preferences() {
       </div>
 
       <div className="spacedSection">
-        <button className="narrow primary" onClick={() => void savePreferences()}>
+        <Button className="primary" onClick={() => void savePreferences()}>
           Save Preferences
-        </button>
+        </Button>
         {status && <div className="smallAndGray">{status}</div>}
       </div>
     </div>

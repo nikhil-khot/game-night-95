@@ -1,3 +1,4 @@
+import { Button, TextArea } from "@react95/core";
 import "./MessageCreation.css";
 import { type SubmitEvent, type KeyboardEvent, useState } from "react";
 
@@ -24,13 +25,13 @@ export default function MessageCreation({ handleMessageCreation }: MessageCreati
 
   return (
     <form data-testid="message-creation-form" className="messageCreation" onSubmit={handleSubmit}>
-      <textarea
+      <TextArea
         placeholder="Send a message to chat"
         value={text}
         onKeyDown={handleKeyDown}
         onChange={(e) => setText(e.target.value)}
-      ></textarea>
-      <button className="visuallyHidden">Submit</button>
+      ></TextArea>
+      <Button className="visuallyHidden">Submit</Button>
     </form>
   );
 }

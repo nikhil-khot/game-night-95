@@ -1,6 +1,8 @@
 import type { GuessMove, GuessView } from "@gamenite/shared";
 import type { GameProps } from "../util/types.ts";
 import { useState } from "react";
+import { Button, Range } from "@react95/core";
+import { Star } from "@react95/icons";
 
 export default function GuessGame({
   view,
@@ -45,7 +47,7 @@ export default function GuessGame({
         {view.guesses.map((guess, index) => (
           <li key={index}>
             {getGuessText(guess, index)}
-            {isBestGuess(index) && " 👑"}
+            {isBestGuess(index) && <Star variant="16x16_4" style={{ display: "inline-block" }} />}
           </li>
         ))}
       </ul>
@@ -63,16 +65,16 @@ export default function GuessGame({
             }}
           >
             <div>Guess a number between 1 and 100!</div>
-            <input
-              type="range"
+            <Range
               value={guess}
               min={1}
               max={100}
               step={1}
               onChange={(e) => setGuess(parseInt(e.target.value))}
+              style={{ width: 150 }}
             />
             <div>Ready to guess {guess}?</div>
-            <button className="primary narrow">Submit Guess</button>
+            <Button className="primary">Submit Guess</Button>
           </form>
         ))}
     </div>

@@ -1,3 +1,4 @@
+import { Button, Input, TextArea } from "@react95/core";
 import useNewThreadForm from "../hooks/useNewThreadForm.ts";
 
 export default function NewThread() {
@@ -8,7 +9,7 @@ export default function NewThread() {
       <h2>Create new post</h2>
       <div className="tightSection">
         <div className="smallAndGray">Title</div>
-        <input
+        <Input
           className="notTooWide widefill"
           value={title}
           onChange={(e) => handleInputChange(e, "title")}
@@ -16,16 +17,16 @@ export default function NewThread() {
       </div>
       <div className="tightSection">
         <div className="smallAndGray">Post contents</div>
-        <textarea
+        <TextArea
           className="notTooWide"
           style={{ minHeight: "10rem" }}
           value={contents}
           onChange={(e) => handleInputChange(e, "contents")}
-        ></textarea>
+        ></TextArea>
       </div>
       {err && <p className="error-message">{err}</p>}
       <div>
-        <button className="primary narrow">Create</button>
+        <Button className="primary">Create</Button>
       </div>
     </form>
   );

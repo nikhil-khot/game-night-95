@@ -1,3 +1,4 @@
+import { Button } from "@react95/core";
 import useNewGameForm from "../hooks/useNewGameForm.ts";
 import { gameModes, gameNames } from "../util/consts.ts";
 
@@ -69,7 +70,7 @@ export default function NewGame() {
       )}
       {err && <p className="error-message">{err}</p>}
       <div>
-        <button className="primary narrow">Create New Game</button>
+        <Button className="primary">Create New Game</Button>
       </div>
     </form>
   );

@@ -6,6 +6,7 @@ import GameDispatch from "../games/GameDispatch.tsx";
 import useSocketsForGame from "../hooks/useSocketsForGame.ts";
 import useTimeSince from "../hooks/useTimeSince.ts";
 import UserLink from "./UserLink.tsx";
+import { Button } from "@react95/core";
 
 /**
  * A game panel allows viewing the status and players of a live game
@@ -49,9 +50,9 @@ export default function GamePanel({
             !view &&
             (mode === "player vs player" || mode === "club vs club") && (
               <div className="buttonContainer">
-                <button className="primary narrow" onClick={joinGame}>
+                <Button className="primary" onClick={joinGame}>
                   Join Game
-                </button>
+                </Button>
               </div>
             )
         }
@@ -62,21 +63,21 @@ export default function GamePanel({
             <div className="buttonContainer">
               {mode === "player vs ai" && (
                 <>
-                  <button className="primary narrow" onClick={() => addAI("easy")}>
+                  <Button className="primary" onClick={() => addAI("easy")}>
                     Add Easy AI
-                  </button>
-                  <button className="primary narrow" onClick={() => addAI("medium")}>
+                  </Button>
+                  <Button className="primary" onClick={() => addAI("medium")}>
                     Add Medium AI
-                  </button>
-                  <button className="primary narrow" onClick={() => addAI("hard")}>
+                  </Button>
+                  <Button className="primary" onClick={() => addAI("hard")}>
                     Add Hard AI
-                  </button>
+                  </Button>
                 </>
               )}
               {players.length >= minPlayers && (
-                <button className="primary narrow" onClick={startGame}>
+                <Button className="primary" onClick={startGame}>
                   Start Game
-                </button>
+                </Button>
               )}
             </div>
           )

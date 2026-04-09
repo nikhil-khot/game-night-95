@@ -10,6 +10,7 @@ import ThreadSummaryView from "../components/ThreadSummaryView";
 import useGameList from "../hooks/useGameList";
 import { generateStatsFromGames, sortLeaderboardEntries } from "../util/leaderboardProcessing";
 import UserLeaderboardView from "../components/UserLeaderboardView";
+import { Button, Input } from "@react95/core";
 
 export default function UpdateProfile() {
   const { user } = useLoginContext();
@@ -89,35 +90,35 @@ export default function UpdateProfile() {
         <div className="spacedSection">
           <h3>Display name</h3>
           <div style={{ display: "flex", flexDirection: "row", gap: "0.5rem" }}>
-            <input
+            <Input
               className="widefill notTooWide"
               value={display}
               onChange={(e) => setDisplay(e.target.value)}
             />
-            <button
-              className="secondary narrow"
+            <Button
+              className="secondary"
               onClick={(e) => {
                 e.preventDefault(); // Don't submit form
                 setDisplay(user.display);
               }}
             >
               Reset
-            </button>
+            </Button>
           </div>
         </div>
         <br />
         <div className="spacedSection">
           <h3>Reset password</h3>
           <div style={{ display: "flex", flexDirection: "row", gap: "0.5rem" }}>
-            <input
+            <Input
               type={showPass ? "input" : "password"}
               className="widefill notTooWide"
               placeholder="New password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-            <button
-              className="secondary narrow"
+            <Button
+              className="secondary"
               onClick={(e) => {
                 e.preventDefault(); // Don't submit form
                 setPassword("");
@@ -125,9 +126,9 @@ export default function UpdateProfile() {
               }}
             >
               Reset
-            </button>
-            <button
-              className="secondary narrow"
+            </Button>
+            <Button
+              className="secondary"
               aria-label="Toggle show password"
               onClick={(e) => {
                 e.preventDefault(); // Don't submit form
@@ -135,10 +136,10 @@ export default function UpdateProfile() {
               }}
             >
               {showPass ? "Hide" : "Reveal"}
-            </button>
+            </Button>
           </div>
           <div style={{ display: "flex", flexDirection: "row", gap: "0.5rem" }}>
-            <input
+            <Input
               type={showPass ? "input" : "password"}
               className="widefill notTooWide"
               placeholder="Confirm new password"
@@ -169,18 +170,18 @@ export default function UpdateProfile() {
         </div>
         {err && <p className="error-message">{err}</p>}
         <div>
-          <button className="primary narrow">Submit</button>
+          <Button className="primary">Submit</Button>
         </div>
         <div>
-          <button
-            className="secondary narrow"
+          <Button
+            className="secondary"
             onClick={(e) => {
               e.preventDefault(); // Prevent form submission
               navigate(`/profile/view/${user.username}`); // Navigate using React Router
             }}
           >
             Preview Profile
-          </button>
+          </Button>
         </div>
         <div className="smallAndGray">After updating your profile, you will be logged out</div>
       </form>

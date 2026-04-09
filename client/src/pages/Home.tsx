@@ -5,6 +5,7 @@ import useGameList from "../hooks/useGameList.ts";
 import GameSummaryView from "../components/GameSummaryView.tsx";
 import useAuth from "../hooks/useAuth.ts";
 import { useEffect, useState } from "react";
+import type { GameInfo } from "@gamenite/shared";
 import { getInvitedGames } from "../services/inviteService.ts";
 
 export default function Home() {
@@ -12,7 +13,7 @@ export default function Home() {
   const gameList = useGameList(4);
   const navigate = useNavigate();
   const auth = useAuth();
-  const [invitedGames, setInvitedGames] = useState<any[] | null>(null);
+  const [invitedGames, setInvitedGames] = useState<GameInfo[] | null>(null);
   useEffect(() => {
     (async () => {
       const games = await getInvitedGames(auth);

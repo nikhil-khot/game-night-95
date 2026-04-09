@@ -84,6 +84,10 @@ export interface GameRecord {
   players: RecordId[]; // References User records
   createdAt: DateISO;
   createdBy: RecordId; // References User records
+  /**
+   * List of user IDs who have been invited to this game but are not yet in players[]
+   */
+  invited?: RecordId[];
 }
 
 /**

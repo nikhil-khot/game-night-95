@@ -238,3 +238,50 @@ export async function viewGame(gameId: string, user: UserWithId) {
     players: await Promise.all(game.players.map(populateSafeUserInfo)),
   };
 }
+
+/**
+ * Invite another user to a game lobby.
+ *
+ * @param gameId - game id
+ * @param inviterId - user id of the inviter (must already be in players[])
+ * @param friendId - user id of the friend being invited
+ */
+export async function inviteToGame(
+  gameId: string,
+  inviterId: string,
+  friendId: string,
+): Promise<void> {
+  const game = await GameRepo.find(gameId);
+  if (!game) throw new Error("Game not found");
+
+  // Only players in the game may invite others
+  if (!game.players.includes(inviterId)) {
+    throw new Error("Only players in the game can send invites");
+  }
+
+  // Lobby is full when we already have the maximum number of players
+  if (game.players.length === gameServices[game.type].maxPlayers) {
+    throw new Error("Lobby is full");
+  }
+
+  if (game.players.includes(friendId)) {
+    throw new Error("User is already in the game");
+  }
+  if (game.invited?.includes(friendId)) {
+    throw new Error("User has already been invited");
+  }
+
+  game.invited = [...(game.invited ?? []), friendId];
+  await GameRepo.set(gameId, game);
+}
+
+/**
+ * Get all games where a given user has been invited but is not yet a player.
+ */
+export async function getInvitedGames(userId: string): Promise<GameInfo[]> {
+  const keys = await GameRepo.getAllKeys();
+  const games = await GameRepo.getMany(keys);
+
+  const invitedGameIds = keys.filter((_, index) => games[index].invited?.includes(userId));
+  return Promise.all(invitedGameIds.map((id) => populateGameInfo(id)));
+}

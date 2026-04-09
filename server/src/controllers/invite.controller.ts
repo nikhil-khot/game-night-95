@@ -8,12 +8,13 @@ import { checkAuth, getUserByUsername } from "../services/auth.service.ts";
 // POST /api/game/invite
 export const postInvite: RestAPI = async (req, res) => {
   const body = withAuth(z.object({ gameId: z.string(), friendId: z.string() })).safeParse(req.body);
-  if (body.error) {
+  if (!body.success) {
     console.error("[INVITE] Bad request body for /api/game/invite", {
-      errors: body.error.issues,
+      errors: body.error?.issues,
       rawBody: req.body,
     });
-    return res.status(400).send({ error: "Poorly-formed request" });
+    res.status(400).send({ error: "Poorly-formed request" });
+    return;
   }
 
   const {
@@ -26,19 +27,23 @@ export const postInvite: RestAPI = async (req, res) => {
     console.warn("[INVITE] Invalid credentials on /api/game/invite", {
       username: auth.username,
     });
-    return res.status(403).send({ error: "Invalid credentials" });
+    res.status(403).send({ error: "Invalid credentials" });
+    return;
   }
   try {
     await inviteToGame(gameId, user.userId, friendId);
     res.send({ success: true });
-  } catch (e) {
+    return;
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
     console.error("[INVITE] Error in inviteToGame", {
       gameId,
       inviterId: user.userId,
       friendId,
-      error: e instanceof Error ? e.message : e,
+      error: message,
     });
-    res.status(400).send({ error: e.message });
+    res.status(400).send({ error: message });
+    return;
   }
 };
 

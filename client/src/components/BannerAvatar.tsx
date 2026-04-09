@@ -15,7 +15,7 @@ export default function BannerAvatar({ imageUrl, width, height }: BannerAvatarPr
         left: 0,
         width: width || "36px",
         height: height || "36px",
-        borderRadius: "8px", // Slightly rounded corners for banners
+        //        borderRadius: "8px", // Slightly rounded corners for banners
         overflow: "hidden",
         display: "flex",
         justifyContent: "center",

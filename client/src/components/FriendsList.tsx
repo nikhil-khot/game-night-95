@@ -8,12 +8,19 @@ import "./FriendsList.css";
 interface FriendsListProps {
   friends: { message: string } | SafeUserInfo[];
   onRemove: () => void;
+  onSelect: (friendUsername: string) => void;
+  selectedUsername: string | null;
 }
 
 /**
  * Component to display the list of friends with the ability to remove them
  */
-export default function FriendsList({ friends, onRemove }: FriendsListProps) {
+export default function FriendsList({
+  friends,
+  onRemove,
+  onSelect,
+  selectedUsername,
+}: FriendsListProps) {
   const auth = useAuth();
   const [removingId, setRemovingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -42,13 +49,28 @@ export default function FriendsList({ friends, onRemove }: FriendsListProps) {
       {error && <p className="error">{error}</p>}
       <div className="dottedList">
         {friends.map((friend) => (
-          <div key={friend.username} className="friendItem">
+          <div
+            key={friend.username}
+            className={`friendItem ${selectedUsername === friend.username ? "friendItemActive" : ""}`}
+            onClick={() => onSelect(friend.username)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onSelect(friend.username);
+              }
+            }}
+          >
             <div className="friendInfo">
               <UserLink user={friend} />
             </div>
             <button
               className="removeBtn"
-              onClick={() => handleRemove(friend.username)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleRemove(friend.username);
+              }}
               disabled={removingId === friend.username}
             >
               {removingId === friend.username ? "Removing..." : "Remove"}

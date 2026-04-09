@@ -81,6 +81,28 @@ function buildOpponentView(board: number[][], ships: [number, number][][]): numb
   );
 }
 
+/**
+ * Builds the player's own board view:
+ * - Keeps all cells visible (ships, hits, misses)
+ * - Marks cells of fully-sunk ships as 4 instead of 2
+ */
+function buildMyBoardView(board: number[][], ships: [number, number][][]): number[][] {
+  const sunkSet = new Set<string>();
+  for (const ship of ships) {
+    if (ship.every(([r, c]) => board[r][c] === 2)) {
+      for (const [r, c] of ship) {
+        sunkSet.add(`${r},${c}`);
+      }
+    }
+  }
+  return board.map((row, r) =>
+    row.map((cell, c) => {
+      if (cell === 2 && sunkSet.has(`${r},${c}`)) return 4; // sunk
+      return cell;
+    }),
+  );
+}
+
 /** Returns sizes of all fully-sunk ships for the given player's board. */
 function sunkShipSizes(board: number[][], ships: [number, number][][]): number[] {
   return ships
@@ -171,18 +193,21 @@ export const battleshipLogic: GameLogic<BattleshipState, BattleshipView> = {
         opponentBoard: state.boards[1],
         nextPlayer: state.nextPlayer,
         sunkOpponentShipSizes: [],
+        sunkMyShipSizes: [],
       };
     }
 
     const opponentIndex = 1 - playerIndex;
+    const myShips = state.ships[playerIndex] as [number, number][][];
     const opponentShips = state.ships[opponentIndex] as [number, number][][];
     return {
       finished: false,
       phase: "battle",
-      myBoard: state.boards[playerIndex],
+      myBoard: buildMyBoardView(state.boards[playerIndex], myShips),
       opponentBoard: buildOpponentView(state.boards[opponentIndex], opponentShips),
       nextPlayer: state.nextPlayer,
       sunkOpponentShipSizes: sunkShipSizes(state.boards[opponentIndex], opponentShips),
+      sunkMyShipSizes: sunkShipSizes(state.boards[playerIndex], myShips),
     };
   },
 
@@ -266,6 +291,7 @@ export function randomAIPlacement(): ShipPlacement[] {
 /**
  * Picks a random unattacked cell on the given board for the easy AI to attack.
  * `opponentBoard` should be the board belonging to the player being attacked.
+ * @internal also used as a fallback by the other AI attack functions
  */
 export function randomAIAttack(opponentBoard: number[][]): [number, number] {
   const available: [number, number][] = [];
@@ -319,6 +345,141 @@ export function mediumAIAttack(opponentBoard: number[][]): [number, number] {
 
   if (adjacent.length > 0) {
     return adjacent[Math.floor(Math.random() * adjacent.length)];
+  }
+
+  return randomAIAttack(opponentBoard);
+}
+
+/**
+ * Targeting helper for the hard AI.
+ *
+ * Groups connected hit cells (value 2) via BFS, prioritises the largest group,
+ * then:
+ *  - If the group is axis-aligned (all in one row or column), extends the line
+ *    at both ends.
+ *  - Otherwise (isolated hit or L-shape), tries all four cardinal neighbours.
+ *
+ * Returns the chosen cell, or null if every group is completely surrounded by
+ * already-attacked cells (caller should fall back to hunting).
+ */
+function hardAITargetHits(board: number[][], hits: [number, number][]): [number, number] | null {
+  // BFS to collect connected groups of hit cells
+  const visited = new Set<string>();
+  const groups: [number, number][][] = [];
+
+  for (const [r, c] of hits) {
+    if (visited.has(`${r},${c}`)) continue;
+    const group: [number, number][] = [];
+    const queue: [number, number][] = [[r, c]];
+    while (queue.length > 0) {
+      const [cr, cc] = queue.shift()!;
+      if (visited.has(`${cr},${cc}`)) continue;
+      visited.add(`${cr},${cc}`);
+      group.push([cr, cc]);
+      for (const [dr, dc] of DIRECTIONS) {
+        const nr = cr + dr;
+        const nc = cc + dc;
+        if (nr < 0 || nr >= BOARD_SIZE || nc < 0 || nc >= BOARD_SIZE) continue;
+        if (board[nr][nc] === 2 && !visited.has(`${nr},${nc}`)) queue.push([nr, nc]);
+      }
+    }
+    groups.push(group);
+  }
+
+  // Process largest group first
+  groups.sort((a, b) => b.length - a.length);
+
+  for (const group of groups) {
+    const candidates: [number, number][] = [];
+
+    if (group.length >= 2) {
+      const allSameRow = group.every(([r]) => r === group[0][0]);
+      const allSameCol = group.every(([, c]) => c === group[0][1]);
+
+      if (allSameRow) {
+        const row = group[0][0];
+        const cols = group.map(([, c]) => c).sort((a, b) => a - b);
+        const minC = cols[0];
+        const maxC = cols[cols.length - 1];
+        if (minC - 1 >= 0 && board[row][minC - 1] !== 2 && board[row][minC - 1] !== 3)
+          candidates.push([row, minC - 1]);
+        if (maxC + 1 < BOARD_SIZE && board[row][maxC + 1] !== 2 && board[row][maxC + 1] !== 3)
+          candidates.push([row, maxC + 1]);
+      } else if (allSameCol) {
+        const col = group[0][1];
+        const rows = group.map(([r]) => r).sort((a, b) => a - b);
+        const minR = rows[0];
+        const maxR = rows[rows.length - 1];
+        if (minR - 1 >= 0 && board[minR - 1][col] !== 2 && board[minR - 1][col] !== 3)
+          candidates.push([minR - 1, col]);
+        if (maxR + 1 < BOARD_SIZE && board[maxR + 1][col] !== 2 && board[maxR + 1][col] !== 3)
+          candidates.push([maxR + 1, col]);
+      }
+    }
+
+    // Isolated hit, L-shaped group, or axis was blocked — try all neighbours
+    if (candidates.length === 0) {
+      const seen = new Set<string>();
+      for (const [hr, hc] of group) {
+        for (const [dr, dc] of DIRECTIONS) {
+          const nr = hr + dr;
+          const nc = hc + dc;
+          if (nr < 0 || nr >= BOARD_SIZE || nc < 0 || nc >= BOARD_SIZE) continue;
+          if (board[nr][nc] === 2 || board[nr][nc] === 3) continue;
+          const key = `${nr},${nc}`;
+          if (!seen.has(key)) {
+            candidates.push([nr, nc]);
+            seen.add(key);
+          }
+        }
+      }
+    }
+
+    if (candidates.length > 0) {
+      return candidates[Math.floor(Math.random() * candidates.length)];
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Picks an attack cell for the hard AI.
+ *
+ * **Targeting mode** (active hits exist): identifies connected groups of hit
+ * cells, determines the ship's axis from aligned hits, and shoots along that
+ * axis to sink the ship efficiently.
+ *
+ * **Hunting mode** (no active hits): uses a parity/checkerboard pattern —
+ * only attacks cells where `(row + col) % 2 === 0`. Because the smallest ship
+ * occupies 2 cells, this guarantees a hit within at most 50 shots.
+ *
+ * `opponentBoard` should be the board belonging to the player being attacked.
+ */
+export function hardAIAttack(opponentBoard: number[][]): [number, number] {
+  const hits: [number, number][] = [];
+  for (let r = 0; r < BOARD_SIZE; r++) {
+    for (let c = 0; c < BOARD_SIZE; c++) {
+      if (opponentBoard[r][c] === 2) hits.push([r, c]);
+    }
+  }
+
+  if (hits.length > 0) {
+    const target = hardAITargetHits(opponentBoard, hits);
+    if (target) return target;
+  }
+
+  // Hunt: checkerboard parity — every unattacked cell where (r + c) is even
+  const parityTargets: [number, number][] = [];
+  for (let r = 0; r < BOARD_SIZE; r++) {
+    for (let c = 0; c < BOARD_SIZE; c++) {
+      if ((r + c) % 2 === 0 && opponentBoard[r][c] !== 2 && opponentBoard[r][c] !== 3) {
+        parityTargets.push([r, c]);
+      }
+    }
+  }
+  if (parityTargets.length > 0) {
+    return parityTargets[Math.floor(Math.random() * parityTargets.length)];
   }
 
   return randomAIAttack(opponentBoard);

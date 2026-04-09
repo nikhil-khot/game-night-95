@@ -282,6 +282,16 @@ export async function getClub(clubName: string): Promise<ClubRecord | { error: s
 }
 
 /**
+ * Returns the name of the club the user currently belongs to, or null.
+ */
+export async function findUserClub(username: string): Promise<string | null> {
+  const user = await getUserByUsername(username);
+  if (!user) return null;
+  const club = await findClubForUser(user.userId);
+  return club?.record.name ?? null;
+}
+
+/**
  * Checks whether a user is a member of a given club.
  */
 export async function isClubMember(username: string, clubName: string): Promise<boolean> {

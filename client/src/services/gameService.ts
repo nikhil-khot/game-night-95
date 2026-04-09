@@ -11,11 +11,12 @@ export const createGame = async (
   auth: UserAuth,
   gameType: GameType,
   gameMode: GameMode,
+  opponentClub?: string,
 ): APIResponse<GameInfo> => {
   try {
     const res = await api.post<GameInfo | ErrorMsg>(`${GAME_API_URL}/create`, {
       auth,
-      payload: { gameType, gameMode },
+      payload: { gameType, gameMode, opponentClub },
     });
     return res.data;
   } catch (error) {

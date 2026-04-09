@@ -1,6 +1,8 @@
 import {
   type SafeUserInfo,
+  type FriendChatInfo,
   withAuth,
+  zOpenFriendChatPayload,
   zRespondToFriendRequestPayload,
   zRemoveFriendPayload,
   zSendFriendRequestPayload,
@@ -12,6 +14,7 @@ import {
   getFriends,
   getPendingRequests,
 } from "../services/friendRequest.service.ts";
+import { openFriendChat } from "../services/friendChat.service.ts";
 import { type RestAPI } from "../types.ts";
 import { checkAuth } from "../services/auth.service.ts";
 import { populateSafeUserInfo } from "../services/user.service.ts";
@@ -170,4 +173,29 @@ export const getPending: RestAPI<SafeUserInfo[]> = async (req, res) => {
   }
 
   res.send(pendingInfo);
+};
+
+/**
+ * Opens a private friend chat, creating it if it does not exist yet.
+ */
+export const postOpenChat: RestAPI<FriendChatInfo> = async (req, res) => {
+  const body = withAuth(zOpenFriendChatPayload).safeParse(req.body);
+  if (!body.success) {
+    res.status(400).send({ error: "Poorly-formed request" });
+    return;
+  }
+
+  const user = await checkAuth(body.data.auth);
+  if (!user) {
+    res.status(403).send({ error: "Invalid credentials" });
+    return;
+  }
+
+  const result = await openFriendChat(user.username, body.data.payload.targetUsername);
+  if ("error" in result) {
+    res.send(result);
+    return;
+  }
+
+  res.send(result);
 };

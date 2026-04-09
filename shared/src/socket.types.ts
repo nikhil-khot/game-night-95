@@ -8,8 +8,12 @@ import {
 import { type NewClubMessagePayload } from "./club.types.ts";
 import { type NewMessagePayload } from "./message.types.ts";
 import { type WithAuth } from "./auth.types.ts";
-import { type GameMakeMovePayload, type GamePlayInfo, type TaggedGameView } from "./game.types.ts";
-import { type SafeUserInfo } from "./user.types.ts";
+import {
+  type GameMakeMovePayload,
+  type GamePlayInfo,
+  type GamePlayersInfo,
+  type TaggedGameView,
+} from "./game.types.ts";
 
 /**
  * The Socket.io interface for client to server communication
@@ -18,6 +22,9 @@ export interface ClientToServerEvents {
   chatJoin: (payload: WithAuth<string>) => void;
   chatLeave: (payload: WithAuth<string>) => void;
   chatSendMessage: (payload: WithAuth<NewMessagePayload>) => void;
+  friendChatJoin: (payload: WithAuth<string>) => void;
+  friendChatLeave: (payload: WithAuth<string>) => void;
+  friendChatSendMessage: (payload: WithAuth<NewMessagePayload>) => void;
   clubChatJoin: (payload: WithAuth<string>) => void;
   clubChatLeave: (payload: WithAuth<string>) => void;
   clubChatSendMessage: (payload: WithAuth<NewClubMessagePayload>) => void;
@@ -43,11 +50,15 @@ export interface ServerToClientEvents {
   chatNewMessage: (payload: ChatNewMessagePayload) => void;
   chatUserJoined: (payload: ChatUserJoinedPayload) => void;
   chatUserLeft: (payload: ChatUserLeftPayload) => void;
+  friendChatJoined: (payload: ChatInfo) => void;
+  friendChatNewMessage: (payload: ChatNewMessagePayload) => void;
+  friendChatUserJoined: (payload: ChatUserJoinedPayload) => void;
+  friendChatUserLeft: (payload: ChatUserLeftPayload) => void;
   clubChatJoined: (payload: ChatInfo) => void;
   clubChatNewMessage: (payload: ChatNewMessagePayload) => void;
   clubChatUserJoined: (payload: ChatUserJoinedPayload) => void;
   clubChatUserLeft: (payload: ChatUserLeftPayload) => void;
-  gamePlayersUpdated: (payload: SafeUserInfo[]) => void;
+  gamePlayersUpdated: (payload: GamePlayersInfo) => void;
   gameStateUpdated: (payload: TaggedGameView & { forPlayer: boolean }) => void;
   gameWatched: (payload: GamePlayInfo) => void;
   // Presence updates for arbitrary users

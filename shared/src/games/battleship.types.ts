@@ -61,6 +61,8 @@ export type UnfinishedBattleshipView = {
   nextPlayer: number;
   /** Sizes of opponent ships that have been fully sunk, in the order they were sunk */
   sunkOpponentShipSizes: number[];
+  /** Sizes of the player's own ships that have been fully sunk, in the order they were sunk */
+  sunkMyShipSizes: number[];
 };
 
 /**

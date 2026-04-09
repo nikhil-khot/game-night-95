@@ -27,6 +27,7 @@ const mockRemoveFriend = vi.mocked(friendService.removeFriend);
 describe("FriendsList component", () => {
   const mockAuth = { username: "testuser", password: "testpass" };
   const mockOnRemove = vi.fn();
+  const mockOnSelect = vi.fn();
 
   const mockFriends = [
     { userId: "id1", username: "friend1", display: "Friend One", createdAt: new Date() },
@@ -39,35 +40,104 @@ describe("FriendsList component", () => {
   });
 
   it("renders loading message", () => {
-    render(<FriendsList friends={{ message: "Loading..." }} onRemove={mockOnRemove} />);
+    render(
+      <FriendsList
+        friends={{ message: "Loading..." }}
+        onRemove={mockOnRemove}
+        onSelect={mockOnSelect}
+        selectedUsername={null}
+      />,
+    );
 
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("renders no friends message", () => {
-    render(<FriendsList friends={{ message: "No friends yet..." }} onRemove={mockOnRemove} />);
+    render(
+      <FriendsList
+        friends={{ message: "No friends yet..." }}
+        onRemove={mockOnRemove}
+        onSelect={mockOnSelect}
+        selectedUsername={null}
+      />,
+    );
 
     expect(screen.getByText("No friends yet...")).toBeInTheDocument();
   });
 
   it("renders error message", () => {
-    render(<FriendsList friends={{ message: "Error: Failed to load" }} onRemove={mockOnRemove} />);
+    render(
+      <FriendsList
+        friends={{ message: "Error: Failed to load" }}
+        onRemove={mockOnRemove}
+        onSelect={mockOnSelect}
+        selectedUsername={null}
+      />,
+    );
 
     expect(screen.getByText("Error: Failed to load")).toBeInTheDocument();
   });
 
   it("renders friends list correctly", () => {
-    render(<FriendsList friends={mockFriends} onRemove={mockOnRemove} />);
+    render(
+      <FriendsList
+        friends={mockFriends}
+        onRemove={mockOnRemove}
+        onSelect={mockOnSelect}
+        selectedUsername={null}
+      />,
+    );
 
     expect(screen.getByText("Friend One")).toBeInTheDocument();
     expect(screen.getByText("Friend Two")).toBeInTheDocument();
     expect(screen.getAllByText("Remove")).toHaveLength(2);
   });
 
+  it("selects a friend when the row is clicked", () => {
+    render(
+      <FriendsList
+        friends={mockFriends}
+        onRemove={mockOnRemove}
+        onSelect={mockOnSelect}
+        selectedUsername={null}
+      />,
+    );
+
+    fireEvent.click(screen.getByText("Friend One"));
+
+    expect(mockOnSelect).toHaveBeenCalledWith("friend1");
+  });
+
+  it("supports keyboard selection and active state", () => {
+    render(
+      <FriendsList
+        friends={mockFriends}
+        onRemove={mockOnRemove}
+        onSelect={mockOnSelect}
+        selectedUsername="friend1"
+      />,
+    );
+
+    const activeFriend = screen.getByText("Friend One").closest(".friendItem");
+    const secondFriend = screen.getByText("Friend Two").closest(".friendItem");
+
+    expect(activeFriend).toHaveClass("friendItemActive");
+
+    fireEvent.keyDown(secondFriend!, { key: "Enter" });
+    expect(mockOnSelect).toHaveBeenCalledWith("friend2");
+  });
+
   it("removes friend successfully", async () => {
     mockRemoveFriend.mockResolvedValue({ success: true });
 
-    render(<FriendsList friends={mockFriends} onRemove={mockOnRemove} />);
+    render(
+      <FriendsList
+        friends={mockFriends}
+        onRemove={mockOnRemove}
+        onSelect={mockOnSelect}
+        selectedUsername={null}
+      />,
+    );
 
     const removeButtons = screen.getAllByText("Remove");
     fireEvent.click(removeButtons[0]);
@@ -82,7 +152,14 @@ describe("FriendsList component", () => {
   it("shows error when removal fails", async () => {
     mockRemoveFriend.mockResolvedValue({ error: "Failed to remove friend" });
 
-    render(<FriendsList friends={mockFriends} onRemove={mockOnRemove} />);
+    render(
+      <FriendsList
+        friends={mockFriends}
+        onRemove={mockOnRemove}
+        onSelect={mockOnSelect}
+        selectedUsername={null}
+      />,
+    );
 
     const removeButtons = screen.getAllByText("Remove");
     fireEvent.click(removeButtons[0]);
@@ -99,7 +176,14 @@ describe("FriendsList component", () => {
       () => new Promise((resolve) => setTimeout(() => resolve({ success: true }), 100)),
     );
 
-    render(<FriendsList friends={mockFriends} onRemove={mockOnRemove} />);
+    render(
+      <FriendsList
+        friends={mockFriends}
+        onRemove={mockOnRemove}
+        onSelect={mockOnSelect}
+        selectedUsername={null}
+      />,
+    );
 
     const removeButtons = screen.getAllByText("Remove");
     fireEvent.click(removeButtons[0]);
@@ -116,12 +200,39 @@ describe("FriendsList component", () => {
       () => new Promise(() => {}), // Never resolves
     );
 
-    render(<FriendsList friends={mockFriends} onRemove={mockOnRemove} />);
+    render(
+      <FriendsList
+        friends={mockFriends}
+        onRemove={mockOnRemove}
+        onSelect={mockOnSelect}
+        selectedUsername={null}
+      />,
+    );
 
     const removeButtons = screen.getAllByText("Remove");
     fireEvent.click(removeButtons[0]);
 
     expect(removeButtons[0]).toBeDisabled();
     expect(removeButtons[0]).toHaveTextContent("Removing...");
+  });
+
+  it("does not select a friend when remove is clicked", async () => {
+    mockRemoveFriend.mockResolvedValue({ success: true });
+
+    render(
+      <FriendsList
+        friends={mockFriends}
+        onRemove={mockOnRemove}
+        onSelect={mockOnSelect}
+        selectedUsername={null}
+      />,
+    );
+
+    fireEvent.click(screen.getAllByText("Remove")[0]);
+
+    await waitFor(() => {
+      expect(mockOnRemove).toHaveBeenCalled();
+    });
+    expect(mockOnSelect).not.toHaveBeenCalled();
   });
 });

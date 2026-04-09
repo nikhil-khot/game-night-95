@@ -259,8 +259,9 @@ export default function BattleshipGame({
   userPlayerIndex,
   makeMove,
 }: GameProps<BattleshipView, BattleshipMove>) {
-  const [sinkNotice, setSinkNotice] = useState<string | null>(null);
+  const [sinkBanner, setSinkBanner] = useState<{ text: string; isEnemy: boolean } | null>(null);
   const prevSunkRef = useRef<number[]>([]);
+  const prevMySunkRef = useRef<number[]>([]);
 
   // Local placement state (persists across placement→battle transition for display)
   const [placementShips, setPlacementShips] = useState<LocalShip[]>(defaultShips);
@@ -269,16 +270,34 @@ export default function BattleshipGame({
   // Detect newly sunk ships and show a temporary banner
   useEffect(() => {
     if (view.finished || view.phase !== "battle") return;
-    const current = view.sunkOpponentShipSizes;
-    const prev = prevSunkRef.current;
-    prevSunkRef.current = current;
-    if (current.length > prev.length) {
-      const newlySunk = current.slice(prev.length);
-      const names = newlySunk.map(shipName).join(", ");
-      setSinkNotice(`You sunk their ${names}!`);
-      const timer = setTimeout(() => setSinkNotice(null), 3000);
+
+    const currentOpponent: number[] = view.sunkOpponentShipSizes;
+    const prevOpponent = prevSunkRef.current;
+    prevSunkRef.current = currentOpponent;
+
+    // sunkMyShipSizes was added alongside sunkOpponentShipSizes; guard for safety
+    const currentMy: number[] =
+      (view as unknown as { sunkMyShipSizes: number[] }).sunkMyShipSizes ?? [];
+    const prevMy = prevMySunkRef.current;
+    prevMySunkRef.current = currentMy;
+
+    let next: { text: string; isEnemy: boolean } | null = null;
+
+    if (currentOpponent.length > prevOpponent.length) {
+      const names = currentOpponent.slice(prevOpponent.length).map(shipName).join(", ");
+      next = { text: `You sunk their ${names}!`, isEnemy: false };
+    } else if (currentMy.length > prevMy.length) {
+      const names = currentMy.slice(prevMy.length).map(shipName).join(", ");
+      next = { text: `They sunk your ${names}!`, isEnemy: true };
+    }
+
+    if (next !== null) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSinkBanner(next);
+      const timer = setTimeout(() => setSinkBanner(null), 3000);
       return () => clearTimeout(timer);
     }
+
     return undefined;
   }, [view]);
 
@@ -505,7 +524,7 @@ export default function BattleshipGame({
   }
 
   // ── Battle phase ──
-  const { myBoard, opponentBoard, nextPlayer, sunkOpponentShipSizes } = view;
+  const { myBoard, opponentBoard, nextPlayer, sunkOpponentShipSizes, sunkMyShipSizes } = view;
   const isPlayer = userPlayerIndex >= 0;
   const isMyTurn = userPlayerIndex === nextPlayer;
 
@@ -520,10 +539,10 @@ export default function BattleshipGame({
           : `${playerName(nextPlayer)} is taking their turn`}
       </p>
 
-      {sinkNotice && (
+      {sinkBanner && (
         <div
           style={{
-            background: "#b45309",
+            background: sinkBanner.isEnemy ? "#dc2626" : "#b45309",
             color: "#fff",
             padding: "0.4rem 0.8rem",
             borderRadius: 4,
@@ -532,13 +551,15 @@ export default function BattleshipGame({
             display: "inline-block",
           }}
         >
-          {sinkNotice}
+          {sinkBanner.text}
         </div>
       )}
 
       {isPlayer && (
         <div style={{ fontSize: 13, marginBottom: "0.5rem", color: "#64748b" }}>
           Enemy ships sunk: {sunkOpponentShipSizes.length} / {TOTAL_SHIPS}
+          {" · "}
+          My ships sunk: {sunkMyShipSizes?.length ?? 0} / {TOTAL_SHIPS}
         </div>
       )}
 

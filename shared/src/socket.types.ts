@@ -8,8 +8,12 @@ import {
 import { type NewClubMessagePayload } from "./club.types.ts";
 import { type NewMessagePayload } from "./message.types.ts";
 import { type WithAuth } from "./auth.types.ts";
-import { type GameMakeMovePayload, type GamePlayInfo, type TaggedGameView } from "./game.types.ts";
-import { type SafeUserInfo } from "./user.types.ts";
+import {
+  type GameMakeMovePayload,
+  type GamePlayInfo,
+  type GamePlayersInfo,
+  type TaggedGameView,
+} from "./game.types.ts";
 
 /**
  * The Socket.io interface for client to server communication
@@ -54,7 +58,7 @@ export interface ServerToClientEvents {
   clubChatNewMessage: (payload: ChatNewMessagePayload) => void;
   clubChatUserJoined: (payload: ChatUserJoinedPayload) => void;
   clubChatUserLeft: (payload: ChatUserLeftPayload) => void;
-  gamePlayersUpdated: (payload: SafeUserInfo[]) => void;
+  gamePlayersUpdated: (payload: GamePlayersInfo) => void;
   gameStateUpdated: (payload: TaggedGameView & { forPlayer: boolean }) => void;
   gameWatched: (payload: GamePlayInfo) => void;
   // Presence updates for arbitrary users

@@ -2,7 +2,9 @@ import {
   type BattleshipState,
   type GameInfo,
   type GameMode,
+  type GamePlayersInfo,
   type GameType,
+  type SafeUserInfo,
   type TaggedGameView,
 } from "@gamenite/shared";
 import { createChat } from "./chat.service.ts";
@@ -38,6 +40,16 @@ export const gameServices: { [key in GameType]: GameServicer } = {
  */
 async function populateGameInfo(gameId: string): Promise<GameInfo> {
   const game = await GameRepo.get(gameId);
+
+  let clubRosters: [SafeUserInfo[], SafeUserInfo[]] | undefined;
+  if (game.clubRosters) {
+    const [r0, r1] = game.clubRosters;
+    clubRosters = [
+      await Promise.all(r0.map(populateSafeUserInfo)),
+      await Promise.all(r1.map(populateSafeUserInfo)),
+    ];
+  }
+
   return {
     gameId,
     createdBy: await populateSafeUserInfo(game.createdBy),
@@ -50,6 +62,7 @@ async function populateGameInfo(gameId: string): Promise<GameInfo> {
     minPlayers: gameServices[game.type].minPlayers,
     winners: await Promise.all(game.winners.map(populateSafeUserInfo)),
     clubs: game.clubs,
+    clubRosters,
   };
 }
 
@@ -70,6 +83,7 @@ export async function createGame(
   opponentClub?: string,
 ): Promise<GameInfo> {
   let clubs: [string, string] | undefined;
+  let clubRosters: [string[], string[]] | undefined;
   if (mode === "club vs club") {
     if (!opponentClub) throw new Error("club vs club games require an opponent club");
     const myClub = await findUserClub(user.username);
@@ -77,6 +91,7 @@ export async function createGame(
       throw new Error(`${user.username} must be in a club to create a club vs club game`);
     if (myClub === opponentClub) throw new Error("club vs club games require two different clubs");
     clubs = [myClub, opponentClub];
+    clubRosters = [[user.userId], []];
   }
 
   const chat = await createChat(createdAt);
@@ -90,6 +105,7 @@ export async function createGame(
     players: [user.userId],
     winners: [],
     clubs,
+    clubRosters,
   });
   return populateGameInfo(gameId);
 }
@@ -107,14 +123,17 @@ export async function getGameById(gameId: string): Promise<GameInfo | null> {
 }
 
 /**
- * Adds a user to a game that hasn't started yet. If the resulting game object has the maximum
- * allowed number of players, it is the responsibility of the caller to start the game.
+ * Adds a user to a game that hasn't started yet.
+ *
+ * For "club vs club" games, any member of either participating club may join and
+ * there is no maximum roster size — multiple club members may participate on the
+ * same side. For all other modes, the existing single-player-per-slot rules apply.
  *
  * @param gameId - Ostensible game id
  * @param user - Authenticated user
  * @returns the game's info object, with the `user` listed among the players
- * @throws if the game id is not valid, if the game has started, or if the game cannot accept more
- * players
+ * @throws if the game id is not valid, if the game has started, or if the user
+ *   cannot join (wrong club, already in game, game full for non-club modes, etc.)
  */
 export async function joinGame(gameId: string, user: UserWithId): Promise<GameInfo> {
   const game = await GameRepo.find(gameId);
@@ -122,23 +141,38 @@ export async function joinGame(gameId: string, user: UserWithId): Promise<GameIn
   if (game.state) {
     throw new Error(`user ${user.username} joining game that started`);
   }
-  if (game.players.some((userId) => userId === user.userId)) {
-    throw new Error(`user ${user.username} joining game they are in already`);
-  }
-  if (game.players.length === gameServices[game.type].maxPlayers) {
-    throw new Error(`user ${user.username} joining full`);
-  }
   if (game.aiType) {
     throw new Error(`user ${user.username} joining a game that already has an AI opponent`);
   }
 
   if (game.mode === "club vs club") {
-    const clubs = game.clubs;
-    if (clubs) {
-      const inOpponentClub = await isClubMember(user.username, clubs[1]);
-      if (!inOpponentClub)
-        throw new Error(`user ${user.username} is not a member of opponent club "${clubs[1]}"`);
+    const clubs = game.clubs!;
+    const inClub0 = await isClubMember(user.username, clubs[0]);
+    const inClub1 = await isClubMember(user.username, clubs[1]);
+    if (!inClub0 && !inClub1) {
+      throw new Error(`user ${user.username} is not a member of either participating club`);
     }
+
+    const clubIdx = inClub0 ? 0 : 1;
+    const [r0, r1]: [string[], string[]] = game.clubRosters ?? [[], []];
+    const roster: [string[], string[]] = [r0, r1];
+    if (roster[clubIdx].includes(user.userId)) {
+      throw new Error(`user ${user.username} joining game they are in already`);
+    }
+
+    roster[clubIdx] = [...roster[clubIdx], user.userId];
+    game.clubRosters = roster;
+    game.players = [...game.players, user.userId];
+    await GameRepo.set(gameId, game);
+    return populateGameInfo(gameId);
+  }
+
+  // Non-club-vs-club: original single-slot logic
+  if (game.players.some((userId) => userId === user.userId)) {
+    throw new Error(`user ${user.username} joining game they are in already`);
+  }
+  if (game.players.length === gameServices[game.type].maxPlayers) {
+    throw new Error(`user ${user.username} joining full`);
   }
 
   game.players = [...game.players, user.userId];
@@ -177,6 +211,24 @@ export async function addAIToGame(
 }
 
 /**
+ * Helper to expand a 2-entry player-views array to all club members.
+ * The game service only knows about 2 representative players (one per club);
+ * this expands the result so every joined club member gets the correct view.
+ */
+function expandViewsForClubs(
+  views: GameViewUpdates,
+  clubRosters: [string[], string[]],
+): GameViewUpdates {
+  return {
+    watchers: views.watchers,
+    players: [
+      ...clubRosters[0].map((userId) => ({ userId, view: views.players[0].view })),
+      ...clubRosters[1].map((userId) => ({ userId, view: views.players[1].view })),
+    ],
+  };
+}
+
+/**
  * Initializes a game that hasn't started yet
  *
  * @param gameId - Ostensible game id
@@ -193,6 +245,26 @@ export async function startGame(gameId: string, user: UserWithId): Promise<GameV
   }
 
   const key: GameType = game.type;
+
+  if (game.mode === "club vs club") {
+    const [r0, r1]: [string[], string[]] = game.clubRosters ?? [[], []];
+    const rosters: [string[], string[]] = [r0, r1];
+    if (rosters[0].length === 0 || rosters[1].length === 0) {
+      throw new Error(`user ${user.username} starting underpopulated game`);
+    }
+    if (!rosters[0].includes(user.userId) && !rosters[1].includes(user.userId)) {
+      throw new Error(`user ${user.username} starting game they're not in`);
+    }
+
+    // Use one representative per club for the underlying 2-player game
+    const repPlayers = [rosters[0][0], rosters[1][0]];
+    const { state, views: rawViews } = gameServices[key].create(repPlayers);
+    const views = expandViewsForClubs(rawViews, rosters);
+
+    game.state = state;
+    await GameRepo.set(gameId, game);
+    return Promise.resolve(views);
+  }
 
   const effectivePlayers = game.players.length + (game.aiType ? 1 : 0);
   if (effectivePlayers < gameServices[key].minPlayers) {
@@ -260,15 +332,37 @@ export async function updateGame(
   if (!game.state) {
     throw new Error(`user ${user.username} made a move in game of that hadn't started`);
   }
-  const playerIndex = game.players.findIndex((userId) => userId === user.userId);
-  if (playerIndex < 0) {
-    throw new Error(`user ${user.username} made a move in a game they weren't playing`);
+
+  // Determine playerIndex and representative player list based on mode
+  let playerIndex: number;
+  let gamePlayers: string[];
+
+  if (game.mode === "club vs club" && game.clubRosters) {
+    const [cr0, cr1] = game.clubRosters;
+    if (cr0.includes(user.userId)) {
+      playerIndex = 0;
+    } else if (cr1.includes(user.userId)) {
+      playerIndex = 1;
+    } else {
+      throw new Error(`user ${user.username} made a move in a game they weren't playing`);
+    }
+    gamePlayers = [cr0[0], cr1[0]];
+  } else {
+    playerIndex = game.players.findIndex((userId) => userId === user.userId);
+    if (playerIndex < 0) {
+      throw new Error(`user ${user.username} made a move in a game they weren't playing`);
+    }
+    gamePlayers = game.players;
   }
-  const result = gameServices[game.type].update(game.state, move, playerIndex, game.players);
+
+  const result = gameServices[game.type].update(game.state, move, playerIndex, gamePlayers);
   if (!result) throw new Error(`user ${user.username} made an invalid move in ${game.type}`);
 
   let finalState = result.state;
-  let finalViews = result.views;
+  let finalViews =
+    game.mode === "club vs club" && game.clubRosters
+      ? expandViewsForClubs(result.views, game.clubRosters)
+      : result.views;
   let finalDone = result.done;
 
   // For player vs AI battleship: auto-apply the AI's attack when it becomes the AI's turn
@@ -293,22 +387,28 @@ export async function updateGame(
   game.state = finalState;
   game.done = game.done || finalDone;
   if (finalDone) {
-    const winners = result.winners;
-    if (winners.length === 0) {
-      game.winners = [];
+    const winners = result.winners; // club/player indices: [0] or [1] or []
+
+    if (game.mode === "club vs club" && game.clubRosters) {
+      const [wr0, wr1] = game.clubRosters;
+      const winnerRosters: [string[], string[]] = [wr0, wr1];
+      game.winners = winners.length === 0 ? [] : (winnerRosters[winners[0]] ?? []);
     } else {
       game.winners = winners
         .filter((index) => index < game.players.length)
         .map((index) => game.players[index]);
     }
 
-    if (game.mode === "club vs club") {
+    if (game.mode === "club vs club" && game.clubs && game.clubRosters) {
       const clubs = game.clubs;
-      if (clubs) {
-        // Award 10 points to the winner, 2 participation points to the loser
-        for (let i = 0; i < game.players.length; i++) {
-          const points = game.winners.includes(game.players[i]) ? 10 : 2;
-          await awardPoints(game.players[i], clubs[i], points);
+      const [ar0, ar1] = game.clubRosters;
+      const awardRosters: [string[], string[]] = [ar0, ar1];
+      const winnerSet = new Set(game.winners);
+      for (let clubIdx = 0; clubIdx < 2; clubIdx++) {
+        const clubWon = awardRosters[clubIdx].some((uid) => winnerSet.has(uid));
+        for (const userId of awardRosters[clubIdx]) {
+          const points = clubWon ? 10 : 2;
+          await awardPoints(userId, clubs[clubIdx], points);
         }
       }
     }
@@ -331,7 +431,17 @@ export async function updateGame(
 export async function viewGame(gameId: string, user: UserWithId) {
   const game = await GameRepo.find(gameId);
   if (!game) throw new Error(`user ${user.username} viewed an invalid game id`);
-  const playerIndex = game.players.findIndex((userId) => userId === user.userId);
+
+  let playerIndex: number;
+  if (game.mode === "club vs club" && game.clubRosters) {
+    const [vr0, vr1] = game.clubRosters;
+    if (vr0.includes(user.userId)) playerIndex = 0;
+    else if (vr1.includes(user.userId)) playerIndex = 1;
+    else playerIndex = -1;
+  } else {
+    playerIndex = game.players.findIndex((userId) => userId === user.userId);
+  }
+
   let view: TaggedGameView | null = null;
   if (game.state) {
     view = gameServices[game.type].view(game.state, playerIndex);
@@ -340,5 +450,16 @@ export async function viewGame(gameId: string, user: UserWithId) {
     isPlayer: playerIndex >= 0,
     view,
     players: await Promise.all(game.players.map(populateSafeUserInfo)),
+  };
+}
+
+/**
+ * Build the GamePlayersInfo payload for gamePlayersUpdated socket events.
+ */
+export async function buildGamePlayersInfo(gameId: string): Promise<GamePlayersInfo> {
+  const info = await populateGameInfo(gameId);
+  return {
+    players: info.players,
+    clubRosters: info.clubRosters,
   };
 }

@@ -25,6 +25,8 @@ export interface GameInfo {
   minPlayers: number;
   /** Club names [creatorClub, opponentClub] for "club vs club" games */
   clubs?: [string, string];
+  /** Per-club player rosters for "club vs club" games: [club0members, club1members] */
+  clubRosters?: [SafeUserInfo[], SafeUserInfo[]];
 }
 
 /**
@@ -39,6 +41,17 @@ export interface GamePlayInfo {
   gameId: string;
   view: TaggedGameView | null;
   players: SafeUserInfo[];
+  /** Per-club player rosters for "club vs club" games */
+  clubRosters?: [SafeUserInfo[], SafeUserInfo[]];
+}
+
+/**
+ * Payload for the gamePlayersUpdated socket event.
+ */
+export interface GamePlayersInfo {
+  players: SafeUserInfo[];
+  /** Updated club rosters when a "club vs club" game's roster changes */
+  clubRosters?: [SafeUserInfo[], SafeUserInfo[]];
 }
 
 /*** INDIVIDUAL GAME TYPES ***/

@@ -81,6 +81,28 @@ function buildOpponentView(board: number[][], ships: [number, number][][]): numb
   );
 }
 
+/**
+ * Builds the player's own board view:
+ * - Keeps all cells visible (ships, hits, misses)
+ * - Marks cells of fully-sunk ships as 4 instead of 2
+ */
+function buildMyBoardView(board: number[][], ships: [number, number][][]): number[][] {
+  const sunkSet = new Set<string>();
+  for (const ship of ships) {
+    if (ship.every(([r, c]) => board[r][c] === 2)) {
+      for (const [r, c] of ship) {
+        sunkSet.add(`${r},${c}`);
+      }
+    }
+  }
+  return board.map((row, r) =>
+    row.map((cell, c) => {
+      if (cell === 2 && sunkSet.has(`${r},${c}`)) return 4; // sunk
+      return cell;
+    }),
+  );
+}
+
 /** Returns sizes of all fully-sunk ships for the given player's board. */
 function sunkShipSizes(board: number[][], ships: [number, number][][]): number[] {
   return ships
@@ -171,18 +193,21 @@ export const battleshipLogic: GameLogic<BattleshipState, BattleshipView> = {
         opponentBoard: state.boards[1],
         nextPlayer: state.nextPlayer,
         sunkOpponentShipSizes: [],
+        sunkMyShipSizes: [],
       };
     }
 
     const opponentIndex = 1 - playerIndex;
+    const myShips = state.ships[playerIndex] as [number, number][][];
     const opponentShips = state.ships[opponentIndex] as [number, number][][];
     return {
       finished: false,
       phase: "battle",
-      myBoard: state.boards[playerIndex],
+      myBoard: buildMyBoardView(state.boards[playerIndex], myShips),
       opponentBoard: buildOpponentView(state.boards[opponentIndex], opponentShips),
       nextPlayer: state.nextPlayer,
       sunkOpponentShipSizes: sunkShipSizes(state.boards[opponentIndex], opponentShips),
+      sunkMyShipSizes: sunkShipSizes(state.boards[playerIndex], myShips),
     };
   },
 

@@ -30,7 +30,7 @@ export const zUserUpdateRequest = z.object({
  * User display preferences persisted to the user account.
  */
 export interface UserPreferences {
-  theme: "light" | "dark";
+  theme: "light" | "dark" | "win95";
   fontSize: "small" | "medium" | "large";
   profilePictureUrl?: string;
   bannerImageUrl?: string;
@@ -45,7 +45,7 @@ export interface UserPreferences {
  */
 export interface UserPreferencesRecord {
   userId: string;
-  theme: "light" | "dark";
+  theme: "light" | "dark" | "win95";
   fontSize: "small" | "medium" | "large";
   profilePictureUrl?: string;
   bannerImageUrl?: string;

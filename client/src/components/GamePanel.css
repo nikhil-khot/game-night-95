@@ -1,6 +1,5 @@
 .gamePanel {
-  padding: 1rem;
-  padding-right: 0;
+  padding: 0.5rem;
   display: grid;
   grid-template-rows: max-content 1fr;
 }
@@ -24,5 +23,5 @@
 }
 
 .gameFrame.waiting {
-  background-color: var(--gray-background);
+  background-color: var(--panel-background);
 }

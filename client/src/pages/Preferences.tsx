@@ -6,7 +6,7 @@ import {
   type DisplayFontSize,
   type DisplayTheme,
 } from "../util/displayPreferences.ts";
-import { Button } from "@react95/core";
+import { Frame, Button, Dropdown } from "@react95/core";
 
 /** Preferences page for display settings. */
 export default function Preferences() {
@@ -47,40 +47,53 @@ export default function Preferences() {
 
   return (
     <div className="content notTooWide">
-      <h2>Preferences</h2>
-
-      <div className="spacedSection">
-        <label htmlFor="themeSelect">Theme</label>
-        <select
-          id="themeSelect"
-          value={theme}
-          onChange={(event) => setTheme(event.target.value as DisplayTheme)}
-        >
-          <option value="win95">Win95</option>
-          <option value="light">Light</option>
-          <option value="dark">Dark</option>
-        </select>
-      </div>
-
-      <div className="spacedSection">
-        <label htmlFor="fontSizeSelect">Font Size</label>
-        <select
-          id="fontSizeSelect"
-          value={fontSize}
-          onChange={(event) => setFontSize(event.target.value as DisplayFontSize)}
-        >
-          <option value="small">Small</option>
-          <option value="medium">Medium</option>
-          <option value="large">Large</option>
-        </select>
-      </div>
-
-      <div className="spacedSection">
-        <Button className="primary" onClick={() => void savePreferences()}>
-          Save Preferences
-        </Button>
-        {status && <div className="smallAndGray">{status}</div>}
-      </div>
+      <Frame bgColor="$material" boxShadow="$out" padding="$4" className="outerFrame">
+        <Frame h="100%" boxShadow="$in" className="innerFrame">
+          <div className="content">
+            <h2>Preferences</h2>
+            <div className="spacedSection">
+              <div>
+                <label htmlFor="themeSelect">Theme</label>
+                <Dropdown
+                  id="themeSelect"
+                  onChange={(e) => {
+                    setTheme(
+                      e.target.value === "Light"
+                        ? "light"
+                        : e.target.value === "Dark"
+                          ? "dark"
+                          : "win95",
+                    );
+                  }}
+                  options={["GameNite95", "Light", "Dark"]}
+                />
+              </div>
+              <div>
+                <label htmlFor="fontSizeSelect">Font Size</label>
+                <Dropdown
+                  id="fontSizeSelect"
+                  onChange={(e) => {
+                    setFontSize(
+                      e.target.value === "Small"
+                        ? "small"
+                        : e.target.value === "Medium"
+                          ? "medium"
+                          : "large",
+                    );
+                  }}
+                  options={["Small", "Medium", "Large"]}
+                />
+              </div>
+            </div>
+            <div className="spacedSection">
+              <Button className="primary" onClick={() => void savePreferences()}>
+                Save Preferences
+              </Button>
+              {status && <div className="smallAndGray">{status}</div>}
+            </div>
+          </div>
+        </Frame>
+      </Frame>
     </div>
   );
 }

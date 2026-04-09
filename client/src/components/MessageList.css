@@ -13,7 +13,7 @@ div.chatScroller {
 div.chatScroller .chatMeta {
   text-align: center;
   font-size: 0.75rem;
-  color: var(--gray-foreground);
+  color: color-mix(in srgb, var(--text-color), #808080 60%);
 }
 
 div.chatScroller .chatMoveLog {
@@ -30,12 +30,12 @@ div.chatScroller .chatMoveLog {
 
 div.chatScroller .chatSender {
   font-size: 0.75rem;
-  color: var(--gray-foreground);
+  color: color-mix(in srgb, var(--text-color), #808080 60%);
 }
 
 div.chatScroller .chatMe .chatSender {
   font-size: 0.75rem;
-  color: var(--gray-foreground);
+  color: color-mix(in srgb, var(--text-color), #808080 60%);
   text-align: right;
 }
 
@@ -70,7 +70,7 @@ div.chatScroller .chatMe .chatContent {
 
 .chatContent {
   background-color: #007bff; /* Blue for sent messages */
-  color: white;
+  color: rgb(0, 0, 0);
   padding: 0.5rem 1rem;
   border-radius: 10px;
   max-width: 70%;

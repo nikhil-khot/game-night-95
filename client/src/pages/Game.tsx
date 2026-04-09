@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import type { GameInfo } from "@gamenite/shared";
 import ChatPanel from "../components/ChatPanel.tsx";
 import GamePanel from "../components/GamePanel.tsx";
+import { Frame } from "@react95/core";
 
 export default function Game() {
   const { gameId } = useParams();
@@ -28,8 +29,32 @@ export default function Game() {
     game && (
       <>
         <div className="gameContainer">
-          <GamePanel {...game} />
-          <ChatPanel chatId={game.chat} />
+          <Frame
+            h="96%"
+            w="99%"
+            bgColor="$material"
+            boxShadow="$out"
+            padding="$4"
+            margin="1%"
+            className="outerFrame"
+          >
+            <Frame h="100%" boxShadow="$in" className="innerFrame">
+              <GamePanel {...game} />
+            </Frame>
+          </Frame>
+          <Frame
+            h="96%"
+            w="98%"
+            bgColor="$material"
+            boxShadow="$out"
+            padding="$4"
+            margin="1%"
+            className="outerFrame"
+          >
+            <Frame h="100%" boxShadow="$in" className="innerFrame">
+              <ChatPanel chatId={game.chat} />
+            </Frame>
+          </Frame>
         </div>
       </>
     )

@@ -74,7 +74,7 @@ export default function UpdateProfile() {
   };
 
   return (
-    <>
+    <div className="content">
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h2>Profile</h2>
       </div>
@@ -225,6 +225,6 @@ export default function UpdateProfile() {
           <div>No posts found...</div>
         )}
       </>
-    </>
+    </div>
   );
 }

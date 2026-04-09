@@ -41,7 +41,16 @@ export default function useNewGameForm() {
 
   const handleGameTypeChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setErr(null);
-    setGameType(e.target.value as GameType | "");
+    const type = e.target.value;
+    if (type === "Nim") {
+      setGameType("nim" as GameType | "");
+    } else if (type === "Number Guesser") {
+      setGameType("guess" as GameType | "");
+    } else if (type === "Battleship") {
+      setGameType("battleship" as GameType | "");
+    } else {
+      setGameType("" as GameType | "");
+    }
   };
 
   const handleGameModeChange = (e: ChangeEvent<HTMLSelectElement>) => {
@@ -49,7 +58,16 @@ export default function useNewGameForm() {
     setMyClub(null);
     setOpponentClub("");
     setOtherClubs([]);
-    setGameMode(e.target.value as GameMode | "");
+    const mode = e.target.value;
+    if (mode === "Player vs Player") {
+      setGameMode("player vs player" as GameMode | "");
+    } else if (mode === "Player vs AI") {
+      setGameMode("player vs ai" as GameMode | "");
+    } else if (mode === "Club vs Club") {
+      setGameMode("club vs club" as GameMode | "");
+    } else {
+      setGameMode("" as GameMode | "");
+    }
   };
 
   const handleSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
@@ -82,7 +100,7 @@ export default function useNewGameForm() {
       gameMode === "club vs club" ? opponentClub : undefined,
     );
     if ("error" in game) {
-      setErr(game.error);
+      setErr(game.error + "GameType: " + gameType + ", GameMode: " + gameMode);
       return;
     }
     navigate(`/game/${game.gameId}`);

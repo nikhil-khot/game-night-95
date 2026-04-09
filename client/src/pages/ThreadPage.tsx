@@ -6,6 +6,7 @@ import useTimeSince from "../hooks/useTimeSince.ts";
 import UserLink from "../components/UserLink.tsx";
 import useThreadScore from "../hooks/useThreadScore.ts";
 import useLoginContext from "../hooks/useLoginContext.ts";
+import { Frame } from "@react95/core";
 
 export default function ThreadPage() {
   const formatTimeSince = useTimeSince();
@@ -26,63 +27,81 @@ export default function ThreadPage() {
   return (
     <div className="content">
       {"message" in threadInfo ? (
-        threadInfo.message
+        <Frame bgColor="$material" boxShadow="$out" padding="$4" className="outerFrame">
+          <Frame h="100%" boxShadow="$in" className="innerFrame">
+            <div className="content">threadInfo.message</div>
+          </Frame>
+        </Frame>
       ) : (
-        <div className="spacedSection">
-          <div>
-            <h2>{threadInfo.title}</h2>
-            <div className="smallAndGray">
-              Posted by <UserLink user={threadInfo.createdBy} />{" "}
-              {formatTimeSince(threadInfo.createdAt)}
-            </div>
-          </div>
-          <div className="notTooWide">{threadInfo.text}</div>
-          <div className="medium">
-            <button
-              className={
-                threadInfo.upvoters.some((u) => u.username === user.username)
-                  ? "arrow up voted"
-                  : "arrow up"
-              }
-              onClick={handleUpvote}
-            >
-              ➤
-            </button>
-            {threadInfo.points} {threadInfo.points === 1 ? "point" : "points"}
-            <button
-              className={
-                threadInfo.downvoters.some((u) => u.username === user.username)
-                  ? "arrow down voted"
-                  : "arrow down"
-              }
-              onClick={handleDownvote}
-            >
-              ➤
-            </button>
-          </div>
-          <h3>Replies</h3>
-          <div className="dottedList" role="list">
-            {threadInfo.comments.map(({ commentId, text, createdBy, createdAt, editedAt }) => (
-              <div className="dottedListItem" role="listitem" key={commentId}>
+        <div className="">
+          <Frame bgColor="$material" boxShadow="$out" padding="$4" className="outerFrame">
+            <Frame h="100%" boxShadow="$in" className="innerFrame">
+              <div className="content">
                 <div>
-                  <div>{text}</div>
+                  <h2>{threadInfo.title}</h2>
                   <div className="smallAndGray">
-                    Reply by <UserLink user={createdBy} />
-                    {createdBy.username === threadInfo.createdBy.username && (
-                      <span className="opBlue"> OP</span>
-                    )}{" "}
-                    {formatTimeSince(createdAt)}
-                    {editedAt && ` (last edited ${formatTimeSince(editedAt)})`}
+                    Posted by <UserLink user={threadInfo.createdBy} />{" "}
+                    {formatTimeSince(threadInfo.createdAt)}
                   </div>
                 </div>
+                <div className="notTooWide">{threadInfo.text}</div>
+                <div className="medium">
+                  <button
+                    className={
+                      threadInfo.upvoters.some((u) => u.username === user.username)
+                        ? "arrow up voted"
+                        : "arrow up"
+                    }
+                    onClick={handleUpvote}
+                  >
+                    ➤
+                  </button>
+                  {threadInfo.points} {threadInfo.points === 1 ? "point" : "points"}
+                  <button
+                    className={
+                      threadInfo.downvoters.some((u) => u.username === user.username)
+                        ? "arrow down voted"
+                        : "arrow down"
+                    }
+                    onClick={handleDownvote}
+                  >
+                    ➤
+                  </button>
+                </div>
               </div>
-            ))}
-          </div>
-          <NewForumComment
-            firstPost={threadInfo.comments.length === 0}
-            threadId={threadInfo.threadId.toString()}
-            setThread={setThread}
-          />
+            </Frame>
+          </Frame>
+          <Frame bgColor="$material" boxShadow="$out" padding="$4" className="outerFrame">
+            <Frame h="100%" boxShadow="$in" className="innerFrame">
+              <div className="content">
+                <h3>Replies</h3>
+                <div className="dottedList" role="list">
+                  {threadInfo.comments.map(
+                    ({ commentId, text, createdBy, createdAt, editedAt }) => (
+                      <div className="dottedListItem" role="listitem" key={commentId}>
+                        <div>
+                          <div>{text}</div>
+                          <div className="smallAndGray">
+                            Reply by <UserLink user={createdBy} />
+                            {createdBy.username === threadInfo.createdBy.username && (
+                              <span className="opBlue"> OP</span>
+                            )}{" "}
+                            {formatTimeSince(createdAt)}
+                            {editedAt && ` (last edited ${formatTimeSince(editedAt)})`}
+                          </div>
+                        </div>
+                      </div>
+                    ),
+                  )}
+                </div>
+                <NewForumComment
+                  firstPost={threadInfo.comments.length === 0}
+                  threadId={threadInfo.threadId.toString()}
+                  setThread={setThread}
+                />
+              </div>
+            </Frame>
+          </Frame>
         </div>
       )}
     </div>

@@ -223,9 +223,7 @@ export default function Clubs() {
             <Tabs
               key={activeTab}
               defaultActiveTab={activeTab}
-              onChange={(
-                title: string | React.ChangeEvent<HTMLOListElement>,
-              ) => {
+              onChange={(title: string | React.ChangeEvent<HTMLOListElement>) => {
                 const nextTitle = typeof title === "string" ? title : activeTab;
                 setActiveTab(nextTitle);
                 if (nextTitle === "Club Members") {

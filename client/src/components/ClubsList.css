@@ -1,7 +1,7 @@
 .clubsList {
   display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 .noClubs {
@@ -52,7 +52,6 @@
   font-size: 0.95rem;
   line-height: 1.4;
 }
-
 
 .clubCard__memberCount {
   display: inline-block;

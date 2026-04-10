@@ -33,7 +33,7 @@
   background: var(--panel-background);
   border-radius: 0.75rem;
   border-color: var(--line-color);
-  border: 1px solid ;
+  border: 1px solid;
   box-shadow: 0 18px 45px rgba(15, 23, 42, 0.15);
   padding: 1rem 1.25rem 0.75rem;
 }

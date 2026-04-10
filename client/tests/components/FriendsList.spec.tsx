@@ -30,8 +30,20 @@ describe("FriendsList component", () => {
   const mockOnSelect = vi.fn();
 
   const mockFriends = [
-    { userId: "id1", username: "friend1", display: "Friend One", createdAt: new Date() },
-    { userId: "id2", username: "friend2", display: "Friend Two", createdAt: new Date() },
+    {
+      userId: "id1",
+      username: "friend1",
+      display: "Friend One",
+      createdAt: new Date(),
+      bio: "",
+    },
+    {
+      userId: "id2",
+      username: "friend2",
+      display: "Friend Two",
+      createdAt: new Date(),
+      bio: "",
+    },
   ];
 
   beforeEach(() => {

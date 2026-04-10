@@ -1,12 +1,18 @@
 .main {
   display: grid;
-  grid-template-rows: 3rem 1fr;
-  grid-template-columns: 200px 1fr;
-  grid-template-areas: "header header" "sidebar main";
-  min-height: 100vh;
-  --content-vh: calc(100vh - 3rem);
+  grid-template-rows: 3rem 1fr auto;
+  grid-template-columns: 260px 1fr;
+  grid-template-areas:
+    "header header"
+    "sidebar main"
+    "status status";
+  height: 100vh;
+  --status-height: 2.25rem;
+  --content-vh: calc(100vh - 3rem - var(--status-height));
 }
 
 .right_main {
   grid-area: main;
+  height: var(--content-vh);
+  overflow-y: auto;
 }

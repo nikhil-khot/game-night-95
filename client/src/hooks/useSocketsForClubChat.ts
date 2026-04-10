@@ -80,7 +80,8 @@ export default function useSocketsForClubChat(clubName: string) {
       socket.off("clubChatUserJoined", handleUserJoined);
       socket.off("clubChatUserLeft", handleUserLeft);
       socket.off("clubChatJoined", handleChatJoined);
-      socket.emit("clubChatLeave", { auth, payload: clubName });
+      // Intentionally do not emit "clubChatLeave" here so the socket
+      // remains subscribed for global notifications (e.g., sidebar badge).
     };
   }, [socket, auth, clubName, user, expectedChatId]);
 

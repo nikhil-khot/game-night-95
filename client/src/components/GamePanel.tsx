@@ -2,6 +2,11 @@ import "./GamePanel.css";
 import type { GameInfo, SafeUserInfo } from "@gamenite/shared";
 import { gameNames } from "../util/consts.ts";
 import useLoginContext from "../hooks/useLoginContext.ts";
+import useAuth from "../hooks/useAuth.ts";
+import { useEffect, useState } from "react";
+import type { AxiosError } from "axios";
+import { inviteFriendToGame } from "../services/inviteService.ts";
+import { useFriendList } from "../hooks/useFriendList.ts";
 import GameDispatch from "../games/GameDispatch.tsx";
 import useSocketsForGame from "../hooks/useSocketsForGame.ts";
 import useTimeSince from "../hooks/useTimeSince.ts";
@@ -21,14 +26,19 @@ export default function GamePanel({
   createdAt,
   minPlayers,
 }: GameInfo) {
-  const { user } = useLoginContext();
+  const { user, socket } = useLoginContext();
+  const auth = useAuth();
   const timeSince = useTimeSince();
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [inviteStatus, setInviteStatus] = useState<string | null>(null);
+  const [inviteSearch, setInviteSearch] = useState("");
+  const [onlineStatus, setOnlineStatus] = useState<Record<string, boolean>>({});
+  const friends = useFriendList(user.username);
 
   const { view, players, clubRosters, userPlayerIndex, hasWatched, joinGame, startGame, addAI } =
     useSocketsForGame(gameId, initialPlayers);
 
   // Effective rosters: use live state if available, fall back to initial prop
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const effectiveClubRosters: [SafeUserInfo[], SafeUserInfo[]] | undefined =
     clubRosters ?? initialClubRosters;
 
@@ -41,6 +51,31 @@ export default function GamePanel({
     effectiveClubRosters !== undefined &&
     effectiveClubRosters[0].length >= 1 &&
     effectiveClubRosters[1].length >= 1;
+
+  // Track online/offline status for friends when the invite dialog is open
+  useEffect(() => {
+    if (!inviteOpen) return;
+    if ("message" in friends) return;
+
+    const handleStatus = ({ userId, isOnline }: { userId: string; isOnline: boolean }) => {
+      setOnlineStatus((prev) => {
+        if (prev[userId] === isOnline) return prev;
+        return { ...prev, [userId]: isOnline };
+      });
+    };
+
+    socket.on("userStatusUpdated", handleStatus);
+
+    // Ask for the current presence of each friend
+    const friendList = friends;
+    friendList.forEach((f) => {
+      socket.emit("userPresenceQuery", { auth, payload: f.userId });
+    });
+
+    return () => {
+      socket.off("userStatusUpdated", handleStatus);
+    };
+  }, [inviteOpen, friends, socket, auth]);
 
   function renderClubRoster(clubName: string, members: SafeUserInfo[]) {
     return (
@@ -101,22 +136,33 @@ export default function GamePanel({
             </div>
           )}
 
-        {/* Controls for players who have joined but game hasn't started */}
+        {/* Controls (invite / AI / start) for players who have joined but the game hasn't started */}
         {userPlayerIndex >= 0 && !hasStarted && (
           <div className="buttonContainer">
-            {mode === "player vs ai" && (
-              <>
-                <Button className="primary" onClick={() => addAI("easy")}>
-                  Add Easy AI
+            <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+              {mode === "player vs player" && (
+                <Button
+                  className="primary"
+                  disabled={players.length >= 4}
+                  onClick={() => setInviteOpen(true)}
+                >
+                  Invite Friend
                 </Button>
-                <Button className="primary" onClick={() => addAI("medium")}>
-                  Add Medium AI
-                </Button>
-                <Button className="primary" onClick={() => addAI("hard")}>
-                  Add Hard AI
-                </Button>
-              </>
-            )}
+              )}
+              {mode === "player vs ai" && (
+                <>
+                  <Button className="primary" onClick={() => addAI("easy")}>
+                    Add Easy AI
+                  </Button>
+                  <button className="primary" onClick={() => addAI("medium")}>
+                    Add Medium AI
+                  </Button>
+                  <Button className="primary" onClick={() => addAI("hard")}>
+                    Add Hard AI
+                  </Button>
+                </>
+              )}
+            </div>
             {isClubVsClub
               ? clubVsClubReady && (
                   <Button className="primary" onClick={startGame}>
@@ -128,6 +174,111 @@ export default function GamePanel({
                     Start Game
                   </Button>
                 )}
+          </div>
+        )}
+        {inviteOpen && (
+          <div className="inviteDialog">
+            <div className="inviteDialogCard">
+              <div className="inviteDialogHeader">
+                <div className="inviteDialogTitle">Invite a Friend</div>
+                <button
+                  type="button"
+                  className="inviteCloseButton"
+                  onClick={() => setInviteOpen(false)}
+                  aria-label="Close invite dialog"
+                >
+                  ×
+                </button>
+              </div>
+              <div className="inviteSearch">
+                <input
+                  type="text"
+                  className="inviteSearchInput"
+                  placeholder="Search by username..."
+                  value={inviteSearch}
+                  onChange={(e) => setInviteSearch(e.target.value)}
+                />
+              </div>
+              {"message" in friends ? (
+                <div>{friends.message}</div>
+              ) : (
+                <ul className="inviteList">
+                  {friends
+                    .filter((f) =>
+                      (f.username + ("display" in f && f.display ? f.display : ""))
+                        .toLowerCase()
+                        .includes(inviteSearch.toLowerCase()),
+                    )
+                    .map((f) => {
+                      const initials = f.username.slice(0, 2).toUpperCase();
+                      const isInThisGame = players.some((p) => p.userId === f.userId);
+                      const presence = onlineStatus[f.userId];
+                      let statusLabel: string;
+                      if (isInThisGame) {
+                        statusLabel = "In this game";
+                      } else if (presence === true) {
+                        statusLabel = "Online";
+                      } else if (presence === false) {
+                        statusLabel = "Offline";
+                      } else {
+                        statusLabel = "Friend";
+                      }
+                      return (
+                        <li key={f.userId} className="inviteListItem">
+                          <div className="inviteFriendMeta">
+                            <div className="inviteAvatar">{initials}</div>
+                            <div>
+                              <div className="inviteFriendName">{f.username}</div>
+                              <div className="inviteFriendSub">
+                                {(presence === true || presence === false) && (
+                                  <span
+                                    className={
+                                      "invitePresenceDot" + (presence ? " online" : " offline")
+                                    }
+                                  />
+                                )}
+                                <span>{statusLabel}</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="inviteActions">
+                            <button
+                              className="primary narrow"
+                              type="button"
+                              onClick={async () => {
+                                if (inviteStatus === "sent:" + f.userId) return;
+                                setInviteStatus(f.userId);
+                                try {
+                                  await inviteFriendToGame(auth, gameId, f.userId);
+                                  setInviteStatus("sent:" + f.userId);
+                                } catch (err) {
+                                  const axiosErr = err as AxiosError<{ error?: string }>;
+                                  const message =
+                                    axiosErr.response?.data?.error ?? "Failed to invite";
+                                  setInviteStatus("fail:" + f.userId + ":" + message);
+                                }
+                              }}
+                            >
+                              {inviteStatus === "sent:" + f.userId ? "Invited" : "Invite"}
+                            </button>
+                            <div
+                              className={
+                                "inviteStatusText" +
+                                (inviteStatus?.startsWith("fail:" + f.userId + ":") ? " error" : "")
+                              }
+                            >
+                              {inviteStatus === f.userId && "Inviting..."}
+                              {inviteStatus === "sent:" + f.userId && "Invitation sent"}
+                              {inviteStatus?.startsWith("fail:" + f.userId + ":") &&
+                                inviteStatus.split(":").slice(2).join(":")}
+                            </div>
+                          </div>
+                        </li>
+                      );
+                    })}
+                </ul>
+              )}
+            </div>
           </div>
         )}
       </div>

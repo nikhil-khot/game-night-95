@@ -6,6 +6,7 @@ import { z } from "zod";
 import * as http from "node:http";
 import * as chat from "./controllers/chat.controller.ts";
 import * as game from "./controllers/game.controller.ts";
+import * as invite from "./controllers/invite.controller.ts";
 import * as user from "./controllers/user.controller.ts";
 import * as thread from "./controllers/thread.controller.ts";
 import * as friend from "./controllers/friend.controller.ts";
@@ -35,6 +36,10 @@ app.use(
         .Router() //
         .post("/create", game.postCreate)
         .get("/list", game.getList)
+        .post("/invite", invite.postInvite)
+        .post("/invite/cancel", invite.postCancelInvite)
+        .post("/invite/decline", invite.postDeclineInvite)
+        .get("/invited", invite.getInvited)
         .get("/:id", game.getById),
     )
     .use(

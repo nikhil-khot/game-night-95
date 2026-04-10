@@ -124,7 +124,6 @@ export const socketJoinAsPlayer: SocketAPI = (socket, io) => async (body) => {
 
     // Let everyone know the user joined (`io` instead of `socket` includes
     // the joiner)
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     io.to(gameId).emit("gamePlayersUpdated", await buildGamePlayersInfo(gameId));
 
     // This socket should receive user-specific updates for this game, if it

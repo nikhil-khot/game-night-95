@@ -4,14 +4,42 @@ import { useNavigate } from "react-router-dom";
 import useGameList from "../hooks/useGameList.ts";
 import GameSummaryView from "../components/GameSummaryView.tsx";
 import { Button, Frame } from "@react95/core";
+import useAuth from "../hooks/useAuth.ts";
+import { useEffect, useState } from "react";
+import type { GameInfo } from "@gamenite/shared";
+import { getInvitedGames } from "../services/inviteService.ts";
 
 export default function Home() {
   const { threadOrMessage, setThreadInList } = useThreadList(4);
   const gameList = useGameList(4);
   const navigate = useNavigate();
+  const auth = useAuth();
+  const [invitedGames, setInvitedGames] = useState<GameInfo[] | null>(null);
+  useEffect(() => {
+    (async () => {
+      const games = await getInvitedGames(auth);
+      setInvitedGames(games);
+    })();
+  }, [auth]);
 
   return (
     <div className="content">
+      {invitedGames && invitedGames.length > 0 && (
+        <Frame bgColor="$material" boxShadow="$out" padding="$4" className="outerFrame">
+          <Frame h="100%" boxShadow="$in" className="innerFrame">
+            <div className="content">
+              <div className="spacedSection">
+                <h2>Invited Games</h2>
+                <div id="invitedGameList" className="dottedList">
+                  {invitedGames.map((game) => (
+                    <GameSummaryView {...game} key={game.gameId.toString()} />
+                  ))}
+                </div>
+              </div>
+            </div>
+          </Frame>
+        </Frame>
+      )}
       <Frame bgColor="$material" boxShadow="$out" padding="$4" className="outerFrame">
         <Frame h="100%" boxShadow="$in" className="innerFrame">
           <div className="content">

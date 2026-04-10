@@ -55,6 +55,7 @@ export async function createUser(
     username,
     createdAt,
     display: username,
+    bio: "",
   };
 }
 
@@ -94,7 +95,7 @@ export async function updateUser(
   if (password !== undefined) await updateAuth(username, password, user.userId);
   const newUser = await UserRepo.get(user.userId);
   if (display !== undefined) newUser.display = display;
-   if (bio !== undefined) newUser.bio = bio;
+  if (bio !== undefined) newUser.bio = bio;
   await UserRepo.set(user.userId, newUser);
   return populateSafeUserInfo(user.userId);
 }

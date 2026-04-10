@@ -32,7 +32,7 @@ export const zUserUpdateRequest = z.object({
  * User display preferences persisted to the user account.
  */
 export interface UserPreferences {
-  theme: "light" | "dark" | "win95";
+  theme: "light" | "dark";
   fontSize: "small" | "medium" | "large";
   profilePictureUrl?: string;
   bannerImageUrl?: string;
@@ -47,7 +47,7 @@ export interface UserPreferences {
  */
 export interface UserPreferencesRecord {
   userId: string;
-  theme: "light" | "dark" | "win95";
+  theme: "light" | "dark";
   fontSize: "small" | "medium" | "large";
   profilePictureUrl?: string;
   bannerImageUrl?: string;
@@ -59,7 +59,7 @@ export interface UserPreferencesRecord {
  */
 export type UserPreferencesUpdateRequest = z.infer<typeof zUserPreferencesUpdateRequest>;
 export const zUserPreferencesUpdateRequest = z.object({
-  theme: z.enum(["win95", "light", "dark"]).optional(),
+  theme: z.enum(["light", "dark"]).optional(),
   fontSize: z.enum(["small", "medium", "large"]).optional(),
   profilePictureUrl: z.string().optional(),
   bannerImageUrl: z.string().optional(),

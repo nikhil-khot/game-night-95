@@ -1,4 +1,4 @@
-export type DisplayTheme = "win95" | "light" | "dark";
+export type DisplayTheme = "light" | "dark";
 export type DisplayFontSize = "small" | "medium" | "large";
 
 /** Apply current display preferences to the root document. */

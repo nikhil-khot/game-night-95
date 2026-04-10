@@ -1,16 +1,4 @@
 /* Styles used across the site */
-
-:root[data-theme="win95"] {
-  --header-color: #000e7a;
-  --sidebar-color: #c2c7ca;
-  --page-background: #008080;
-  --panel-background: #ffffff;
-  --muted-foreground: #555;
-  --text-color: #000000;
-  --line-color: #000;
-  --arrow-color: rgba(157, 157, 157);
-}
-
 :root[data-theme="dark"] {
   --header-color: #000e7a;
   --sidebar-color: #c2c7ca;

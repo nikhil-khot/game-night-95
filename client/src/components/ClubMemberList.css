@@ -34,6 +34,38 @@
   font-weight: 600;
 }
 
+.memberAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #d9d9d9;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.memberStatusDot {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #4caf50; /* default to online-style green */
+  border: 2px solid #ffffff;
+}
+
+.memberText {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.memberStatusMessage {
+  font-size: 0.85rem;
+  color: var(--text-muted, #666);
+  font-style: italic;
+}
+
 .memberRole {
   padding: 0.25rem 0.6rem;
   font-size: 0.75rem;

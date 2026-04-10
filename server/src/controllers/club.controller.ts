@@ -6,6 +6,7 @@ import {
   zDeleteClubPayload,
   zRemoveClubMemberPayload,
   zSetClubMemberRolePayload,
+  zSetClubMemberStatusPayload,
 } from "@gamenite/shared";
 import type { ClubRecord } from "../models.ts";
 import type { ClubMemberInfo, ClubInfo } from "@gamenite/shared";
@@ -18,6 +19,7 @@ import {
   listClubs,
   removeMember,
   setMemberRole,
+  setMemberStatus,
 } from "../services/club.service.ts";
 import { type RestAPI } from "../types.ts";
 import { checkAuth } from "../services/auth.service.ts";
@@ -215,6 +217,39 @@ export const postSetMemberRole: RestAPI = async (req, res) => {
 };
 
 /**
+ * Sets the authenticated member's status message within a club.
+ *
+ * @param req The request containing auth, clubName, and statusMessage in the body.
+ * @param res The response, either returning the updated ClubInfo or an error.
+ */
+export const postSetMemberStatus: RestAPI = async (req, res) => {
+  const body = withAuth(zSetClubMemberStatusPayload).safeParse(req.body);
+  if (!body.success) {
+    res.status(400).send({ error: "Poorly-formed request" });
+    return;
+  }
+
+  const user = await checkAuth(body.data.auth);
+  if (!user) {
+    res.status(403).send({ error: "Invalid credentials" });
+    return;
+  }
+
+  const result = await setMemberStatus(
+    user.username,
+    body.data.payload.clubName,
+    body.data.payload.statusMessage,
+  );
+  if ("error" in result) {
+    res.send(result);
+    return;
+  }
+
+  const clubInfo = await populateClubInfo(result);
+  res.send(clubInfo);
+};
+
+/**
  * Gets information about a specific club by name.
  *
  * @param req The request containing the club name as a parameter.
@@ -271,6 +306,7 @@ async function populateClubInfo(club: ClubRecord): Promise<ClubInfo> {
         role: member.role,
         points: member.points,
         joinedAt: member.joinedAt,
+        statusMessage: member.statusMessage,
       };
     }),
   );

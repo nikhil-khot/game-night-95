@@ -1,3 +1,4 @@
+import type React from "react";
 import { useState, useEffect, useCallback } from "react";
 import useAuth from "../hooks/useAuth.ts";
 import { createClub, listClubs } from "../services/clubService.ts";
@@ -8,6 +9,7 @@ import "./Clubs.css";
 import ClubMemberList from "../components/ClubMemberList.tsx";
 import ClubChatSection from "../components/ClubChatSection.tsx";
 import ClubLeaderboard from "../components/ClubLeaderboard.tsx";
+import YourStatus from "../components/YourStatus.tsx";
 
 /**
  * Component to manage clubs: create new clubs and view all clubs
@@ -23,6 +25,7 @@ export default function Clubs() {
   const [clubName, setClubName] = useState("");
   const [clubDescription, setClubDescription] = useState("");
   const [creatingClub, setCreatingClub] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>("Club Information");
 
   const loadClubs = useCallback(async () => {
     setLoading(true);
@@ -43,6 +46,23 @@ export default function Clubs() {
       }
     }
     setLoading(false);
+  }, [auth]);
+
+  // Refresh clubs without showing the global loading state (used when switching tabs)
+  const refreshClubsSilently = useCallback(async () => {
+    const result = await listClubs();
+    if ("error" in result) {
+      setError(result.error);
+      setClubs([]);
+    } else {
+      setClubs(result as unknown as ClubInfo[]);
+      if (auth) {
+        const userClub = (result as unknown as ClubInfo[]).find((club) =>
+          club.members.some((m) => m.username === auth.username),
+        );
+        setCurrentUserClub(userClub || null);
+      }
+    }
   }, [auth]);
 
   // Load clubs on mount
@@ -200,7 +220,19 @@ export default function Clubs() {
         </Frame>
         <div>
           {currentUserClub && (
-            <Tabs>
+            <Tabs
+              key={activeTab}
+              defaultActiveTab={activeTab}
+              onChange={(
+                title: string | React.ChangeEvent<HTMLOListElement>,
+              ) => {
+                const nextTitle = typeof title === "string" ? title : activeTab;
+                setActiveTab(nextTitle);
+                if (nextTitle === "Club Members") {
+                  void refreshClubsSilently();
+                }
+              }}
+            >
               <Tab title="Club Information" className="tab">
                 <Frame
                   h="100%"
@@ -216,6 +248,7 @@ export default function Clubs() {
                       onClubJoined={loadClubs}
                       onClubUpdated={loadClubs}
                     />
+                    <YourStatus club={currentUserClub} onStatusUpdated={loadClubs} />
                   </div>
                 </Frame>
               </Tab>

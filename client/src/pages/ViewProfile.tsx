@@ -160,8 +160,27 @@ export default function ViewProfile({ username: profileUsername }: ViewProfilePr
                         </div>
                         <ul>
                           <p>Username: {componentState.user.username}</p>
-                          <p>Account created {timeSince(componentState.user.createdAt)}</p>
                         </ul>
+                      </div>
+
+                      <div>
+                        <hr style={{ margin: 0 }} />
+                        <h3 style={{ marginBottom: "0.3rem" }}>Bio</h3>
+                        <Frame
+                          bgColor="$material"
+                          boxShadow="$out"
+                          padding="$4"
+                          style={{ maxWidth: "40rem" }}
+                        >
+                          <p style={{ margin: 0 }}>
+                            {componentState.user.bio && componentState.user.bio.trim() !== ""
+                              ? componentState.user.bio
+                              : "This user hasn't added a bio yet."}
+                          </p>
+                        </Frame>
+                        <div className="smallAndGray" style={{ marginTop: "0.5rem" }}>
+                          joined {timeSince(componentState.user.createdAt)}
+                        </div>
                       </div>
 
                       <div>

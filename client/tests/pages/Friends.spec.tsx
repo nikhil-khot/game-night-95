@@ -117,7 +117,13 @@ describe("Friends page", () => {
 
   it("passes friends data to FriendsList component", () => {
     const mockFriends = [
-      { userId: "id1", username: "friend1", display: "Friend One", createdAt: new Date() },
+      {
+        userId: "id1",
+        username: "friend1",
+        display: "Friend One",
+        createdAt: new Date(),
+        bio: "",
+      },
     ];
     mockUseFriendList.mockReturnValue(mockFriends);
     mockUsePendingRequests.mockReturnValue({ message: "No pending requests..." });
@@ -129,7 +135,13 @@ describe("Friends page", () => {
 
   it("passes pending requests data to PendingRequests component", () => {
     const mockRequests = [
-      { userId: "id2", username: "requester1", display: "Requester One", createdAt: new Date() },
+      {
+        userId: "id2",
+        username: "requester1",
+        display: "Requester One",
+        createdAt: new Date(),
+        bio: "",
+      },
     ];
     mockUseFriendList.mockReturnValue({ message: "No friends yet..." });
     mockUsePendingRequests.mockReturnValue(mockRequests);
@@ -141,8 +153,20 @@ describe("Friends page", () => {
 
   it("shows friend count in section header", () => {
     const mockFriends = [
-      { userId: "id3", username: "friend1", display: "Friend One", createdAt: new Date() },
-      { userId: "id4", username: "friend2", display: "Friend Two", createdAt: new Date() },
+      {
+        userId: "id3",
+        username: "friend1",
+        display: "Friend One",
+        createdAt: new Date(),
+        bio: "",
+      },
+      {
+        userId: "id4",
+        username: "friend2",
+        display: "Friend Two",
+        createdAt: new Date(),
+        bio: "",
+      },
     ];
     mockUseFriendList.mockReturnValue(mockFriends);
     mockUsePendingRequests.mockReturnValue({ message: "No pending requests..." });
@@ -154,9 +178,27 @@ describe("Friends page", () => {
 
   it("shows pending request count in section header", () => {
     const mockRequests = [
-      { userId: "id5", username: "requester1", display: "Requester One", createdAt: new Date() },
-      { userId: "id6", username: "requester2", display: "Requester Two", createdAt: new Date() },
-      { userId: "id7", username: "requester3", display: "Requester Three", createdAt: new Date() },
+      {
+        userId: "id5",
+        username: "requester1",
+        display: "Requester One",
+        createdAt: new Date(),
+        bio: "",
+      },
+      {
+        userId: "id6",
+        username: "requester2",
+        display: "Requester Two",
+        createdAt: new Date(),
+        bio: "",
+      },
+      {
+        userId: "id7",
+        username: "requester3",
+        display: "Requester Three",
+        createdAt: new Date(),
+        bio: "",
+      },
     ];
     mockUseFriendList.mockReturnValue({ message: "No friends yet..." });
     mockUsePendingRequests.mockReturnValue(mockRequests);
@@ -198,7 +240,13 @@ describe("Friends page", () => {
 
   it("opens a private chat when a friend is selected", async () => {
     const mockFriends = [
-      { userId: "id8", username: "friend1", display: "Friend One", createdAt: new Date() },
+      {
+        userId: "id8",
+        username: "friend1",
+        display: "Friend One",
+        createdAt: new Date(),
+        bio: "",
+      },
     ];
     mockUseFriendList.mockReturnValue(mockFriends);
     mockUsePendingRequests.mockReturnValue({ message: "No pending requests..." });
@@ -219,7 +267,13 @@ describe("Friends page", () => {
 
   it("shows friend chat errors", async () => {
     const mockFriends = [
-      { userId: "id9", username: "friend1", display: "Friend One", createdAt: new Date() },
+      {
+        userId: "id9",
+        username: "friend1",
+        display: "Friend One",
+        createdAt: new Date(),
+        bio: "",
+      },
     ];
     mockUseFriendList.mockReturnValue(mockFriends);
     mockUsePendingRequests.mockReturnValue({ message: "No pending requests..." });

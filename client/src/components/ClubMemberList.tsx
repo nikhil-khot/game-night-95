@@ -70,7 +70,17 @@ export default function ClubMemberList({ club, onClubJoined, onClubUpdated }: Cl
           {club.members.map((member) => (
             <div key={member.userId} className="memberItem">
               <div className="memberInfo">
-                <span className="memberName">{member.username}</span>
+                <div className="memberAvatar">
+                  <span className="memberStatusDot" />
+                </div>
+                <div className="memberText">
+                  <span className="memberName">{member.username}</span>
+                  <span className="memberStatusMessage">
+                    {member.statusMessage && member.statusMessage.trim() !== ""
+                      ? `"${member.statusMessage}"`
+                      : '"No status set"'}
+                  </span>
+                </div>
                 <span className={`memberRole memberRole--${member.role}`}>{member.role}</span>
               </div>
               {canModerate(userRole?.role) &&

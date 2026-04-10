@@ -15,6 +15,7 @@ import type { UserUpdateRequest } from "@gamenite/shared";
 export default function useEditProfileForm() {
   const { user, reset } = useLoginContext();
   const [display, setDisplay] = useState(user.display);
+  const [bio, setBio] = useState(user.bio ?? "");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [profilePictureUrl, setProfilePictureUrl] = useState("");
@@ -33,6 +34,7 @@ export default function useEditProfileForm() {
 
     if (
       user.display === display &&
+      user.bio === bio &&
       password === confirm &&
       password === "" &&
       !hasProfilePictureUpdate &&
@@ -49,6 +51,11 @@ export default function useEditProfileForm() {
 
     if (display.trim() === "") {
       setErr("Please enter a display name");
+      return;
+    }
+
+    if (bio.length > 500) {
+      setErr("Bio must be 500 characters or fewer");
       return;
     }
 
@@ -84,6 +91,7 @@ export default function useEditProfileForm() {
 
     const updates: UserUpdateRequest = {};
     if (display !== user.display) updates.display = display;
+    if (bio !== user.bio) updates.bio = bio;
     if (password !== "") updates.password = password;
 
     if (Object.keys(updates).length > 0) {
@@ -101,6 +109,8 @@ export default function useEditProfileForm() {
   return {
     display,
     setDisplay,
+    bio,
+    setBio,
     password,
     setPassword,
     confirm,

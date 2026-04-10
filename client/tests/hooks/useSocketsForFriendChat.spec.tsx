@@ -34,7 +34,13 @@ function createWrapper(mockSocket: GameSocket) {
     return (
       <LoginContext
         value={{
-          user: { userId: "id1", username: "user1", display: "User One", createdAt: new Date() },
+          user: {
+            userId: "id1",
+            username: "user1",
+            display: "User One",
+            createdAt: new Date(),
+            bio: "",
+          },
           pass: "pwd1111",
           socket: mockSocket,
           reset: vi.fn(),
@@ -92,6 +98,7 @@ describe("useSocketsForFriendChat", () => {
               username: "user1",
               display: "User One",
               createdAt: new Date(),
+              bio: "",
             },
             createdAt: new Date(),
           },
@@ -113,6 +120,7 @@ describe("useSocketsForFriendChat", () => {
             username: "user1",
             display: "User One",
             createdAt: new Date(),
+            bio: "",
           },
           createdAt: new Date(),
         },
@@ -151,6 +159,7 @@ describe("useSocketsForFriendChat", () => {
             username: "user2",
             display: "User Two",
             createdAt: new Date(),
+            bio: "",
           },
           createdAt: new Date(),
         },

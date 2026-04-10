@@ -12,6 +12,7 @@ export interface SafeUserInfo {
   username: string;
   display: string;
   createdAt: Date;
+  bio: string;
   // Removed isOnline and isActive as they are managed in real-time
 }
 
@@ -24,6 +25,7 @@ export type UserUpdateRequest = z.infer<typeof zUserUpdateRequest>;
 export const zUserUpdateRequest = z.object({
   password: z.string().optional(),
   display: z.string().optional(),
+  bio: z.string().max(500).optional(),
 });
 
 /**

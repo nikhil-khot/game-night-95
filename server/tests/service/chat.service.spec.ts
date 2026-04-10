@@ -6,6 +6,7 @@ import {
   addMoveLogToChat,
   createChat,
   forceChatById,
+  getOrCreateChatById,
   getMoveLog,
 } from "../../src/services/chat.service.ts";
 import { createMessage } from "../../src/services/message.service.ts";
@@ -74,5 +75,13 @@ describe("chat.service", () => {
     await expect(addMoveLogToChat(randomUUID().toString(), "x", user1, new Date())).rejects.toThrow(
       "invalid chat id",
     );
+  });
+
+  it("creates a chat when getOrCreateChatById is called for a missing id", async () => {
+    const newChatId = randomUUID().toString();
+
+    const chat = await getOrCreateChatById(newChatId);
+
+    expect(chat).toMatchObject({ chatId: newChatId, messages: [], moveLog: [] });
   });
 });

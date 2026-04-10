@@ -37,7 +37,7 @@ test.describe("The game of Number Guesser", () => {
 
     await expect(page1.getByText("Game over!")).toBeVisible();
     await expect(page2.getByText("Game over!")).toBeVisible();
-    expect(await page1.locator('svg[viewBox="0 -0.5 16 16"]').count()).toBe(2);
-    expect(await page2.locator('svg[viewBox="0 -0.5 16 16"]').count()).toBe(2);
+    expect(await page1.locator('svg[viewBox="0 -0.5 16 16"]').count()).toBe(8);
+    expect(await page2.locator('svg[viewBox="0 -0.5 16 16"]').count()).toBe(8);
   });
 });

@@ -135,6 +135,25 @@ export const setMemberRole = async (
 };
 
 /**
+ * Sets the authenticated member's status message within a club.
+ */
+export const setMemberStatus = async (
+  auth: UserAuth,
+  clubName: string,
+  statusMessage: string,
+): APIResponse<ClubInfo> => {
+  try {
+    const res = await api.post<ClubInfo | ErrorMsg>(`${CLUB_API_URL}/set-status`, {
+      auth,
+      payload: { clubName, statusMessage },
+    });
+    return res.data;
+  } catch (error) {
+    return exceptionToErrorMsg(error);
+  }
+};
+
+/**
  * Gets information about a specific club by name
  *
  * @param clubName - The name of the club

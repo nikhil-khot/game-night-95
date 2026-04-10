@@ -10,7 +10,7 @@ import ThreadSummaryView from "../components/ThreadSummaryView";
 import useGameList from "../hooks/useGameList";
 import { generateStatsFromGames, sortLeaderboardEntries } from "../util/leaderboardProcessing";
 import UserLeaderboardView from "../components/UserLeaderboardView";
-import { Button, Frame, Input } from "@react95/core";
+import { Button, Frame, Input, TextArea } from "@react95/core";
 
 export default function UpdateProfile() {
   const { user } = useLoginContext();
@@ -22,6 +22,8 @@ export default function UpdateProfile() {
   const {
     display,
     setDisplay,
+    bio,
+    setBio,
     password,
     setPassword,
     confirm,
@@ -175,6 +177,19 @@ export default function UpdateProfile() {
                   >
                     Reset
                   </Button>
+                </div>
+              </div>
+              <div className="spacedSection">
+                <h3>Bio</h3>
+                <div className="tightSection">
+                  <div className="smallAndGray">Tell others a bit about yourself</div>
+                  <TextArea
+                    className="notTooWide"
+                    style={{ minHeight: "6rem", minWidth: "40rem" }}
+                    value={bio}
+                    onChange={(e) => setBio(e.target.value)}
+                  ></TextArea>
+                  <div className="smallAndGray">Max 500 characters.</div>
                 </div>
               </div>
               <div className="spacedSection">

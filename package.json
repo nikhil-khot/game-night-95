@@ -36,5 +36,9 @@
         "statements": 80
       }
     }
+  },
+  "dependencies": {
+    "@react95/core": "^9.7.1",
+    "@react95/icons": "^2.4.0"
   }
 }

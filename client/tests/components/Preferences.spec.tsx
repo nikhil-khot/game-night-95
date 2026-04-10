@@ -42,8 +42,8 @@ describe("Preferences page", () => {
     expect(mockedGetUserPreferences).toHaveBeenCalledExactlyOnceWith("user1");
 
     await waitFor(() => {
-      expect(screen.getByLabelText(/Theme/i)).toHaveProperty("value", "dark");
-      expect(screen.getByLabelText(/Font Size/i)).toHaveProperty("value", "large");
+      expect(screen.getByLabelText(/Theme/i)).toHaveProperty("value", "Dark");
+      expect(screen.getByLabelText(/Font Size/i)).toHaveProperty("value", "Large");
     });
 
     expect(mockedApplyDisplayPreferences).toHaveBeenCalledWith("dark", "large");
@@ -59,8 +59,8 @@ describe("Preferences page", () => {
 
     render(<Preferences />);
 
-    fireEvent.change(screen.getByLabelText(/Theme/i), { target: { value: "dark" } });
-    fireEvent.change(screen.getByLabelText(/Font Size/i), { target: { value: "small" } });
+    fireEvent.change(screen.getByLabelText(/Theme/i), { target: { value: "Dark" } });
+    fireEvent.change(screen.getByLabelText(/Font Size/i), { target: { value: "Small" } });
     fireEvent.click(screen.getByText(/Save Preferences/i));
 
     await waitFor(() => {

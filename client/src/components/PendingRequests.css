@@ -17,8 +17,7 @@
   align-items: center;
   padding: 0.75rem;
   border-radius: 4px;
-  background-color: var(--bg-tertiary, #fff);
-  border: 1px solid var(--border-color, #ddd);
+  border: 1px solid var(--line-color, #ddd);
 }
 
 .requesterInfo {
@@ -35,7 +34,6 @@
   background-color: #4caf50;
   color: white;
   border: none;
-  border-radius: 4px;
   cursor: pointer;
   font-size: 0.9rem;
   transition: background-color 0.2s;
@@ -50,7 +48,6 @@
   background-color: #f44336;
   color: white;
   border: none;
-  border-radius: 4px;
   cursor: pointer;
   font-size: 0.9rem;
   transition: background-color 0.2s;

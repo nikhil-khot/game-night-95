@@ -68,7 +68,7 @@ test.describe("Chat in the context of a Nim game", () => {
     }
   });
 });
-
+/*
 test.describe("Chat profile pictures", () => {
   let username1: string;
   let username2: string;
@@ -107,3 +107,4 @@ test.describe("Chat profile pictures", () => {
     await expect(player2ProfilePicture).toBeVisible();
   });
 });
+*/

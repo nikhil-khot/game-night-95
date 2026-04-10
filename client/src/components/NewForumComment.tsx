@@ -1,6 +1,7 @@
 import "./NewForumComment.css";
 import type { ThreadInfo } from "@gamenite/shared";
 import useNewCommentForm from "../hooks/useNewCommentForm.ts";
+import { Button, TextArea } from "@react95/core";
 
 interface NewForumCommentProps {
   threadId: string;
@@ -20,7 +21,7 @@ export default function NewForumComment({ threadId, firstPost, setThread }: NewF
 
   return (
     <form className="newForumComment" onSubmit={handleSubmit}>
-      <textarea
+      <TextArea
         className="notTooWide"
         placeholder={firstPost ? "Be the first to comment" : "Share your thoughts"}
         value={comment}
@@ -28,7 +29,7 @@ export default function NewForumComment({ threadId, firstPost, setThread }: NewF
       />
       {err && <p className="error-message">{err}</p>}
       <div>
-        <button className="primary narrow">Add Comment</button>
+        <Button className="primary">Add Comment</Button>
       </div>
     </form>
   );

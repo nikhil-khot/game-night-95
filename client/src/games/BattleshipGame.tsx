@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { SHIP_SIZES, type BattleshipMove, type BattleshipView } from "@gamenite/shared";
 import type { GameProps } from "../util/types.ts";
+import { Button } from "@react95/core";
 
 const COL_LABELS = "ABCDEFGHIJ";
 const CELL = 28; // px per cell
@@ -414,7 +415,7 @@ export default function BattleshipGame({
     return (
       <div className="content spacedSection">
         <h2>Battleship — Place Your Ships</h2>
-        <p style={{ color: "#94a3b8", fontSize: 13 }}>
+        <p style={{ fontSize: 13 }}>
           Arrow keys to move · <strong>R</strong> to rotate · Tab or click to select a ship
         </p>
 
@@ -430,34 +431,37 @@ export default function BattleshipGame({
             {Array.from(SHIP_SIZES).map((size, i) => {
               const ship = placementShips[i];
               const isSelected = i === selectedIdx;
-              const cells = computeShipCells(ship);
-              const outOfBounds = cells.some(([r, c]) => r < 0 || r >= 10 || c < 0 || c >= 10);
               return (
-                <div
+                <Button
                   key={i}
                   onClick={() => setSelectedIdx(i)}
                   style={{
                     padding: "0.3rem 0.6rem",
-                    borderRadius: 4,
                     cursor: "pointer",
                     background: isSelected ? "#1e3a5f" : "transparent",
                     border: `1px solid ${isSelected ? "#22c55e" : "#334155"}`,
                     fontSize: 13,
-                    color: outOfBounds ? "#f87171" : "#e2e8f0",
+                    color: isSelected ? "#e2e8f0" : "#6b7280",
                   }}
                 >
                   <span style={{ color: isSelected ? "#22c55e" : "#6b7280", marginRight: 6 }}>
                     {"█".repeat(size)}
                   </span>
                   {shipName(size)}
-                  <span style={{ color: "#64748b", marginLeft: 6, fontSize: 11 }}>
+                  <span
+                    style={{
+                      color: isSelected ? "#e2e8f0" : "#6b7280",
+                      marginLeft: 6,
+                      fontSize: 11,
+                    }}
+                  >
                     {ship.horizontal ? "H" : "V"}
                   </span>
-                </div>
+                </Button>
               );
             })}
 
-            <button
+            <Button
               disabled={!valid}
               onClick={() =>
                 makeMove({
@@ -475,14 +479,13 @@ export default function BattleshipGame({
                 background: valid ? "#22c55e" : "#374151",
                 color: valid ? "#000" : "#6b7280",
                 border: "none",
-                borderRadius: 4,
                 cursor: valid ? "pointer" : "not-allowed",
                 fontWeight: "bold",
                 fontSize: 14,
               }}
             >
               Confirm Placement
-            </button>
+            </Button>
             {!valid && (
               <p style={{ fontSize: 12, color: "#f87171", margin: 0 }}>
                 Ships are overlapping or out of bounds

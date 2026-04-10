@@ -28,7 +28,7 @@ describe("zUserPreferencesUpdateRequest", () => {
       success: false,
     });
     expect(
-      zUserPreferencesUpdateRequest.safeParse({ banner: { overlayOpacity: 1.1 } }),
+      zUserPreferencesUpdateRequest.safeParse({ bannerImageUrl: { overlayOpacity: 1.1 } }),
     ).toMatchObject({ success: false });
   });
 });

@@ -4,6 +4,7 @@ import useAuth from "../hooks/useAuth.ts";
 import { removeFriend } from "../services/friendService.ts";
 import UserLink from "./UserLink.tsx";
 import "./FriendsList.css";
+import { Button } from "@react95/core";
 
 interface FriendsListProps {
   friends: { message: string } | SafeUserInfo[];
@@ -65,7 +66,7 @@ export default function FriendsList({
             <div className="friendInfo">
               <UserLink user={friend} />
             </div>
-            <button
+            <Button
               className="removeBtn"
               onClick={(e) => {
                 e.stopPropagation();
@@ -74,7 +75,7 @@ export default function FriendsList({
               disabled={removingId === friend.username}
             >
               {removingId === friend.username ? "Removing..." : "Remove"}
-            </button>
+            </Button>
           </div>
         ))}
       </div>

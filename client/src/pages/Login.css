@@ -4,15 +4,14 @@
   flex-direction: column;
   align-items: center;
   min-height: 100vh;
-  background-color: var(--gray-background);
+  background-color: var(--page-background);
   padding: 20px;
   padding-top: 6rem;
 }
 
-form.login {
+.login {
   width: 300px;
   padding: 1rem;
-  border-radius: 1.5rem;
   background-color: #fff;
   display: flex;
   flex-direction: column;
@@ -20,13 +19,13 @@ form.login {
   box-shadow: 0 0 5px #000;
 }
 
-form.login .intertext {
+.login .intertext {
   text-align: center;
   font-size: 0.8rem;
   color: #888;
 }
 
-form.login .labeled-section {
+.login .labeled-section {
   display: flex;
   flex-direction: row;
   gap: 0.5rem;

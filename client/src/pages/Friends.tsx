@@ -7,6 +7,7 @@ import PendingRequests from "../components/PendingRequests.tsx";
 import { openFriendChat } from "../services/friendService.ts";
 import FriendChatSection from "../components/FriendChatSection.tsx";
 import "./Friends.css";
+import { Frame } from "@react95/core";
 
 /**
  * The Friends page allows users to:
@@ -48,50 +49,90 @@ export default function Friends() {
 
   return (
     <div className="content">
-      <div className="spacedSection">
-        <h2>Friends</h2>
+      <div className="">
+        <Frame
+          bgColor="$material"
+          boxShadow="$out"
+          padding="$4"
+          className="outerFrame"
+          style={{ width: "fit-content" }}
+        >
+          <Frame h="100%" boxShadow="$in" className="innerFrame">
+            <div className="content">
+              <h2>Friends</h2>
+            </div>
+          </Frame>
+        </Frame>
 
         <div className="friendsHeaderTools">
-          <div className="friendsSection">
-            <h3>Add Friend</h3>
-            <AddFriend onSuccess={handleFriendAction} />
-          </div>
-
-          <div className="friendsSection">
-            <h3>
-              Pending Requests
-              {!("message" in pendingRequests) && pendingRequests.length > 0
-                ? ` (${pendingRequests.length})`
-                : ""}
-            </h3>
-            <PendingRequests requests={pendingRequests} onActionComplete={handleFriendAction} />
-          </div>
+          <Frame bgColor="$material" boxShadow="$out" padding="$4" className="outerFrame">
+            <Frame h="100%" boxShadow="$in" className="innerFrame">
+              <div className="content">
+                <div className="friendsSection">
+                  <h3>Add Friend</h3>
+                  <AddFriend onSuccess={handleFriendAction} />
+                </div>
+              </div>
+            </Frame>
+          </Frame>
+          <Frame bgColor="$material" boxShadow="$out" padding="$4" className="outerFrame">
+            <Frame h="100%" boxShadow="$in" className="innerFrame">
+              <div className="content">
+                <div className="friendsSection">
+                  <h3>
+                    Pending Requests
+                    {!("message" in pendingRequests) && pendingRequests.length > 0
+                      ? ` (${pendingRequests.length})`
+                      : ""}
+                  </h3>
+                  <PendingRequests
+                    requests={pendingRequests}
+                    onActionComplete={handleFriendAction}
+                  />
+                </div>
+              </div>
+            </Frame>
+          </Frame>
         </div>
 
         <div className="friendsWorkspace">
-          <div className="friendsRail friendsSection">
-            <h3>
-              Friends
-              {!("message" in friendsList) && friendsList.length > 0
-                ? ` (${friendsList.length})`
-                : ""}
-            </h3>
-            <FriendsList
-              friends={friendsList}
-              onRemove={handleFriendAction}
-              onSelect={handleStartChat}
-              selectedUsername={selectedFriend}
-            />
-          </div>
-
-          <div className="chatPane friendsSection">
-            {chatError && <p className="chatError">{chatError}</p>}
-            {selectedFriend && selectedChatId ? (
-              <FriendChatSection friendUsername={selectedFriend} chatId={selectedChatId} />
-            ) : (
-              <div className="chatPlaceholder">Select a friend to start chatting.</div>
-            )}
-          </div>
+          <Frame bgColor="$material" boxShadow="$out" padding="$4" className="outerFrame">
+            <Frame h="100%" boxShadow="$in" className="innerFrame">
+              <div className="content">
+                <div className="friendsRail friendsSection">
+                  <h3>
+                    Friends List
+                    {!("message" in friendsList) && friendsList.length > 0
+                      ? ` (${friendsList.length})`
+                      : ""}
+                  </h3>
+                  <FriendsList
+                    friends={friendsList}
+                    onRemove={handleFriendAction}
+                    onSelect={handleStartChat}
+                    selectedUsername={selectedFriend}
+                  />
+                </div>
+              </div>
+            </Frame>
+          </Frame>
+          <Frame bgColor="$material" boxShadow="$out" padding="$4" className="outerFrame">
+            <Frame h="100%" boxShadow="$in" className="innerFrame">
+              <div className="content">
+                <div
+                  className="chatPane friendsSection"
+                  style={{ height: "31rem", paddingBottom: 0 }}
+                >
+                  {chatError && <p className="chatError">{chatError}</p>}
+                  {selectedFriend && selectedChatId ? (
+                    <FriendChatSection friendUsername={selectedFriend} chatId={selectedChatId} />
+                  ) : (
+                    <div className="chatPlaceholder">Select a friend to start chatting.</div>
+                  )}
+                </div>
+              </div>
+            </Frame>
+          </Frame>
         </div>
       </div>
     </div>

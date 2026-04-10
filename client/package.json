@@ -22,7 +22,9 @@
     "react-dom": "^19.2.3",
     "react-error-boundary": "^6.0.0",
     "react-router-dom": "^7.9.5",
-    "socket.io-client": "^4.8.1"
+    "socket.io-client": "^4.8.1",
+    "@react95/core": "^9.7.1",
+    "@react95/icons": "^2.4.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.1",

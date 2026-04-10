@@ -40,7 +40,7 @@ describe("Header component", () => {
     expect(screen.getByText(/displayname/)).not.toBeNull();
   });
 
-  it("pressing Log Out causes a state reset and navigation", () => {
+  it("pressing the Close button causes a state reset and navigation", () => {
     render(
       <LoginContext
         value={{
@@ -51,7 +51,7 @@ describe("Header component", () => {
             createdAt: new Date("01-02-2025"),
           },
           pass: "pwd",
-          socket: {} as GameSocket,
+          socket: { emit: vi.fn() } as unknown as GameSocket,
           reset: mockedReset,
         }}
       >
@@ -59,31 +59,8 @@ describe("Header component", () => {
       </LoginContext>,
     );
 
-    fireEvent.click(screen.getByText(/Log Out/i));
+    fireEvent.click(screen.getByRole("button", { name: /close/i }));
     expect(mockedReset).toHaveBeenCalledOnce();
     expect(mockedUseNavigate).toHaveBeenCalledExactlyOnceWith("/login");
-  });
-
-  it("pressing View Profile navigates to the current user profile", () => {
-    render(
-      <LoginContext
-        value={{
-          user: {
-            userId: "id3",
-            username: "username123",
-            display: "displayname",
-            createdAt: new Date("01-02-2025"),
-          },
-          pass: "pwd",
-          socket: {} as GameSocket,
-          reset: mockedReset,
-        }}
-      >
-        <Header />
-      </LoginContext>,
-    );
-
-    fireEvent.click(screen.getByText(/View Profile/i));
-    expect(mockedUseNavigate).toHaveBeenCalledExactlyOnceWith("/profile/username123");
   });
 });

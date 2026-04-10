@@ -13,6 +13,7 @@ import UserLeaderboardView from "../components/UserLeaderboardView";
 import { generateStatsFromGames, sortLeaderboardEntries } from "../util/leaderboardProcessing";
 import StatusIndicator from "../components/StatusIndicator";
 import useLoginContext from "../hooks/useLoginContext";
+import { Frame } from "@react95/core";
 
 interface ViewProfileProps {
   username?: string;
@@ -101,87 +102,122 @@ export default function ViewProfile({ username: profileUsername }: ViewProfilePr
       return <div>Loading...</div>;
     case "profile": {
       return (
-        <div className="content spacedSection">
-          <h2>Profile for {componentState.user.display}</h2>
-          <div className="view-profile-page">
-            <div
-              className="view-profile-banner"
-              style={{ position: "relative", width: "100%", height: "350px" }}
+        <div className="content">
+          <div className="spacedSection">
+            <Frame
+              bgColor="$material"
+              boxShadow="$out"
+              padding="$4"
+              className="outerFrame"
+              style={{ width: "fit-content" }}
             >
-              <BannerAvatar
-                imageUrl={bannerImageUrl || "/resources/images.png"}
-                width="1500px"
-                height="300px"
-              />
-              <div
-                style={{
-                  position: "absolute", // Position it absolutely within the banner
-                  bottom: "-10px", // Move it closer to the bottom
-                  left: "7%", // Center horizontally
-                  transform: "translateX(-50%)", // Adjust for centering
-                }}
-              >
-                <ProfileAvatar imageUrl={profilePictureUrl} width="200px" height="200px" />
-                <div
-                  style={{
-                    position: "absolute",
-                    bottom: "10px",
-                    right: "25px",
-                  }}
-                >
-                  <StatusIndicator status={isOnline ? "online" : "offline"} />
+              <Frame h="100%" boxShadow="$in" className="innerFrame">
+                <div className="content">
+                  <h2>Profile for {componentState.user.display}</h2>
                 </div>
-              </div>
-            </div>
-            <div className="content spacedSection">
-              <div>
-                <h3>General information</h3>
-                <ul>
-                  <p>Username: {componentState.user.username}</p>
-                  <p>Account created {timeSince(componentState.user.createdAt)}</p>
-                </ul>
-              </div>
-            </div>
-            <hr style={{ marginBottom: 0 }} />
-            <h3>Game Statistics (Win/Loss/Tie)</h3>
-            {"message" in gameList ? (
-              gameList.message
-            ) : filteredStats.length === 0 ? (
-              <div>No game stats found...</div>
-            ) : (
-              <div>
-                <div className="leaderboardSubheader" role="">
-                  <div className="stats">Overall</div>
-                  <div className="stats">Nim</div>
-                  <div className="stats">Number Guesser</div>
-                  <div className="stats">Battleship</div>
-                </div>
-                <div className="dottedList">
-                  {filteredStats.map(([user, record], index) => (
-                    <UserLeaderboardView key={index} rank={undefined} user={user} record={record} />
-                  ))}
-                </div>
-              </div>
-            )}
-            <hr style={{ marginBottom: 0, marginTop: 30 }} />
-            <h3>Forum Posts</h3>
-            <>
-              {"message" in threadOrMessage ? (
-                threadOrMessage.message
-              ) : filteredThreads.length > 0 ? (
-                <div className="dottedList" role="list">
-                  {filteredThreads.map((thread) => (
-                    <ThreadSummaryView
-                      summary={thread}
-                      setThreadInList={setThreadInList}
-                      key={thread.threadId.toString()}
+              </Frame>
+            </Frame>
+            <div className="view-profile-page">
+              <Frame bgColor="$material" boxShadow="$out" padding="$4" className="outerFrame">
+                <Frame h="100%" boxShadow="$in" className="innerFrame">
+                  <div
+                    className="view-profile-banner"
+                    style={{ position: "relative", width: "100%", height: "300px" }}
+                  >
+                    <BannerAvatar
+                      imageUrl={bannerImageUrl || "/resources/images.png"}
+                      width="100%"
+                      height="100%"
                     />
-                  ))}
-                </div>
-              ) : (
-                <div>No posts found...</div>
-              )}
-            </>
+                  </div>
+                </Frame>
+              </Frame>
+              <Frame bgColor="$material" boxShadow="$out" padding="$4" className="outerFrame">
+                <Frame h="100%" boxShadow="$in" className="innerFrame">
+                  <div className="content">
+                    <div className="spacedSection">
+                      <div>
+                        <h3 style={{ marginBottom: "0.3rem" }}>General information</h3>
+                        <div
+                          style={{
+                            position: "absolute", // Position it absolutely within the banner
+                          }}
+                        >
+                          <ProfileAvatar
+                            imageUrl={profilePictureUrl}
+                            width="200px"
+                            height="200px"
+                          />
+                          <div
+                            style={{
+                              position: "absolute",
+                              bottom: "10px",
+                              right: "25px",
+                            }}
+                          >
+                            <StatusIndicator status={isOnline ? "online" : "offline"} />
+                          </div>
+                        </div>
+                        <ul>
+                          <p>Username: {componentState.user.username}</p>
+                          <p>Account created {timeSince(componentState.user.createdAt)}</p>
+                        </ul>
+                      </div>
+
+                      <div>
+                        <hr style={{ margin: 0 }} />
+                        <h3>Game Statistics (Win/Loss/Tie)</h3>
+                        {"message" in gameList ? (
+                          gameList.message
+                        ) : filteredStats.length === 0 ? (
+                          <div>No game stats found...</div>
+                        ) : (
+                          <div style={{ marginBottom: "0.6rem" }}>
+                            <div className="leaderboardSubheader" role="">
+                              <div className="stats">Overall</div>
+                              <div className="stats">Nim</div>
+                              <div className="stats">Number Guesser</div>
+                              <div className="stats">Battleship</div>
+                            </div>
+                            <div className="dottedList">
+                              {filteredStats.map(([user, record], index) => (
+                                <UserLeaderboardView
+                                  key={index}
+                                  rank={undefined}
+                                  user={undefined}
+                                  record={record}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      <div>
+                        <hr style={{ marginBottom: 0 }} />
+                        <h3 style={{ marginBottom: "0.3rem" }}>Forum Posts</h3>
+                        <>
+                          {"message" in threadOrMessage ? (
+                            threadOrMessage.message
+                          ) : filteredThreads.length > 0 ? (
+                            <div className="dottedList" role="list">
+                              {filteredThreads.map((thread) => (
+                                <ThreadSummaryView
+                                  summary={thread}
+                                  setThreadInList={setThreadInList}
+                                  key={thread.threadId.toString()}
+                                />
+                              ))}
+                            </div>
+                          ) : (
+                            <div>No posts found...</div>
+                          )}
+                        </>
+                      </div>
+                    </div>
+                  </div>
+                </Frame>
+              </Frame>
+            </div>
           </div>
         </div>
       );

@@ -101,7 +101,7 @@ export default function Friends() {
               <div className="content">
                 <div className="friendsRail friendsSection">
                   <h3>
-                    Friends
+                    Friends List
                     {!("message" in friendsList) && friendsList.length > 0
                       ? ` (${friendsList.length})`
                       : ""}
@@ -119,7 +119,10 @@ export default function Friends() {
           <Frame bgColor="$material" boxShadow="$out" padding="$4" className="outerFrame">
             <Frame h="100%" boxShadow="$in" className="innerFrame">
               <div className="content">
-                <div className="chatPane friendsSection">
+                <div
+                  className="chatPane friendsSection"
+                  style={{ height: "31rem", paddingBottom: 0 }}
+                >
                   {chatError && <p className="chatError">{chatError}</p>}
                   {selectedFriend && selectedChatId ? (
                     <FriendChatSection friendUsername={selectedFriend} chatId={selectedChatId} />

@@ -182,6 +182,7 @@ export default function Clubs() {
           <Frame h="100%" boxShadow="$in" className="innerFrame">
             <div className="content">
               <div className="clubsListSection">
+                <h2>Clubs List</h2>
                 {clubs.length > 0 ? (
                   <ClubsList
                     clubs={clubs}

@@ -12,6 +12,17 @@ export const inviteFriendToGame = async (
   });
 };
 
+export const cancelInviteToGame = async (
+  auth: UserAuth,
+  gameId: string,
+  friendId: string,
+): Promise<void> => {
+  await api.post<{ success: boolean } | { error: string }>(`/api/game/invite/cancel`, {
+    auth,
+    payload: { gameId, friendId },
+  });
+};
+
 export const getInvitedGames = async (auth: UserAuth): Promise<GameInfo[]> => {
   try {
     const res = await api.get<{ games: GameInfo[] }>(`/api/game/invited`, {
@@ -21,4 +32,11 @@ export const getInvitedGames = async (auth: UserAuth): Promise<GameInfo[]> => {
   } catch {
     return [];
   }
+};
+
+export const declineInvitedGame = async (auth: UserAuth, gameId: string): Promise<void> => {
+  await api.post<{ success: boolean } | { error: string }>(`/api/game/invite/decline`, {
+    auth,
+    payload: { gameId },
+  });
 };

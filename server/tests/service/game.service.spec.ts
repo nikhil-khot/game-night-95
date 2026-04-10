@@ -4,9 +4,11 @@ import { enforceAuth } from "../../src/services/auth.service.ts";
 import { createUser } from "../../src/services/user.service.ts";
 import {
   addAIToGame,
+  cancelInviteToGame,
   createGame,
   getGameById,
   getGames,
+  inviteToGame,
   joinGame,
   startGame,
   updateGame,
@@ -259,6 +261,50 @@ describe("joinGame - AI and club vs club cases", () => {
       const joined = await joinGame(game.gameId, user2);
       expect(joined.players).toHaveLength(2);
     });
+  });
+});
+
+describe("inviteToGame and cancelInviteToGame", () => {
+  it("allows inviting a friend in a player vs player lobby", async () => {
+    const user1 = await enforceAuth({ username: "user1", password: "pwd1111" });
+    const user2 = await enforceAuth({ username: "user2", password: "pwd2222" });
+
+    const waitingNimId = await getSeededGameId("nim", "waiting");
+
+    await inviteToGame(waitingNimId, user1.userId, user2.userId);
+
+    const record = await GameRepo.find(waitingNimId);
+    expect(record?.invited).toEqual([user2.userId]);
+  });
+
+  it("rejects invites when the game mode is not player vs player", async () => {
+    const user1 = await enforceAuth({ username: "user1", password: "pwd1111" });
+    const user2 = await enforceAuth({ username: "user2", password: "pwd2222" });
+
+    const pvAiGame = await createGame(user1, "nim", "player vs ai", new Date());
+
+    await expect(inviteToGame(pvAiGame.gameId, user1.userId, user2.userId)).rejects.toThrow(
+      "Invites are only allowed in player vs player games",
+    );
+  });
+
+  it("can cancel a previously-sent invite", async () => {
+    const user1 = await enforceAuth({ username: "user1", password: "pwd1111" });
+    const user2 = await enforceAuth({ username: "user2", password: "pwd2222" });
+
+    const game = await createGame(user1, "nim", "player vs player", new Date());
+
+    await inviteToGame(game.gameId, user1.userId, user2.userId);
+    let record = await GameRepo.find(game.gameId);
+    expect(record?.invited).toEqual([user2.userId]);
+
+    await cancelInviteToGame(game.gameId, user1.userId, user2.userId);
+    record = await GameRepo.find(game.gameId);
+    expect(record?.invited ?? []).not.toContain(user2.userId);
+
+    await expect(cancelInviteToGame(game.gameId, user1.userId, user2.userId)).rejects.toThrow(
+      "User is not currently invited to this game",
+    );
   });
 });
 

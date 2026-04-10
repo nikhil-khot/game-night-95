@@ -37,6 +37,8 @@ app.use(
         .post("/create", game.postCreate)
         .get("/list", game.getList)
         .post("/invite", invite.postInvite)
+        .post("/invite/cancel", invite.postCancelInvite)
+        .post("/invite/decline", invite.postDeclineInvite)
         .get("/invited", invite.getInvited)
         .get("/:id", game.getById),
     )

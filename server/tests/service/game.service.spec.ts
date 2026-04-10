@@ -4,9 +4,13 @@ import { enforceAuth } from "../../src/services/auth.service.ts";
 import { createUser } from "../../src/services/user.service.ts";
 import {
   addAIToGame,
+  cancelInviteToGame,
   createGame,
   getGameById,
   getGames,
+  declineInviteForUser,
+  getInvitedGames,
+  inviteToGame,
   joinGame,
   startGame,
   updateGame,
@@ -259,6 +263,140 @@ describe("joinGame - AI and club vs club cases", () => {
       const joined = await joinGame(game.gameId, user2);
       expect(joined.players).toHaveLength(2);
     });
+  });
+});
+
+describe("inviteToGame and cancelInviteToGame", () => {
+  it("allows inviting a friend in a player vs player lobby", async () => {
+    const user1 = await enforceAuth({ username: "user1", password: "pwd1111" });
+    const user2 = await enforceAuth({ username: "user2", password: "pwd2222" });
+
+    const waitingNimId = await getSeededGameId("nim", "waiting");
+
+    await inviteToGame(waitingNimId, user1.userId, user2.userId);
+
+    const record = await GameRepo.find(waitingNimId);
+    expect(record?.invited).toEqual([user2.userId]);
+  });
+
+  it("rejects invites when the game mode is not player vs player", async () => {
+    const user1 = await enforceAuth({ username: "user1", password: "pwd1111" });
+    const user2 = await enforceAuth({ username: "user2", password: "pwd2222" });
+
+    const pvAiGame = await createGame(user1, "nim", "player vs ai", new Date());
+
+    await expect(inviteToGame(pvAiGame.gameId, user1.userId, user2.userId)).rejects.toThrow(
+      "Invites are only allowed in player vs player games",
+    );
+  });
+
+  it("rejects invites when the inviter is not a player", async () => {
+    const user1 = await enforceAuth({ username: "user1", password: "pwd1111" });
+    const user2 = await enforceAuth({ username: "user2", password: "pwd2222" });
+    const user3 = await enforceAuth({ username: "user3", password: "pwd3333" });
+
+    const game = await createGame(user1, "nim", "player vs player", new Date());
+
+    await expect(inviteToGame(game.gameId, user3.userId, user2.userId)).rejects.toThrow(
+      "Only players in the game can send invites",
+    );
+  });
+
+  it("rejects invites when the lobby is full", async () => {
+    const user1 = await enforceAuth({ username: "user1", password: "pwd1111" });
+    const user2 = await enforceAuth({ username: "user2", password: "pwd2222" });
+    await createUser("user5", "pwd5555", new Date());
+    const user5 = await enforceAuth({ username: "user5", password: "pwd5555" });
+
+    const game = await createGame(user1, "nim", "player vs player", new Date());
+    // With nim's maxPlayers = 2, adding a second player fills the lobby
+    await joinGame(game.gameId, user2);
+
+    await expect(inviteToGame(game.gameId, user1.userId, user5.userId)).rejects.toThrow(
+      "Lobby is full",
+    );
+  });
+
+  it("rejects invites when the friend is already in the game", async () => {
+    const user1 = await enforceAuth({ username: "user1", password: "pwd1111" });
+    const user2 = await enforceAuth({ username: "user2", password: "pwd2222" });
+
+    // Use a "guess" game so the lobby is never considered full, ensuring
+    // we exercise the "already in the game" branch rather than "Lobby is full".
+    const game = await createGame(user1, "guess", "player vs player", new Date());
+    await joinGame(game.gameId, user2);
+
+    await expect(inviteToGame(game.gameId, user1.userId, user2.userId)).rejects.toThrow(
+      "User is already in the game",
+    );
+  });
+
+  it("rejects invites when the friend is already invited", async () => {
+    const user1 = await enforceAuth({ username: "user1", password: "pwd1111" });
+    const user2 = await enforceAuth({ username: "user2", password: "pwd2222" });
+
+    const game = await createGame(user1, "nim", "player vs player", new Date());
+
+    await inviteToGame(game.gameId, user1.userId, user2.userId);
+
+    await expect(inviteToGame(game.gameId, user1.userId, user2.userId)).rejects.toThrow(
+      "User has already been invited",
+    );
+  });
+
+  it("can cancel a previously-sent invite", async () => {
+    const user1 = await enforceAuth({ username: "user1", password: "pwd1111" });
+    const user2 = await enforceAuth({ username: "user2", password: "pwd2222" });
+
+    const game = await createGame(user1, "nim", "player vs player", new Date());
+
+    await inviteToGame(game.gameId, user1.userId, user2.userId);
+    let record = await GameRepo.find(game.gameId);
+    expect(record?.invited).toEqual([user2.userId]);
+
+    await cancelInviteToGame(game.gameId, user1.userId, user2.userId);
+    record = await GameRepo.find(game.gameId);
+    expect(record?.invited ?? []).not.toContain(user2.userId);
+
+    await expect(cancelInviteToGame(game.gameId, user1.userId, user2.userId)).rejects.toThrow(
+      "User is not currently invited to this game",
+    );
+  });
+});
+
+describe("declineInviteForUser and getInvitedGames", () => {
+  it("allows an invited user to decline and removes the invite", async () => {
+    const inviter = await enforceAuth({ username: "user1", password: "pwd1111" });
+    const invitee = await enforceAuth({ username: "user2", password: "pwd2222" });
+
+    const game = await createGame(inviter, "nim", "player vs player", new Date());
+
+    await inviteToGame(game.gameId, inviter.userId, invitee.userId);
+
+    const before = await getInvitedGames(invitee.userId);
+    expect(before.map((g) => g.gameId)).toContain(game.gameId);
+
+    await declineInviteForUser(game.gameId, invitee.userId);
+
+    const record = await GameRepo.find(game.gameId);
+    expect(record?.invited ?? []).not.toContain(invitee.userId);
+
+    const after = await getInvitedGames(invitee.userId);
+    expect(after.map((g) => g.gameId)).not.toContain(game.gameId);
+  });
+
+  it("throws when a non-invited user tries to decline", async () => {
+    const inviter = await enforceAuth({ username: "user1", password: "pwd1111" });
+    const invitee = await enforceAuth({ username: "user2", password: "pwd2222" });
+    const otherUser = await enforceAuth({ username: "user3", password: "pwd3333" });
+
+    const game = await createGame(inviter, "nim", "player vs player", new Date());
+
+    await inviteToGame(game.gameId, inviter.userId, invitee.userId);
+
+    await expect(declineInviteForUser(game.gameId, otherUser.userId)).rejects.toThrow(
+      "You are not invited to this game",
+    );
   });
 });
 

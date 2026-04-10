@@ -84,6 +84,10 @@ export interface GameRecord {
   players: RecordId[]; // References User records
   createdAt: DateISO;
   createdBy: RecordId; // References User records
+  /**
+   * List of user IDs who have been invited to this game but are not yet in players[]
+   */
+  invited?: RecordId[];
   /** Club names [creatorClub, opponentClub] for "club vs club" games */
   clubs?: [string, string];
   /** Per-club player rosters for "club vs club" games: [club0userIds, club1userIds] */

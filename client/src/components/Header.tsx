@@ -24,11 +24,13 @@ export default function Header() {
         className="narrowcenter secondary"
         onClick={() => {
           resetDisplayPreferences();
-          // Let the server know this user is going offline
-          socket.emit("userPresenceOffline", {
-            auth: { username: user.username, password: pass },
-            payload: null,
-          });
+          // Let the server know this user is going offline (if socket is available)
+          if (typeof socket.emit === "function") {
+            socket.emit("userPresenceOffline", {
+              auth: { username: user.username, password: pass },
+              payload: null,
+            });
+          }
           reset();
           navigate("/login");
         }}

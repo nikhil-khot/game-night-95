@@ -2,6 +2,7 @@ import "./Layout.css";
 import { Outlet } from "react-router-dom";
 import Header from "./Header.tsx";
 import SideBarNav from "./SideBarNav.tsx";
+import InviteToast from "./InviteToast.tsx";
 
 /**
  * Main component represents the layout of the main page, including a sidebar
@@ -14,6 +15,7 @@ export default function Layout() {
         <Header />
         <SideBarNav />
         <div id="right_main" className="right_main">
+          <InviteToast />
           <Outlet />
         </div>
       </div>

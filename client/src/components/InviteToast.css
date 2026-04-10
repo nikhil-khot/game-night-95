@@ -1,0 +1,85 @@
+.inviteToastContainer {
+  position: fixed;
+  right: 1.5rem;
+  top: 1.5rem;
+  z-index: 40;
+}
+
+.inviteToast {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background-color: #111827;
+  color: #e5e7eb;
+  border-radius: 0.75rem;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.6);
+}
+
+.inviteToastAvatar {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  background-color: #a5b4fc;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.inviteToastBody {
+  display: flex;
+  flex-direction: column;
+  margin-right: 0.75rem;
+}
+
+.inviteToastName {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.inviteToastText {
+  font-size: 0.8rem;
+  color: #d1d5db;
+}
+
+.inviteToastActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.inviteToastAccept,
+.inviteToastDecline {
+  border-radius: 9999px;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.8rem;
+  border: none;
+  cursor: pointer;
+}
+
+.inviteToastAccept {
+  background-color: #10b981;
+  color: white;
+}
+
+.inviteToastDecline {
+  background-color: #374151;
+  color: #e5e7eb;
+}
+
+.inviteToastClose {
+  position: absolute;
+  top: 0.35rem;
+  right: 0.35rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 9999px;
+  border: none;
+  background-color: transparent;
+  color: #9ca3af;
+  cursor: pointer;
+  font-size: 0.85rem;
+}

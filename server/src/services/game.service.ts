@@ -454,6 +454,111 @@ export async function viewGame(gameId: string, user: UserWithId) {
 }
 
 /**
+ * Invite another user to a game lobby.
+ *
+ * @param gameId - game id
+ * @param inviterId - user id of the inviter (must already be in players[])
+ * @param friendId - user id of the friend being invited
+ */
+export async function inviteToGame(
+  gameId: string,
+  inviterId: string,
+  friendId: string,
+): Promise<void> {
+  const game = await GameRepo.find(gameId);
+  if (!game) throw new Error("Game not found");
+
+  // Invites are only allowed for classic player-vs-player games
+  if (game.mode !== "player vs player") {
+    throw new Error("Invites are only allowed in player vs player games");
+  }
+
+  // Only players in the game may invite others
+  if (!game.players.includes(inviterId)) {
+    throw new Error("Only players in the game can send invites");
+  }
+
+  // Lobby is full when we already have the maximum number of players
+  if (game.players.length === gameServices[game.type].maxPlayers) {
+    throw new Error("Lobby is full");
+  }
+
+  if (game.players.includes(friendId)) {
+    throw new Error("User is already in the game");
+  }
+  if (game.invited?.includes(friendId)) {
+    throw new Error("User has already been invited");
+  }
+
+  game.invited = [...(game.invited ?? []), friendId];
+  await GameRepo.set(gameId, game);
+}
+
+/**
+ * Cancel a previously-sent invite for a game lobby.
+ *
+ * @param gameId - game id
+ * @param inviterId - user id of the inviter (must already be in players[])
+ * @param friendId - user id of the friend whose invite is being cancelled
+ */
+export async function cancelInviteToGame(
+  gameId: string,
+  inviterId: string,
+  friendId: string,
+): Promise<void> {
+  const game = await GameRepo.find(gameId);
+  if (!game) throw new Error("Game not found");
+
+  if (game.mode !== "player vs player") {
+    throw new Error("Invites are only allowed in player vs player games");
+  }
+
+  if (!game.players.includes(inviterId)) {
+    throw new Error("Only players in the game can cancel invites");
+  }
+
+  if (!game.invited?.includes(friendId)) {
+    throw new Error("User is not currently invited to this game");
+  }
+
+  game.invited = game.invited.filter((id) => id !== friendId);
+  await GameRepo.set(gameId, game);
+}
+
+/**
+ * Decline an invite for a game lobby as the invited user.
+ *
+ * @param gameId - game id
+ * @param userId - user id of the invited user who is declining
+ */
+export async function declineInviteForUser(gameId: string, userId: string): Promise<void> {
+  const game = await GameRepo.find(gameId);
+  if (!game) throw new Error("Game not found");
+
+  if (game.mode !== "player vs player") {
+    throw new Error("Invites are only allowed in player vs player games");
+  }
+
+  if (!game.invited?.includes(userId)) {
+    throw new Error("You are not invited to this game");
+  }
+
+  game.invited = game.invited.filter((id) => id !== userId);
+  await GameRepo.set(gameId, game);
+}
+
+/**
+ * Get all games where a given user has been invited but is not yet a player.
+ */
+export async function getInvitedGames(userId: string): Promise<GameInfo[]> {
+  const keys = await GameRepo.getAllKeys();
+  const games = await GameRepo.getMany(keys);
+
+  const invitedGameIds = keys.filter((_, index) => games[index].invited?.includes(userId));
+  return Promise.all(invitedGameIds.map((id) => populateGameInfo(id)));
+}
+
+/**
  * Build the GamePlayersInfo payload for gamePlayersUpdated socket events.
  */
 export async function buildGamePlayersInfo(gameId: string): Promise<GamePlayersInfo> {

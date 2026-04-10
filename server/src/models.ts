@@ -145,7 +145,7 @@ export interface UserRecord {
 /**
  * Theme options for user display preferences.
  */
-export type UserTheme = "light" | "dark" | "win95";
+export type UserTheme = "light" | "dark";
 
 /**
  * Font size options for user display preferences.

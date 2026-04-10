@@ -11,7 +11,7 @@ import { Frame, Button, Dropdown } from "@react95/core";
 /** Preferences page for display settings. */
 export default function Preferences() {
   const auth = useAuth();
-  const [theme, setTheme] = useState<DisplayTheme>("win95");
+  const [theme, setTheme] = useState<DisplayTheme>("light");
   const [fontSize, setFontSize] = useState<DisplayFontSize>("medium");
   const [status, setStatus] = useState<string>("");
 
@@ -56,17 +56,11 @@ export default function Preferences() {
                 <label htmlFor="themeSelect">Theme</label>
                 <Dropdown
                   id="themeSelect"
-                  value={theme === "light" ? "Light" : theme === "dark" ? "Dark" : "GameNite95"}
+                  value={theme === "light" ? "Light" : "Dark"}
                   onChange={(e) => {
-                    setTheme(
-                      e.target.value === "Light"
-                        ? "light"
-                        : e.target.value === "Dark"
-                          ? "dark"
-                          : "win95",
-                    );
+                    setTheme(e.target.value === "Light" ? "light" : "dark");
                   }}
-                  options={["GameNite95", "Light", "Dark"]}
+                  options={["Light", "Dark"]}
                 />
               </div>
               <div>

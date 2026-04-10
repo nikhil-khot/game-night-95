@@ -8,6 +8,8 @@ import {
   createGame,
   getGameById,
   getGames,
+  declineInviteForUser,
+  getInvitedGames,
   inviteToGame,
   joinGame,
   startGame,
@@ -304,6 +306,42 @@ describe("inviteToGame and cancelInviteToGame", () => {
 
     await expect(cancelInviteToGame(game.gameId, user1.userId, user2.userId)).rejects.toThrow(
       "User is not currently invited to this game",
+    );
+  });
+});
+
+describe("declineInviteForUser and getInvitedGames", () => {
+  it("allows an invited user to decline and removes the invite", async () => {
+    const inviter = await enforceAuth({ username: "user1", password: "pwd1111" });
+    const invitee = await enforceAuth({ username: "user2", password: "pwd2222" });
+
+    const game = await createGame(inviter, "nim", "player vs player", new Date());
+
+    await inviteToGame(game.gameId, inviter.userId, invitee.userId);
+
+    const before = await getInvitedGames(invitee.userId);
+    expect(before.map((g) => g.gameId)).toContain(game.gameId);
+
+    await declineInviteForUser(game.gameId, invitee.userId);
+
+    const record = await GameRepo.find(game.gameId);
+    expect(record?.invited ?? []).not.toContain(invitee.userId);
+
+    const after = await getInvitedGames(invitee.userId);
+    expect(after.map((g) => g.gameId)).not.toContain(game.gameId);
+  });
+
+  it("throws when a non-invited user tries to decline", async () => {
+    const inviter = await enforceAuth({ username: "user1", password: "pwd1111" });
+    const invitee = await enforceAuth({ username: "user2", password: "pwd2222" });
+    const otherUser = await enforceAuth({ username: "user3", password: "pwd3333" });
+
+    const game = await createGame(inviter, "nim", "player vs player", new Date());
+
+    await inviteToGame(game.gameId, inviter.userId, invitee.userId);
+
+    await expect(declineInviteForUser(game.gameId, otherUser.userId)).rejects.toThrow(
+      "You are not invited to this game",
     );
   });
 });

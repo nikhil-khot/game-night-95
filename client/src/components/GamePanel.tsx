@@ -38,7 +38,6 @@ export default function GamePanel({
     useSocketsForGame(gameId, initialPlayers);
 
   // Effective rosters: use live state if available, fall back to initial prop
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const effectiveClubRosters: [SafeUserInfo[], SafeUserInfo[]] | undefined =
     clubRosters ?? initialClubRosters;
 
@@ -67,7 +66,7 @@ export default function GamePanel({
     socket.on("userStatusUpdated", handleStatus);
 
     // Ask for the current presence of each friend
-    const friendList = friends as SafeUserInfo[];
+    const friendList = friends;
     friendList.forEach((f) => {
       socket.emit("userPresenceQuery", { auth, payload: f.userId });
     });

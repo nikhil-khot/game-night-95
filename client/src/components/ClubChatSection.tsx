@@ -16,7 +16,7 @@ export default function ClubChatSection({ clubName }: ClubChatSectionProps) {
 
   return (
     <div className="clubChatSection">
-      <h4>Club Chat</h4>
+      <h2>Club Chat</h2>
       <MessageList messages={messages} />
       <MessageCreation handleMessageCreation={handleMessageCreation} />
     </div>

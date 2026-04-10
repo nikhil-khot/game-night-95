@@ -277,7 +277,6 @@ hr {
   font-size: 0.85rem;
 }
 
-/** Inner frame background for theme support **/
 .innerFrame {
   background-color: var(--panel-background);
 }

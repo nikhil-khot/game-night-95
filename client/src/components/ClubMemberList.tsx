@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { ClubInfo } from "@gamenite/shared";
 import useAuth from "../hooks/useAuth.ts";
 import { removeMember, setMemberRole } from "../services/clubService.ts";
-import "./ClubsList.css";
+import "./ClubMemberList.css";
 import { Button } from "@react95/core";
 
 interface ClubsListProps {

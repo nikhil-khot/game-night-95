@@ -1,4 +1,6 @@
 import { expect, type Page } from "@playwright/test";
+import { gameNames, gameModes } from "../../src/util/consts.ts";
+import type { GameMode, GameType } from "@gamenite/shared";
 
 /**
  * Log a user in with a username and password, and wait for successful
@@ -54,8 +56,8 @@ export async function createAndLoadGame(
   // User 1 creates a new game
   await page1.getByRole("button", { name: "Create New Game" }).click();
   await page1.waitForURL("/game/new");
-  await page1.getByLabel("Game Type selection").selectOption(gameId);
-  await page1.getByLabel("Game Mode selection").selectOption(gameMode);
+  await page1.getByLabel("Game Type selection").selectOption(gameNames[gameId as GameType]);
+  await page1.getByLabel("Game Mode selection").selectOption(gameModes[gameMode as GameMode]);
   await page1.getByRole("button", { name: "Create New Game" }).click();
 
   // Causes Playwright to auto-wait for for game to be enabled

@@ -56,6 +56,7 @@ export default function Preferences() {
                 <label htmlFor="themeSelect">Theme</label>
                 <Dropdown
                   id="themeSelect"
+                  value={theme === "light" ? "Light" : theme === "dark" ? "Dark" : "GameNite95"}
                   onChange={(e) => {
                     setTheme(
                       e.target.value === "Light"
@@ -72,6 +73,9 @@ export default function Preferences() {
                 <label htmlFor="fontSizeSelect">Font Size</label>
                 <Dropdown
                   id="fontSizeSelect"
+                  value={
+                    fontSize === "small" ? "Small" : fontSize === "medium" ? "Medium" : "Large"
+                  }
                   onChange={(e) => {
                     setFontSize(
                       e.target.value === "Small"

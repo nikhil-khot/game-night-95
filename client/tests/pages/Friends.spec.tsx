@@ -111,7 +111,7 @@ describe("Friends page", () => {
 
     expect(screen.getByRole("heading", { level: 3, name: "Add Friend" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 3, name: "Pending Requests" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { level: 3, name: "Friends" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 3, name: "Friends List" })).toBeInTheDocument();
     expect(screen.getByText("Select a friend to start chatting.")).toBeInTheDocument();
   });
 
@@ -149,7 +149,7 @@ describe("Friends page", () => {
 
     render(<Friends />);
 
-    expect(screen.getByText("Friends (2)")).toBeInTheDocument();
+    expect(screen.getByText("Friends List (2)")).toBeInTheDocument();
   });
 
   it("shows pending request count in section header", () => {
@@ -172,8 +172,8 @@ describe("Friends page", () => {
 
     render(<Friends />);
 
-    expect(screen.getByRole("heading", { level: 3, name: "Friends" })).toBeInTheDocument();
-    expect(screen.queryByText("Friends (0)")).not.toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 3, name: "Friends List" })).toBeInTheDocument();
+    expect(screen.queryByText("Friends List (0)")).not.toBeInTheDocument();
   });
 
   it("does not show count when there are no pending requests", () => {

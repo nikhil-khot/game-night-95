@@ -290,6 +290,60 @@ describe("inviteToGame and cancelInviteToGame", () => {
     );
   });
 
+  it("rejects invites when the inviter is not a player", async () => {
+    const user1 = await enforceAuth({ username: "user1", password: "pwd1111" });
+    const user2 = await enforceAuth({ username: "user2", password: "pwd2222" });
+    const user3 = await enforceAuth({ username: "user3", password: "pwd3333" });
+
+    const game = await createGame(user1, "nim", "player vs player", new Date());
+
+    await expect(inviteToGame(game.gameId, user3.userId, user2.userId)).rejects.toThrow(
+      "Only players in the game can send invites",
+    );
+  });
+
+  it("rejects invites when the lobby is full", async () => {
+    const user1 = await enforceAuth({ username: "user1", password: "pwd1111" });
+    const user2 = await enforceAuth({ username: "user2", password: "pwd2222" });
+    await createUser("user5", "pwd5555", new Date());
+    const user5 = await enforceAuth({ username: "user5", password: "pwd5555" });
+
+    const game = await createGame(user1, "nim", "player vs player", new Date());
+    // With nim's maxPlayers = 2, adding a second player fills the lobby
+    await joinGame(game.gameId, user2);
+
+    await expect(inviteToGame(game.gameId, user1.userId, user5.userId)).rejects.toThrow(
+      "Lobby is full",
+    );
+  });
+
+  it("rejects invites when the friend is already in the game", async () => {
+    const user1 = await enforceAuth({ username: "user1", password: "pwd1111" });
+    const user2 = await enforceAuth({ username: "user2", password: "pwd2222" });
+
+    // Use a "guess" game so the lobby is never considered full, ensuring
+    // we exercise the "already in the game" branch rather than "Lobby is full".
+    const game = await createGame(user1, "guess", "player vs player", new Date());
+    await joinGame(game.gameId, user2);
+
+    await expect(inviteToGame(game.gameId, user1.userId, user2.userId)).rejects.toThrow(
+      "User is already in the game",
+    );
+  });
+
+  it("rejects invites when the friend is already invited", async () => {
+    const user1 = await enforceAuth({ username: "user1", password: "pwd1111" });
+    const user2 = await enforceAuth({ username: "user2", password: "pwd2222" });
+
+    const game = await createGame(user1, "nim", "player vs player", new Date());
+
+    await inviteToGame(game.gameId, user1.userId, user2.userId);
+
+    await expect(inviteToGame(game.gameId, user1.userId, user2.userId)).rejects.toThrow(
+      "User has already been invited",
+    );
+  });
+
   it("can cancel a previously-sent invite", async () => {
     const user1 = await enforceAuth({ username: "user1", password: "pwd1111" });
     const user2 = await enforceAuth({ username: "user2", password: "pwd2222" });

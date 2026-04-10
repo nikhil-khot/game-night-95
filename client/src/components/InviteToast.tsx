@@ -80,7 +80,11 @@ export default function InviteToast() {
           <button
             type="button"
             className="inviteToastAccept"
-            onClick={() => navigate(`/game/${latest.gameId}`)}
+            onClick={() => {
+              // Hide the toast immediately when accepting, then navigate
+              setDismissedIds((prev) => new Set(prev).add(latest.gameId));
+              navigate(`/game/${latest.gameId}`);
+            }}
           >
             accept
           </button>

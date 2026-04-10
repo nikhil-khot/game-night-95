@@ -180,7 +180,6 @@ export default function GamePanel({
             <div className="inviteDialogCard">
               <div className="inviteDialogHeader">
                 <div className="inviteDialogTitle">Invite a Friend</div>
-                <div className="inviteDialogHint">Player vs player only</div>
                 <button
                   type="button"
                   className="inviteCloseButton"

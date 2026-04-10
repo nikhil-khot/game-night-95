@@ -154,7 +154,7 @@ export default function GamePanel({
                   <Button className="primary" onClick={() => addAI("easy")}>
                     Add Easy AI
                   </Button>
-                  <button className="primary" onClick={() => addAI("medium")}>
+                  <Button className="primary" onClick={() => addAI("medium")}>
                     Add Medium AI
                   </Button>
                   <Button className="primary" onClick={() => addAI("hard")}>

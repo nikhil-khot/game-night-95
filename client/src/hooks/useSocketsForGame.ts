@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import useAuth from "./useAuth.ts";
-import type { GamePlayInfo, SafeUserInfo, TaggedGameView } from "@gamenite/shared";
+import type { GamePlayInfo, GamePlayersInfo, SafeUserInfo, TaggedGameView } from "@gamenite/shared";
 import useLoginContext from "./useLoginContext.ts";
 
 /**
@@ -22,7 +22,20 @@ export default function useSocketsForGame(gameId: string, initialPlayers: SafeUs
   const [view, setView] = useState<null | TaggedGameView>(null);
   const [hasWatched, setHasWatched] = useState<boolean>(false);
   const [players, setPlayers] = useState<SafeUserInfo[]>(initialPlayers);
-  const userPlayerIndex = players.findIndex(({ username }) => username === user.username);
+  const [clubRosters, setClubRosters] = useState<[SafeUserInfo[], SafeUserInfo[]] | undefined>(
+    undefined,
+  );
+
+  // In club vs club, playerIndex is determined by club roster membership.
+  // For all other modes it's the position in the players array.
+  let userPlayerIndex: number;
+  if (clubRosters) {
+    if (clubRosters[0].some(({ username }) => username === user.username)) userPlayerIndex = 0;
+    else if (clubRosters[1].some(({ username }) => username === user.username)) userPlayerIndex = 1;
+    else userPlayerIndex = -1;
+  } else {
+    userPlayerIndex = players.findIndex(({ username }) => username === user.username);
+  }
 
   useEffect(() => {
     const handleWatched = (game: GamePlayInfo) => {
@@ -30,11 +43,13 @@ export default function useSocketsForGame(gameId: string, initialPlayers: SafeUs
       socket.off("gameWatched", handleWatched);
       setHasWatched(true);
       setPlayers(game.players);
+      if (game.clubRosters) setClubRosters(game.clubRosters);
       setView(game.view);
     };
 
-    const handlePlayersUpdated = (newPlayers: SafeUserInfo[]) => {
-      setPlayers(newPlayers);
+    const handlePlayersUpdated = (info: GamePlayersInfo) => {
+      setPlayers(info.players);
+      if (info.clubRosters) setClubRosters(info.clubRosters);
     };
 
     const handleStateUpdated = (view: TaggedGameView & { forPlayer: boolean }) => {
@@ -70,6 +85,7 @@ export default function useSocketsForGame(gameId: string, initialPlayers: SafeUs
   return {
     hasWatched,
     players,
+    clubRosters,
     userPlayerIndex,
     view,
     joinGame,

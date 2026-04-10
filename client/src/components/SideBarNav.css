@@ -1,11 +1,5 @@
 .sideBarNav {
-  padding-inline: 1rem;
-  display: flex;
-  flex-direction: column;
-  width: 200px;
-  padding-block: 1rem;
   background-color: var(--sidebar-color);
-  grid-area: sidebar;
 }
 
 .menu_button {
@@ -17,4 +11,5 @@
   height: 100%;
   color: cornflowerblue;
   text-decoration: none;
+  font-size: larger;
 }

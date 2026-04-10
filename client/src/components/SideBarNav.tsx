@@ -21,7 +21,7 @@ export default function SideBarNav() {
     `menu_button ${isActive ? "menu_selected" : ""}`;
 
   return (
-    <List className="">
+    <List className="sideBarNav">
       <List.Item>
         <NavLink to="/" className={navClass}>
           Home

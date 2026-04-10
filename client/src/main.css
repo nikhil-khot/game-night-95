@@ -1,35 +1,5 @@
 /* Styles used across the site */
 
-:root[data-theme="light"] {
-  --gray-background: #f7f7f7;
-  --gray-foreground: #555;
-  --page-background: #ffffff;
-  --page-foreground: #121212;
-  --line-color: #000;
-  --arrow-color: rgba(157, 157, 157);
-  --selection-color: #cccccc;
-}
-
-:root[data-theme="dark"] {
-  --gray-background: #1f2937;
-  --gray-foreground: #a7aeb7;
-  --page-background: #0f172a;
-  --page-foreground: #e2e8f0;
-  --line-color: #64748b;
-  --arrow-color: rgba(107, 112, 124);
-  --selection-color: #3c4757;
-}
-
-:root[data-theme="win95"] {
-  --gray-background: #f7f7f7;
-  --gray-foreground: #555;
-  --page-background: #008080;
-  --page-foreground: #121212;
-  --line-color: #000;
-  --arrow-color: rgba(157, 157, 157);
-  --selection-color: #cccccc;
-}
-
 :root[data-theme="win95"] {
   --header-color: #000e7a;
   --sidebar-color: #c2c7ca;

@@ -2,6 +2,7 @@ import useLoginForm from "../hooks/useLoginForm.ts";
 import "./Login.css";
 import { useState } from "react";
 import { type AuthContext } from "../contexts/LoginContext.ts";
+import { Button, Checkbox, Frame, Input } from "@react95/core";
 
 interface LoginProps {
   setAuth: (s: AuthContext | null) => void;
@@ -22,75 +23,94 @@ export default function Login({ setAuth }: LoginProps) {
 
   return (
     <div className="container">
-      <h1>GameNite</h1>
-      <form className="login" onSubmit={(e) => handleSubmit(e)}>
-        <h2>Log into GameNite</h2>
+      <h1>GameNite95!</h1>
+      <Frame
+        bgColor="$material"
+        boxShadow="$out"
+        padding="$4"
+        className="outerFrame"
+        style={{ width: "fit-content" }}
+      >
+        <Frame h="100%" boxShadow="$in" className="innerFrame">
+          <form className="login" onSubmit={(e) => handleSubmit(e)}>
+            <h2>Log into GameNite95!</h2>
 
-        <input
-          type="text"
-          value={username}
-          onChange={(event) => handleInputChange(event, "username")}
-          placeholder="Username"
-          aria-label="Username"
-          className="widefill"
-        />
+            <Input
+              type="text"
+              value={username}
+              onChange={(event) => handleInputChange(event, "username")}
+              placeholder="Username"
+              aria-label="Username"
+              className="widefill"
+            />
 
-        <input
-          type={showPassword ? "text" : "password"}
-          value={password}
-          onChange={(event) => handleInputChange(event, "password")}
-          placeholder="Password"
-          aria-label="Password"
-          className="widefill"
-        />
+            <Input
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(event) => handleInputChange(event, "password")}
+              placeholder="Password"
+              aria-label="Password"
+              className="widefill"
+            />
 
-        {mode === "signup" && (
-          <input
-            type={showPassword ? "text" : "password"}
-            value={confirm}
-            onChange={(event) => handleInputChange(event, "confirm")}
-            placeholder="Confirm Password"
-            aria-label="Confirm Password"
-            className="widefill"
-          />
-        )}
+            {mode === "signup" && (
+              <Input
+                type={showPassword ? "text" : "password"}
+                value={confirm}
+                onChange={(event) => handleInputChange(event, "confirm")}
+                placeholder="Confirm Password"
+                aria-label="Confirm Password"
+                className="widefill"
+              />
+            )}
 
-        <div className="labeled-section">
-          <input
-            type="checkbox"
-            id="showPasswordToggle"
-            checked={showPassword}
-            onChange={() => setShowPassword((prevShowPassword) => !prevShowPassword)}
-          />
-          <label htmlFor="showPasswordToggle">Show Password</label>
-        </div>
+            <div className="labeled-section">
+              <Checkbox
+                type="checkbox"
+                id="showPasswordToggle"
+                checked={showPassword}
+                onChange={() => setShowPassword((prevShowPassword) => !prevShowPassword)}
+              />
+              <label htmlFor="showPasswordToggle">Show Password</label>
+            </div>
 
-        {err && <p className="error-message centered">{err}</p>}
+            {err && <p className="error-message centered">{err}</p>}
 
-        <button type="submit" className="widefill primary">
-          {mode === "signup" ? "Sign Up" : "Log In"}
-        </button>
+            <Button type="submit" className=" primary">
+              {mode === "signup" ? "Sign Up" : "Log In"}
+            </Button>
 
-        {mode === "login" && (
-          <>
+            {mode === "login" && (
+              <>
+                <div className="intertext">or</div>
+                <Button type="button" className=" secondary" onClick={handleGoogleLogin}>
+                  Sign in with Google
+                </Button>
+              </>
+            )}
+
             <div className="intertext">or</div>
-            <button type="button" className="widefill secondary" onClick={handleGoogleLogin}>
-              Sign in with Google
-            </button>
-          </>
-        )}
 
-        <div className="intertext">or</div>
-
-        <button type="button" className="narrowcenter secondary" onClick={toggleMode}>
-          {mode === "signup" ? "Use Existing Account" : "Create New Account"}
-        </button>
-      </form>
-
-      <div className="smallAndGray" style={{ marginTop: "1rem" }}>
-        GameNite stores passwords in cleartext; reusing passwords here is a catastrophically bad
-        idea
-      </div>
+            <Button type="button" className="secondary" onClick={toggleMode}>
+              {mode === "signup" ? "Use Existing Account" : "Create New Account"}
+            </Button>
+          </form>
+        </Frame>
+      </Frame>
+      <Frame
+        bgColor="$material"
+        boxShadow="$out"
+        padding="$4"
+        className="outerFrame"
+        style={{ width: "fit-content", height: "fit-content" }}
+      >
+        <Frame h="100%" boxShadow="$in" className="innerFrame">
+          <div className="smallAndGray" style={{ padding: "0.1rem" }}>
+            GameNite stores passwords in cleartext; reusing passwords here is a catastrophically bad
+            idea
+          </div>
+        </Frame>
+      </Frame>
     </div>
   );
 }

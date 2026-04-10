@@ -83,6 +83,7 @@ app.use(
         .post("/delete", club.postDelete)
         .post("/remove-member", club.postRemoveMember)
         .post("/set-member-role", club.postSetMemberRole)
+        .post("/set-status", club.postSetMemberStatus)
         .get("/list", club.getList)
         .get("/:name", club.getByName),
     ),

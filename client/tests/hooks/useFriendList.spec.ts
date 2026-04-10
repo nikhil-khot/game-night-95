@@ -32,8 +32,20 @@ describe("useFriendList hook", () => {
 
     it("returns friends list when data is loaded", async () => {
       const mockFriends = [
-        { userId: "id1", username: "friend1", display: "Friend One", createdAt: new Date() },
-        { userId: "id2", username: "friend2", display: "Friend Two", createdAt: new Date() },
+        {
+          userId: "id1",
+          username: "friend1",
+          display: "Friend One",
+          createdAt: new Date(),
+          bio: "",
+        },
+        {
+          userId: "id2",
+          username: "friend2",
+          display: "Friend Two",
+          createdAt: new Date(),
+          bio: "",
+        },
       ];
       mockGetFriendsList.mockResolvedValue(mockFriends);
 
@@ -68,7 +80,13 @@ describe("useFriendList hook", () => {
 
     it("refetches data when refreshTrigger changes", async () => {
       mockGetFriendsList.mockResolvedValue([
-        { userId: "id1", username: "friend1", display: "Friend One", createdAt: new Date() },
+        {
+          userId: "id1",
+          username: "friend1",
+          display: "Friend One",
+          createdAt: new Date(),
+          bio: "",
+        },
       ]);
 
       const { result, rerender } = renderHook(
@@ -98,8 +116,20 @@ describe("useFriendList hook", () => {
 
     it("returns pending requests list when data is loaded", async () => {
       const mockRequests = [
-        { userId: "id3", username: "requester1", display: "Requester One", createdAt: new Date() },
-        { userId: "id4", username: "requester2", display: "Requester Two", createdAt: new Date() },
+        {
+          userId: "id3",
+          username: "requester1",
+          display: "Requester One",
+          createdAt: new Date(),
+          bio: "",
+        },
+        {
+          userId: "id4",
+          username: "requester2",
+          display: "Requester Two",
+          createdAt: new Date(),
+          bio: "",
+        },
       ];
       mockGetPendingRequests.mockResolvedValue(mockRequests);
 
@@ -134,7 +164,13 @@ describe("useFriendList hook", () => {
 
     it("refetches data when refreshTrigger changes", async () => {
       mockGetPendingRequests.mockResolvedValue([
-        { userId: "id5", username: "requester1", display: "Requester One", createdAt: new Date() },
+        {
+          userId: "id5",
+          username: "requester1",
+          display: "Requester One",
+          createdAt: new Date(),
+          bio: "",
+        },
       ]);
 
       const { result, rerender } = renderHook(

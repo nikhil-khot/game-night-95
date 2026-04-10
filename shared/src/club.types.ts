@@ -23,6 +23,8 @@ export interface ClubMemberInfo {
   role: ClubRole;
   points: number;
   joinedAt: string;
+  /** Optional short status message set by this member for their club */
+  statusMessage?: string;
 }
 
 /**
@@ -117,8 +119,18 @@ export const zClubListResponse = z.array(
         role: z.enum(["owner", "admin", "member"]),
         points: z.number(),
         joinedAt: z.string(),
+        statusMessage: z.string().optional(),
       }),
     ),
     createdAt: z.string(),
   }),
 );
+
+/**
+ * Payload for setting the calling member's status message within a club.
+ */
+export type SetClubMemberStatusPayload = z.infer<typeof zSetClubMemberStatusPayload>;
+export const zSetClubMemberStatusPayload = z.object({
+  clubName: z.string(),
+  statusMessage: z.string(),
+});

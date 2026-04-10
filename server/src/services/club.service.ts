@@ -75,7 +75,15 @@ export async function createClub(
   const record: ClubRecord = {
     name,
     description,
-    members: [{ userId: owner.userId, role: "owner", points: 0, joinedAt: now }],
+    members: [
+      {
+        userId: owner.userId,
+        role: "owner",
+        points: 0,
+        joinedAt: now,
+        statusMessage: "",
+      },
+    ],
     createdAt: now,
   };
 
@@ -107,7 +115,13 @@ export async function joinClub(
     ...club.record,
     members: [
       ...club.record.members,
-      { userId: user.userId, role: "member", points: 0, joinedAt: new Date().toISOString() },
+      {
+        userId: user.userId,
+        role: "member",
+        points: 0,
+        joinedAt: new Date().toISOString(),
+        statusMessage: "",
+      },
     ],
   };
 
@@ -252,6 +266,39 @@ export async function setMemberRole(
     ...club.record,
     members: club.record.members.map((m) =>
       m.userId === target.userId ? { ...m, role: newRole } : m,
+    ),
+  };
+
+  await ClubRepo.set(club.key, updated);
+  return updated;
+}
+
+/**
+ * Updates the calling user's status message within a club they belong to.
+ *
+ * @param username - The username of the member updating their status
+ * @param clubName - The name of the club
+ * @param statusMessage - The new status message
+ * @returns The updated ClubRecord, or an error message
+ */
+export async function setMemberStatus(
+  username: string,
+  clubName: string,
+  statusMessage: string,
+): Promise<ClubRecord | { error: string }> {
+  const user = await getUserByUsername(username);
+  if (!user) return { error: `User ${username} not found` };
+
+  const club = await findClubByName(clubName);
+  if (!club) return { error: `Club "${clubName}" not found` };
+
+  const memberEntry = getMemberEntry(club.record, user.userId);
+  if (!memberEntry) return { error: `You are not a member of "${clubName}"` };
+
+  const updated: ClubRecord = {
+    ...club.record,
+    members: club.record.members.map((m) =>
+      m.userId === user.userId ? { ...m, statusMessage } : m,
     ),
   };
 

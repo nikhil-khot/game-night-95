@@ -140,6 +140,7 @@ export interface UserRecord {
   username: string; // References Auth records
   display: string;
   createdAt: DateISO;
+  bio: string;
 }
 
 /**
@@ -221,6 +222,8 @@ export interface ClubMember {
   role: ClubRole;
   points: number;
   joinedAt: string;
+  /** Optional short status message for this member within the club */
+  statusMessage?: string;
 }
 
 /**

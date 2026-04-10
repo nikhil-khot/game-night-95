@@ -1,0 +1,55 @@
+.yourStatus {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line-color, #ddd);
+}
+
+.yourStatus__title {
+  margin: 0 0 0.75rem 0;
+  font-size: 1.1rem;
+}
+
+.yourStatus__current {
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+}
+
+.yourStatus__label {
+  font-weight: 600;
+}
+
+.yourStatus__value {
+  margin-left: 0.5rem;
+  font-style: italic;
+  color: var(--text-muted, #666);
+}
+
+.yourStatus__editor {
+  margin-bottom: 0.75rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.yourStatus__textarea {
+  width: 260px;
+  resize: none;
+  margin-top: 0.35rem;
+  height: 0.8rem;
+  font-size: 0.9rem;
+  line-height: 1.2;
+  padding: 2px 4px;
+}
+
+.yourStatus__error {
+  color: #d32f2f;
+  font-size: 0.85rem;
+  background-color: #ffebee;
+  padding: 0.5rem;
+  border-radius: 4px;
+  margin: 0.5rem 0;
+}
+
+.yourStatus__actions {
+  display: flex;
+  justify-content: flex-start;
+}

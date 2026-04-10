@@ -33,10 +33,3 @@ export const getInvitedGames = async (auth: UserAuth): Promise<GameInfo[]> => {
     return [];
   }
 };
-
-export const declineInvitedGame = async (auth: UserAuth, gameId: string): Promise<void> => {
-  await api.post<{ success: boolean } | { error: string }>(`/api/game/invite/decline`, {
-    auth,
-    payload: { gameId },
-  });
-};

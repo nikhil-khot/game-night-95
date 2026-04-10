@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import type { GameInfo } from "@gamenite/shared";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth.ts";
-import { declineInvitedGame, getInvitedGames } from "../services/inviteService.ts";
+import { getInvitedGames } from "../services/inviteService.ts";
+import { api } from "../services/api.ts";
 import useLoginContext from "../hooks/useLoginContext.ts";
 import "./InviteToast.css";
 
@@ -90,7 +91,13 @@ export default function InviteToast() {
               // Optimistically remove from local state
               setDismissedIds((prev) => new Set(prev).add(latest.gameId));
               try {
-                await declineInvitedGame(auth, latest.gameId);
+                await api.post<{ success: boolean } | { error: string }>(
+                  "/api/game/invite/decline",
+                  {
+                    auth,
+                    payload: { gameId: latest.gameId },
+                  },
+                );
                 // Also remove from invitedGames so it disappears from any future toasts
                 setInvitedGames((current) => current.filter((g) => g.gameId !== latest.gameId));
               } catch {

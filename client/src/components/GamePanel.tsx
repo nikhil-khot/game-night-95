@@ -176,7 +176,7 @@ export default function GamePanel({
                 )}
           </div>
         )}
-        {inviteOpen && (
+        {!hasStarted && inviteOpen && (
           <div className="inviteDialog">
             <div className="inviteDialogCard">
               <div className="inviteDialogHeader">

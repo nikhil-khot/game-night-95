@@ -1,0 +1,91 @@
+.statusBar {
+  grid-area: status;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: stretch;
+  background-color: #c0c0c0;
+  padding: 0.2rem 0.25rem;
+  box-sizing: border-box;
+  border-top: 1px solid #ffffff;
+}
+
+.statusBar-left,
+.statusBar-right {
+  display: flex;
+  align-items: center;
+}
+
+.statusBar-left {
+  padding-right: 0.25rem;
+}
+
+.statusBar-right {
+  justify-content: flex-end;
+}
+
+.statusBar-window {
+  min-width: 14rem;
+  background: #c0c0c0;
+  box-shadow:
+    inset -1px -1px 0 #000000,
+    inset 1px 1px 0 #ffffff,
+    inset -2px -2px 0 #808080,
+    inset 2px 2px 0 #dfdfdf;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+}
+
+.statusBar-windowTitle {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.statusBar-tray {
+  display: flex;
+  align-items: stretch;
+  background: #c0c0c0;
+  box-shadow:
+    inset -1px -1px 0 #000000,
+    inset 1px 1px 0 #ffffff,
+    inset -2px -2px 0 #808080,
+    inset 2px 2px 0 #dfdfdf;
+}
+
+.statusBar-trayIcon {
+  width: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid #dfdfdf;
+  position: relative;
+}
+
+.statusBar-trayIcon::before {
+  content: "";
+  width: 0.8rem;
+  height: 0.6rem;
+  background: #808080;
+}
+
+.statusBar-trayIcon--bars::before {
+  width: 0.9rem;
+  height: 0.6rem;
+  background: repeating-linear-gradient(to top, #808080, #808080 1px, #c0c0c0 1px, #c0c0c0 2px);
+}
+
+.statusBar-trayDivider {
+  width: 1px;
+  background: linear-gradient(to right, #ffffff, #808080);
+}
+
+.statusBar-clock {
+  min-width: 4.5rem;
+  padding: 0 0.5rem;
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+}

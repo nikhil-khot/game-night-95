@@ -250,3 +250,7 @@ hr {
 .innerFrame {
   background-color: var(--panel-background);
 }
+
+.pageFrameFillHeight {
+  min-height: calc(var(--content-vh) - 1.5rem);
+}

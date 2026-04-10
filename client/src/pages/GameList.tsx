@@ -10,7 +10,7 @@ export default function GameList() {
   return (
     <div className="content">
       <Frame bgColor="$material" boxShadow="$out" padding="$4" className="outerFrame">
-        <Frame h="100%" boxShadow="$in" className="innerFrame">
+        <Frame h="100%" boxShadow="$in" className="innerFrame pageFrameFillHeight">
           <div className="content">
             <div className="spacedSection">
               <h2>All games</h2>

@@ -3,6 +3,7 @@ import { Outlet } from "react-router-dom";
 import Header from "./Header.tsx";
 import SideBarNav from "./SideBarNav.tsx";
 import InviteToast from "./InviteToast.tsx";
+import StatusBar from "./StatusBar.tsx";
 
 /**
  * Main component represents the layout of the main page, including a sidebar
@@ -18,6 +19,7 @@ export default function Layout() {
           <InviteToast />
           <Outlet />
         </div>
+        <StatusBar />
       </div>
     </>
   );

@@ -63,13 +63,7 @@ export default function ClubMemberList({ club, onClubJoined, onClubUpdated }: Cl
   useEffect(() => {
     if (!socket || !club.members.length) return;
 
-    const handleStatus = ({
-      userId,
-      isOnline,
-    }: {
-      userId: string;
-      isOnline: boolean;
-    }) => {
+    const handleStatus = ({ userId, isOnline }: { userId: string; isOnline: boolean }) => {
       setOnlineStatus((prev) => {
         if (prev[userId] === isOnline) return prev;
         return { ...prev, [userId]: isOnline };
